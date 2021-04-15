@@ -19,45 +19,6 @@ const SELL_PERCENTAGE = 5;
 // maker 0.10% (staking 5000 discount 0.090%)
 // taker 0.16% (staking 5000 discount 0.144%)
 
-function signRequest(request, apiKey, apiSecret) {
-
-	const { id, method, params, nonce } = request;
-
-	const paramsString = params == null
-		? ''
-		: Object.keys(params)
-			.sort()
-			.reduce((a, b) => a + b + params[b], '');
-
-	const sigPayload = method + id + apiKey + paramsString + nonce;
-
-	request.sig = crypto
-		.HmacSHA256(sigPayload, apiSecret)
-		.toString(crypto.enc.Hex);
-
-	return request;
-}
-
-
-/**
- * Returns the investment state from the database
- */
-async function loadInvestmentState() {
-
-	// TODO - replace with database call
-	// - move the databaseInvestmentTemplate out of src so its not deployed to lambda
-	return require('./resources/databaseInvestmentTemplate.json'); // eslint-disable-line
-}
-
-
-function validateInvestmentData() {
-	// TODO - validate the database data & structure
-	return true;
-}
-
-
-const calculateDiffPerc = (a, b) => 100 * ((a - b) / ((a + b) / 2));
-
 
 // MAIN FUNCTION
 (async () => {
@@ -127,6 +88,46 @@ const calculateDiffPerc = (a, b) => 100 * ((a - b) / ((a + b) / 2));
 })();
 
 
+const calculateDiffPerc = (a, b) => 100 * ((a - b) / ((a + b) / 2));
+
+
+/**
+ * Returns the investment state from the database
+ */
+async function loadInvestmentState() {
+
+	// TODO - replace with database call
+	// - move the databaseInvestmentTemplate out of src so its not deployed to lambda
+	return require('./resources/databaseInvestmentTemplate.json'); // eslint-disable-line
+}
+
+
+function validateInvestmentData() {
+	// TODO - validate the database data & structure
+	return true;
+}
+
+
+function signRequest(request, apiKey, apiSecret) {
+
+	const { id, method, params, nonce } = request;
+
+	const paramsString = params == null
+		? ''
+		: Object.keys(params)
+			.sort()
+			.reduce((a, b) => a + b + params[b], '');
+
+	const sigPayload = method + id + apiKey + paramsString + nonce;
+
+	request.sig = crypto
+		.HmacSHA256(sigPayload, apiSecret)
+		.toString(crypto.enc.Hex);
+
+	return request;
+}
+
+
 async function examplePostRequest() {
 
 	const request = {
@@ -152,4 +153,3 @@ async function examplePostRequest() {
 
 	return res.data;
 }
-
