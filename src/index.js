@@ -1,8 +1,4 @@
 
-/**
- * Crypto.com API docs: https://exchange-docs.crypto.com/spot/index.html
- */
-
 const axios = require('axios');
 const crypto = require('crypto-js');
 require('dotenv').config();
