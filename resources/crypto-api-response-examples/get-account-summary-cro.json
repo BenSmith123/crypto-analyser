@@ -1,0 +1,16 @@
+{
+    "id": 11,
+    "method": "private/get-account-summary",
+    "code": 0,
+    "result": {
+        "accounts": [
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "CRO"
+            }
+        ]
+    }
+}

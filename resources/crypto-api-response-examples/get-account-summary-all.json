@@ -1,0 +1,492 @@
+{
+    "id": 11,
+    "method": "private/get-account-summary",
+    "code": 0,
+    "result": {
+        "accounts": [
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "MATIC"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "NEAR"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "FLOW"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "COMP"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "STX"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "ZRX"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "BCH"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "DOT"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "OMG"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "BAND"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "HOT"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "1INCH"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "BTC"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "KNC"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "ANKR"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "ALGO"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "ATOM"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "WBTC"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "ONT"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "SNX"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "RLY"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "MANA"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "DAI"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "ETC"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "MKR"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "OGN"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "CELR"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "ETH"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "MCO"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "NEO"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "REN"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "LRC"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "ADA"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "ICX"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "STORJ"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "VET"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "PAXG"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "BNT"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "DOGE"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "USDT"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "WAVES"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "CHZ"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "XRP"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "SAND"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "OCEAN"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "UMA"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "LTC"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "EGLD"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "USDC"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "THETA"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "ENJ"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "CRO"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "CRV"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "GRT"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "UNI"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "AAVE"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "WAVE"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "XLM"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "LINK"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "YFI"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "QTUM"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "XTZ"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "KSM"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "EOS"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "FIL"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "BAL"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "SKL"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "BAT"
+            },
+            {
+                "balance": 0,
+                "available": 0,
+                "order": 0,
+                "stake": 0,
+                "currency": "ZIL"
+            }
+        ]
+    }
+}

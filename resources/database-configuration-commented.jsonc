@@ -1,0 +1,16 @@
+{
+	"id": "configuration",
+	"inputDate": 0, // TODO
+	"action": "BUY", // BUY, SELL or PAUSED (paused = don't do anything!)
+	"firstTimeBuy": true, // buy at market price (no price comparisons etc.)
+	"sellPercentage": 10,
+	"buyPercentage": 10,
+	"latest": {
+		"transactionType": 0,
+		"transactionTime": 0,
+		"buyPrice": 0,
+		"sellPrice": 0,
+		"targetBuyPrice": 0,
+		"targetSellPrice": 0
+	}
+}
