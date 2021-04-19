@@ -7,6 +7,7 @@
 			"request": "launch",
 			"program": "${file}",
 			"env": {
+				"AWS_PROFILE": "bensmith",
                 "NODE_ENV": "test"
             }
 		},

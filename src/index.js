@@ -1,9 +1,15 @@
 
 const axios = require('axios');
 const crypto = require('crypto-js');
+const { DynamoDB } = require('aws-sdk');
 require('dotenv').config();
 
+
+const dynamoClient = new DynamoDB.DocumentClient({ region: 'ap-southeast-2' });
+const DATABASE_TABLE = 'CRYPTO_TRANSACTIONS_TEST';
+
 const { API_KEY, API_SECRET } = process.env;
+
 
 const API_URL = process.env.NODE_ENV === '!test'
 	? 'https://uat-api.3ona.co/v2/'
@@ -38,6 +44,9 @@ const SELL_PERCENTAGE = 5;
 		const tickerEndpoint = 'public/get-ticker?instrument_name=BTC_USDC'; // get coin value
 		const instrumentsEndpoint = 'public/get-instruments';
 		const getCandlestick = 'public/get-candlestick?instrument_name=BTC_USDT&timeframe=1D';
+
+		const a = await sellCryptoExample();
+		console.log(a);
 
 		const res = await axios(API_URL + tickerEndpoint);
 
@@ -92,9 +101,20 @@ const calculateDiffPerc = (a, b) => 100 * ((a - b) / ((a + b) / 2));
  */
 async function loadInvestmentState() {
 
+	// const params = {
+	// 	TableName: DATABASE_TABLE,
+	// 	Key: {
+	// 		id: 'configuration',
+	// 	},
+	// };
+
+	// const a = await dynamoClient.get(params).promise();
+	// console.log(a.Item);
+
+
 	// TODO - replace with database call
 	// - move the databaseInvestmentTemplate out of src so its not deployed to lambda
-	return require('./resources/databaseInvestmentTemplate.json'); // eslint-disable-line
+	return require('./databaseInvestmentTemplate.json'); // eslint-disable-line
 }
 
 
@@ -131,7 +151,7 @@ async function examplePostRequest() {
 		method: 'private/get-account-summary',
 		api_key: API_KEY,
 		params: {
-			currency: 'CRO',
+			// currency: 'CRO',
 		},
 		nonce: Date.now(),
 	};
@@ -140,6 +160,68 @@ async function examplePostRequest() {
 
 	const res = await axios({
 		url: `${API_URL}private/get-account-summary`,
+		method: 'post',
+		data: requestBody,
+		headers: {
+			'content-type': 'application/json',
+		},
+	});
+
+	return res.data;
+}
+
+
+// THIS ISN'T WORKING ATM!
+async function buyCryptoExample() {
+
+	const request = {
+		id: 11,
+		method: 'private/create-order',
+		params: {
+			instrument_name: 'CRO_USDT',
+			side: 'BUY',
+			type: 'MARKET',
+			notional: 10, // amount to spend
+			client_oid: 'my_order00234', // optional client order ID
+		},
+		nonce: Date.now(),
+	};
+
+	const requestBody = JSON.stringify(signRequest(request, API_KEY, API_SECRET));
+
+	const res = await axios({
+		url: `${API_URL}private/get-account-summary`,
+		method: 'post',
+		data: requestBody,
+		headers: {
+			'content-type': 'application/json',
+		},
+	});
+
+	return res.data;
+}
+
+
+async function sellCryptoExample() {
+
+	const request = {
+		id: 11,
+		method: 'private/create-order',
+		api_key: API_KEY,
+		params: {
+			instrument_name: 'CRO_USDT',
+			side: 'SELL',
+			type: 'MARKET',
+			quantity: 5,
+			// client_oid: 'my_order00234', // optional client order ID
+		},
+		nonce: Date.now(),
+	};
+
+	const requestBody = JSON.stringify(signRequest(request, API_KEY, API_SECRET));
+
+	const res = await axios({
+		url: `${API_URL}private/create-order`,
 		method: 'post',
 		data: requestBody,
 		headers: {
