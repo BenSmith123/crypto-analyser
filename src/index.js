@@ -4,22 +4,19 @@ const crypto = require('crypto-js');
 const { DynamoDB } = require('aws-sdk');
 require('dotenv').config();
 
+const { writeFileSync } = require('fs');
+
 
 const dynamoClient = new DynamoDB.DocumentClient({ region: 'ap-southeast-2' });
 const DATABASE_TABLE = 'CRYPTO_TRANSACTIONS_TEST';
 
 const { API_KEY, API_SECRET } = process.env;
 
-
 const API_URL = process.env.NODE_ENV === '!test'
 	? 'https://uat-api.3ona.co/v2/'
 	: 'https://api.crypto.com/v2/';
 
 const SELL_PERCENTAGE = 5;
-
-
-// maker 0.10% (staking 5000 discount 0.090%)
-// taker 0.16% (staking 5000 discount 0.144%)
 
 
 // MAIN FUNCTION
@@ -41,12 +38,15 @@ const SELL_PERCENTAGE = 5;
 
 		validateInvestmentData(investmentState);
 
-		const tickerEndpoint = 'public/get-ticker?instrument_name=BTC_USDC'; // get coin value
+		const b = {
+			ben: 5,
+		};
+
+		writeFileSync('z-temp.json', JSON.stringify(b, null, 2));
+
+		const tickerEndpoint = 'public/get-ticker?instrument_name=CRO_USDT'; // get coin value
 		const instrumentsEndpoint = 'public/get-instruments';
 		const getCandlestick = 'public/get-candlestick?instrument_name=BTC_USDT&timeframe=1D';
-
-		const a = await sellCryptoExample();
-		console.log(a);
 
 		const res = await axios(API_URL + tickerEndpoint);
 
@@ -144,7 +144,7 @@ function signRequest(request, apiKey, apiSecret) {
 }
 
 
-async function examplePostRequest() {
+async function getAccountSummary() {
 
 	const request = {
 		id: 11,
@@ -156,18 +156,7 @@ async function examplePostRequest() {
 		nonce: Date.now(),
 	};
 
-	const requestBody = JSON.stringify(signRequest(request, API_KEY, API_SECRET));
-
-	const res = await axios({
-		url: `${API_URL}private/get-account-summary`,
-		method: 'post',
-		data: requestBody,
-		headers: {
-			'content-type': 'application/json',
-		},
-	});
-
-	return res.data;
+	return postToCryptoApi(request);
 }
 
 
@@ -187,18 +176,7 @@ async function buyCryptoExample() {
 		nonce: Date.now(),
 	};
 
-	const requestBody = JSON.stringify(signRequest(request, API_KEY, API_SECRET));
-
-	const res = await axios({
-		url: `${API_URL}private/get-account-summary`,
-		method: 'post',
-		data: requestBody,
-		headers: {
-			'content-type': 'application/json',
-		},
-	});
-
-	return res.data;
+	return postToCryptoApi(request);
 }
 
 
@@ -218,12 +196,24 @@ async function sellCryptoExample() {
 		nonce: Date.now(),
 	};
 
-	const requestBody = JSON.stringify(signRequest(request, API_KEY, API_SECRET));
+	return postToCryptoApi(request);
+}
+
+
+/**
+ * Signs the request with the API keys - returns the Crypto.com API response
+ *
+ * @param {string} apiEndpoint
+ * @param {object} requestBody
+ */
+async function postToCryptoApi(requestBody) {
+
+	if (!requestBody || !requestBody.method) { throw new Error('Missing request body or request method'); }
 
 	const res = await axios({
-		url: `${API_URL}private/create-order`,
+		url: API_URL + requestBody.method,
 		method: 'post',
-		data: requestBody,
+		data: JSON.stringify(signRequest(requestBody, API_KEY, API_SECRET)),
 		headers: {
 			'content-type': 'application/json',
 		},
@@ -231,3 +221,29 @@ async function sellCryptoExample() {
 
 	return res.data;
 }
+
+
+/**
+ * Saves a transaction to the database
+ */
+async function saveTransaction(transaction) {
+
+	if (!transaction.id) { throw new Error('Missing transaction id'); }
+
+	const params = {
+		TableName: DATABASE_TABLE,
+		Item: transaction,
+	};
+
+	const a = await dynamoClient.put(params).promise();
+	return a;
+}
+
+
+/**
+ * @param {object} data
+ * @param {string=} fileName - optional
+ */
+const saveJsonFile = (data, fileName) => {
+	writeFileSync('z-temp.json' || fileName, JSON.stringify(data, null, 2));
+};
