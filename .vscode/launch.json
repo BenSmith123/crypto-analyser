@@ -2,14 +2,26 @@
     "version": "0.2.0",
     "configurations": [
 		{
+			"name": "Local invoke [test]",
+			"type": "node",
+			"request": "launch",
+			"program": "${workspaceFolder}/local-invoke.js",
+			"internalConsoleOptions": "openOnSessionStart",
+			"env": {
+				"AWS_PROFILE": "bensmith",
+                "NODE_ENV": "test",
+				"NODE_LOCAL": "true" // enable console.logs & file save
+            }
+		},
+		{
 			"name": "Node selected file [test]",
 			"type": "node",
 			"request": "launch",
 			"program": "${file}",
 			"env": {
 				"AWS_PROFILE": "bensmith",
-                "NODE_ENV": "test"
-            }
+                "NODE_ENV": "test",
+				"NODE_LOCAL": "true"            }
 		},
     ]
 }
