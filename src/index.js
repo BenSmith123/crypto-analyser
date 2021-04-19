@@ -2,20 +2,17 @@
 const axios = require('axios');
 const { DynamoDB } = require('aws-sdk');
 
-const { calculateDiffPerc, saveJsonFile, signRequest } = require('./helpers');
+const { calculateDiffPerc, saveJsonFile } = require('./helpers');
+const { getAccountSummary } = require('./crypto');
 
 require('dotenv').config();
 
 const dynamoClient = new DynamoDB.DocumentClient({ region: 'ap-southeast-2' });
 const DATABASE_TABLE = 'CRYPTO_TRANSACTIONS_TEST';
 
-const { API_KEY, API_SECRET } = process.env;
-
-const API_URL = process.env.NODE_ENV === '!test'
-	? 'https://uat-api.3ona.co/v2/'
-	: 'https://api.crypto.com/v2/';
 
 const SELL_PERCENTAGE = 5;
+const SELL_PERCENTAGE_DECIMAL = SELL_PERCENTAGE / 100;
 
 
 /**
@@ -46,18 +43,15 @@ exports.main = async function (event) { // eslint-disable-line func-names
 
 		validateInvestmentData(investmentState);
 
-		const a = require('../z-temp.json');
-
-		const accountSummary = await getAccountSummary();
-
-		saveJsonFile(accountSummary, 'account-summary1');
+		// const accountSummary = await getAccountSummary();
+		// saveJsonFile(accountSummary, 'account-summary1');
 
 
 		const tickerEndpoint = 'public/get-ticker?instrument_name=CRO_USDT'; // get coin value
 		const instrumentsEndpoint = 'public/get-instruments';
-		const getCandlestick = 'public/get-candlestick?instrument_name=BTC_USDT&timeframe=1D';
+		const getCandlestick = 'public/get-candlestick?instrument_name=BTC_USDT&timeframe=1h';
 
-		const res = await axios(API_URL + tickerEndpoint);
+		const res = await axios(`https://api.crypto.com/v2/${getCandlestick}`);
 
 		const cryptoData = res.data.result.data;
 
@@ -68,7 +62,18 @@ exports.main = async function (event) { // eslint-disable-line func-names
 			latestTrade: 'a',
 		};
 
+
 		if (investmentState.action === 'BUY') {
+
+			if (investmentState.firstTimeBuy) {
+				// buy @ market price?
+
+				investmentState.firstTimeBuy = false;
+				investmentState.latest.targetSellPrice = cryptoData[PRICE.bestAsk] * (1 + SELL_PERCENTAGE_DECIMAL);
+
+				// TODO - update database config
+				return;
+			}
 
 			const lastSellPrice = 70567.101; // 57736.719;
 			const cryptoValue = cryptoData[PRICE.bestAsk];
@@ -79,12 +84,15 @@ exports.main = async function (event) { // eslint-disable-line func-names
 
 			// if best ask price is X percent less than the sell price, BUY!
 			if (percentageDiff > SELL_PERCENTAGE) {
+
+				// TODO - how to avoid early before a big spike?
+				// maybe look at smaller intervals of the crypto price and if its incrementing
+				// high percentages then don't buy yet - NOTE: consider the lambda function invocation cycle
+
 				// TODO - buy!
 				console.log('BUY!');
 
 			}
-
-			console.log('SELL!');
 
 		} else {
 			// sell
@@ -96,6 +104,9 @@ exports.main = async function (event) { // eslint-disable-line func-names
 		// console.log(res.data);
 
 	} catch (err) {
+
+		// TODO - in this generic error scenario should the database config 'action' be updated to 'PAUSED'?
+
 		console.log(err.response.data);
 	}
 
@@ -129,100 +140,10 @@ async function loadInvestmentState() {
 
 function validateInvestmentData() {
 	// TODO - validate the database data & structure
+
+	// TODO return false if data.action = 'PAUSED'
+	// in error scenarios that might need looking at manually, stop further trading
 	return true;
-}
-
-
-/**
- * Returns the crypto API account summary
- *
- * @param {string} currency - optional (default will return all crypto)
- * @returns {object}
- */
-async function getAccountSummary(currency) {
-
-	const request = {
-		id: 11,
-		method: 'private/get-account-summary',
-		api_key: API_KEY,
-		params: currency
-			? { currency }
-			: {}, // API requires empty params when none are needed
-		nonce: Date.now(),
-	};
-
-	const response = await postToCryptoApi(request);
-
-	// TODO - return a better structure if we already know the desired currency
-	// i.e. account[currency].balance would be easier than account.find(...)
-
-	return currency
-		// return accounts that have a crypto balance if all currencies were returned
-		? response.result.accounts.filter(account => account.balance > 0)
-		: response.result.accounts;
-}
-
-
-// THIS ISN'T WORKING ATM!
-async function buyCryptoExample() {
-
-	const request = {
-		id: 11,
-		method: 'private/create-order',
-		params: {
-			instrument_name: 'CRO_USDT',
-			side: 'BUY',
-			type: 'MARKET',
-			notional: 10, // amount to spend
-			client_oid: 'my_order00234', // optional client order ID
-		},
-		nonce: Date.now(),
-	};
-
-	return postToCryptoApi(request);
-}
-
-
-async function sellCryptoExample() {
-
-	const request = {
-		id: 11,
-		method: 'private/create-order',
-		api_key: API_KEY,
-		params: {
-			instrument_name: 'CRO_USDT',
-			side: 'SELL',
-			type: 'MARKET',
-			quantity: 5,
-			// client_oid: 'my_order00234', // optional client order ID
-		},
-		nonce: Date.now(),
-	};
-
-	return postToCryptoApi(request);
-}
-
-
-/**
- * Signs the request with the API keys - returns the Crypto.com API response
- *
- * @param {string} apiEndpoint
- * @param {object} requestBody
- */
-async function postToCryptoApi(requestBody) {
-
-	if (!requestBody || !requestBody.method) { throw new Error('Missing request body or request method'); }
-
-	const res = await axios({
-		url: API_URL + requestBody.method,
-		method: 'post',
-		data: JSON.stringify(signRequest(requestBody, API_KEY, API_SECRET)),
-		headers: {
-			'content-type': 'application/json',
-		},
-	});
-
-	return res.data;
 }
 
 

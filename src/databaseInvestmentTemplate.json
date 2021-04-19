@@ -1,6 +1,8 @@
 {
 	"id": "configuration",
+	"inputDate": 0,
 	"action": "BUY",
+	"firstTimeBuy": true,
 	"sellPercentage": 10,
 	"buyPercentage": 10,
 	"latest": {
