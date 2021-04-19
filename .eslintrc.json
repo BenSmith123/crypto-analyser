@@ -14,7 +14,11 @@
         "radix": "off",
         "padded-blocks": "off",
         "object-curly-newline": "off",
-		"no-use-before-define": "off",
+        "no-use-before-define": "off",
+        "arrow-parens": [
+            "error",
+            "as-needed"
+        ],
         "indent": [
             "error",
             "tab"

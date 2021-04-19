@@ -1,11 +1,10 @@
 
 const axios = require('axios');
-const crypto = require('crypto-js');
 const { DynamoDB } = require('aws-sdk');
+
+const { calculateDiffPerc, saveJsonFile, signRequest } = require('./helpers');
+
 require('dotenv').config();
-
-const { writeFileSync } = require('fs');
-
 
 const dynamoClient = new DynamoDB.DocumentClient({ region: 'ap-southeast-2' });
 const DATABASE_TABLE = 'CRYPTO_TRANSACTIONS_TEST';
@@ -19,18 +18,27 @@ const API_URL = process.env.NODE_ENV === '!test'
 const SELL_PERCENTAGE = 5;
 
 
-// MAIN FUNCTION
-(async () => {
+/**
+ * TODO
+ *
+ * - Load database config, validate key/values
+ *     - Store logs in memory and write them all out to database or S3 on lambda termination
+ * - Check last purchase time & number of purchases - don't buy/sell too often
+ * - Check if there are already outstanding buy/sell orders?
+ * - Market OR limit buying/selling? - note market buy/sell is usually instant, safer/easier?
+ */
 
-	/**
-	* TODO
-	*
-	* - Load database config, validate key/values
-	*     - Store logs in memory and write them all out to database or S3 on lambda termination
-	* - Check last purchase time & number of purchases - don't buy/sell too often
-	* - Check if there are already outstanding buy/sell orders?
-	* - Market OR limit buying/selling? - note market buy/sell is usually instant, safer/easier?
-	*/
+exports.main = async function (event) { // eslint-disable-line func-names
+
+	// Scheduled job (CloudWatch)
+	if (!isScheduledEvent(event)) {
+
+		// TODO - implement API gateway and create API functions!
+		// if (event.pathParameters && event.pathParameters.endpoint)
+
+		// terminate the lambda function if it wasn't invoked by a scheduled job (CloudWatch)
+		return 'Nothing to see here :)';
+	}
 
 	try {
 
@@ -38,11 +46,12 @@ const SELL_PERCENTAGE = 5;
 
 		validateInvestmentData(investmentState);
 
-		const b = {
-			ben: 5,
-		};
+		const a = require('../z-temp.json');
 
-		writeFileSync('z-temp.json', JSON.stringify(b, null, 2));
+		const accountSummary = await getAccountSummary();
+
+		saveJsonFile(accountSummary, 'account-summary1');
+
 
 		const tickerEndpoint = 'public/get-ticker?instrument_name=CRO_USDT'; // get coin value
 		const instrumentsEndpoint = 'public/get-instruments';
@@ -90,10 +99,10 @@ const SELL_PERCENTAGE = 5;
 		console.log(err.response.data);
 	}
 
-})();
+};
 
 
-const calculateDiffPerc = (a, b) => 100 * ((a - b) / ((a + b) / 2));
+const isScheduledEvent = event => event['detail-type'] && event['detail-type'] === 'Scheduled Event';
 
 
 /**
@@ -124,39 +133,33 @@ function validateInvestmentData() {
 }
 
 
-function signRequest(request, apiKey, apiSecret) {
-
-	const { id, method, params, nonce } = request;
-
-	const paramsString = params == null
-		? ''
-		: Object.keys(params)
-			.sort()
-			.reduce((a, b) => a + b + params[b], '');
-
-	const sigPayload = method + id + apiKey + paramsString + nonce;
-
-	request.sig = crypto
-		.HmacSHA256(sigPayload, apiSecret)
-		.toString(crypto.enc.Hex);
-
-	return request;
-}
-
-
-async function getAccountSummary() {
+/**
+ * Returns the crypto API account summary
+ *
+ * @param {string} currency - optional (default will return all crypto)
+ * @returns {object}
+ */
+async function getAccountSummary(currency) {
 
 	const request = {
 		id: 11,
 		method: 'private/get-account-summary',
 		api_key: API_KEY,
-		params: {
-			// currency: 'CRO',
-		},
+		params: currency
+			? { currency }
+			: {}, // API requires empty params when none are needed
 		nonce: Date.now(),
 	};
 
-	return postToCryptoApi(request);
+	const response = await postToCryptoApi(request);
+
+	// TODO - return a better structure if we already know the desired currency
+	// i.e. account[currency].balance would be easier than account.find(...)
+
+	return currency
+		// return accounts that have a crypto balance if all currencies were returned
+		? response.result.accounts.filter(account => account.balance > 0)
+		: response.result.accounts;
 }
 
 
@@ -239,11 +242,3 @@ async function saveTransaction(transaction) {
 	return a;
 }
 
-
-/**
- * @param {object} data
- * @param {string=} fileName - optional
- */
-const saveJsonFile = (data, fileName) => {
-	writeFileSync('z-temp.json' || fileName, JSON.stringify(data, null, 2));
-};
