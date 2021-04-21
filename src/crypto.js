@@ -2,14 +2,7 @@
 const axios = require('axios');
 const crypto = require('crypto-js');
 
-
-const { API_KEY, API_SECRET } = process.env;
-
-const API_URL = 'https://api.crypto.com/v2/';
-
-// const API_URL = process.env.NODE_ENV === '!test'
-// 	? 'https://uat-api.3ona.co/v2/'
-// 	: 'https://api.crypto.com/v2/';
+const { API_URL, API_KEY, API_SECRET } = require('./environment');
 
 
 function signRequest(request, apiKey, apiSecret) {
