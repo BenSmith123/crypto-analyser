@@ -12,6 +12,7 @@
     },
     "rules": {
         "radix": "off",
+		"no-plusplus": "off",
         "padded-blocks": "off",
         "object-curly-newline": "off",
         "no-use-before-define": "off",

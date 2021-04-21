@@ -2,26 +2,36 @@
     "version": "0.2.0",
     "configurations": [
 		{
-			"name": "Local invoke [test]",
+			"name": "Local invoke",
 			"type": "node",
 			"request": "launch",
 			"program": "${workspaceFolder}/local-invoke.js",
 			"internalConsoleOptions": "openOnSessionStart",
 			"env": {
 				"AWS_PROFILE": "bensmith",
-                "NODE_ENV": "test",
 				"NODE_LOCAL": "true" // enable console.logs & file save
             }
 		},
 		{
-			"name": "Node selected file [test]",
+			"name": "Local analyse",
+			"type": "node",
+			"request": "launch",
+			"program": "${workspaceFolder}/local-analyser.js",
+			"internalConsoleOptions": "openOnSessionStart",
+			"env": {
+				"AWS_PROFILE": "bensmith",
+				"NODE_LOCAL": "true"
+            }
+		},
+		{
+			"name": "Node selected file",
 			"type": "node",
 			"request": "launch",
 			"program": "${file}",
 			"env": {
 				"AWS_PROFILE": "bensmith",
-                "NODE_ENV": "test",
-				"NODE_LOCAL": "true"            }
+				"NODE_LOCAL": "true"
+			}
 		},
     ]
 }
