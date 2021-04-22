@@ -4,6 +4,12 @@ const crypto = require('crypto-js');
 
 const { API_URL, API_KEY, API_SECRET } = require('./environment');
 
+// const API_ENDPOINTS = {
+// 	getTicker: 'public/get-ticker?instrument_name=CRO_USDT',
+// const instrumentsEndpoint = 'public/get-instruments';
+// const getCandlestick = 'public/get-candlestick?instrument_name=BTC_USDT&timeframe=1h';
+// };
+
 
 function signRequest(request, apiKey, apiSecret) {
 
@@ -49,10 +55,28 @@ async function postToCryptoApi(requestBody) {
 
 
 /**
+ * Returns the crypto API values of a crypto currency
+ *
+ * @param {string} instrumentName - crypto and currency of the coin
+ */
+async function getCryptoValue(instrumentName) {
+
+	if (!instrumentName) { throw new Error('No instrument name provided'); }
+
+	const tickerEndpoint = `public/get-ticker?instrument_name=${instrumentName}`;
+	// TODO - any use case for getting all crypto values? (remove the instrument_name param)
+
+	const res = await axios(API_URL + tickerEndpoint);
+
+	return res.data.result.data;
+}
+
+
+/**
  * Returns the crypto API account summary
  *
  * @param {string} currency - optional (default will return all crypto)
- * @returns {object}
+ * @returns {object} - structured object by currency name e.g. { CRO: { balance: 0 } }
  */
 async function getAccountSummary(currency) {
 
@@ -68,13 +92,11 @@ async function getAccountSummary(currency) {
 
 	const response = await postToCryptoApi(request);
 
-	// TODO - return a better structure if we already know the desired currency
-	// i.e. account[currency].available would be easier than account.find(...)
-
-	return currency
-		// return accounts that have a crypto balance if all currencies were returned
-		? response.result.accounts.filter(account => account.available > 0)
-		: response.result.accounts;
+	return response.result.accounts
+		.filter(account => account.available > 0) // filter out accounts that have no crypto balance
+		.reduce((acc, curr) => ( // eslint-disable-line no-return-assign
+			acc[curr.currency] = { ...curr }, acc),
+		{});
 }
 
 
@@ -119,5 +141,6 @@ async function sellCryptoExample() {
 
 
 module.exports = {
+	getCryptoValue,
 	getAccountSummary,
 };

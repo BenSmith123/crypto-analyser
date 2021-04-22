@@ -1,6 +1,9 @@
 {
 	"id": "configuration",
 	"inputDate": 0, // TODO
+	"currenciesTargeted": [
+
+	],
 	"action": "BUY", // BUY, SELL or PAUSED (paused = don't do anything!)
 	"firstTimeBuy": true, // buy at market price (no price comparisons etc.)
 	"sellPercentage": 10,

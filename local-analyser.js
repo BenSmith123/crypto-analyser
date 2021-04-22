@@ -20,9 +20,12 @@ process.env.DISCORD_ENABLED = false;
 
 fs.mkdir(outputDirectory, { recursive: true }, err => { if (err) throw err; });
 
+
 // mock functions passed in to the main code to replace external calls
 const mockFunctions = {
 	loadInvestmentState,
+	updateInvestmentState: () => {}, // override writing to database with
+	getAccountSummary: () => accountSummary,
 };
 
 
@@ -31,6 +34,35 @@ const mockFunctions = {
 const instrumentName = 'BTC_USDT'; // crypto currency to look at and it's value in comparison to another crypto
 const intervalStr = '15m'; // interval used in the crypto-api query (also the mock scheduled time for every lambda invocation)
 // interval options: 1m, 5m, 15m, 30m, 1h, 4h, 6h, 12h, 1D, 7D, 14D, 1M
+
+const databaseConfiguration = {
+	id: 'configuration',
+	inputDate: 0,
+	action: 'BUY',
+	firstTimeBuy: true,
+	sellPercentage: 10,
+	buyPercentage: 10,
+	latest: {
+		transactionType: 0,
+		transactionTime: 0,
+		buyPrice: 0,
+		sellPrice: 0,
+		targetBuyPrice: 0,
+		targetSellPrice: 0,
+	},
+};
+
+const accountSummary = { // mock of what crypto API account summary should return
+	accounts: [
+		{
+			balance: 0,
+			available: 100, // $100 USD
+			order: 0,
+			stake: 0,
+			currency: 'USDT',
+		},
+	],
+};
 
 /// /////////////////////////////////////////////////
 
@@ -68,8 +100,8 @@ const scheduledEventMock = {
 	for (let i = 0; i < cryptoValueList.length; i++) {
 		const cryptoValue = cryptoValueList[i];
 
-		// invoke the lambda function and pass in the mock crypto data
-		const results = lambda.main(scheduledEventMock, cryptoValue);
+		// invoke the lambda function and pass in the mock functions
+		const results = lambda.main(scheduledEventMock, cryptoValue, mockFunctions);
 
 		const resultDetails = {
 			num: i + 1,
@@ -77,8 +109,10 @@ const scheduledEventMock = {
 		};
 
 		executionResults.push(resultDetails);
-	}
 
+		// TODO - how to deal with updating database config?
+		databaseConfiguration.firstTimeBuy = false;
+	}
 
 	const analysisSummary = {
 		timeExecuted: formatTime(Date.now()),
@@ -105,20 +139,5 @@ function formatTime(unixTime) {
 
 function loadInvestmentState() {
 	// NOTE - keep this up-to-date with the validateInvestmentData function
-	return {
-		id: 'configuration',
-		inputDate: 0,
-		action: 'BUY',
-		firstTimeBuy: true,
-		sellPercentage: 10,
-		buyPercentage: 10,
-		latest: {
-			transactionType: 0,
-			transactionTime: 0,
-			buyPrice: 0,
-			sellPrice: 0,
-			targetBuyPrice: 0,
-			targetSellPrice: 0,
-		},
-	};
+	return databaseConfiguration;
 }

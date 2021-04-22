@@ -1,8 +1,9 @@
 {
 	"id": "configuration",
 	"inputDate": 0,
-	"action": "BUY",
-	"firstTimeBuy": true,
+	"currenciesTargeted": [
+		"CRO"
+	],
 	"sellPercentage": 10,
 	"buyPercentage": 10,
 	"latest": {

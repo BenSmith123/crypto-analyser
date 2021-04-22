@@ -8,6 +8,7 @@ const { name, version } = require('../package.json');
 
 const discordApi = 'https://discord.com/api/webhooks';
 
+
 const calculateDiffPerc = (a, b) => 100 * ((a - b) / ((a + b) / 2));
 
 /**
@@ -25,7 +26,7 @@ const saveJsonFile = (data, fileName) => {
  * @param {string|object} message
  * @param {boolean} [isTransaction=false] - optional: log to #transactions instead of #logs channel
  */
-async function sendMessageToDiscord(message, isTransaction = false) {
+async function postToDiscord(message, isTransaction = false) {
 
 	if (!DISCORD_ENABLED) { return null; }
 
@@ -64,5 +65,5 @@ async function sendMessageToDiscord(message, isTransaction = false) {
 module.exports = {
 	calculateDiffPerc,
 	saveJsonFile,
-	postMessageToDiscord: sendMessageToDiscord,
+	postToDiscord,
 };

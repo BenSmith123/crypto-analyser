@@ -1,18 +1,33 @@
 
-const axios = require('axios');
 const { DynamoDB } = require('aws-sdk');
 
-const { calculateDiffPerc, saveJsonFile } = require('./helpers');
-const { getAccountSummary } = require('./crypto');
-
-require('dotenv').config();
+const { INTERNAL_RUN } = require('./environment');
+const { calculateDiffPerc, saveJsonFile, postToDiscord } = require('./helpers');
+let { getCryptoValue, getAccountSummary } = require('./crypto');
 
 const dynamoClient = new DynamoDB.DocumentClient({ region: 'ap-southeast-2' });
 const DATABASE_TABLE = 'CRYPTO_TRANSACTIONS_TEST';
 
-
+// TODO - configurable via database
+const BUY_PERCENTAGE = 5;
 const SELL_PERCENTAGE = 5;
+
+const BUY_PERCENTAGE_DECIMAL = BUY_PERCENTAGE / 100;
 const SELL_PERCENTAGE_DECIMAL = SELL_PERCENTAGE / 100;
+
+
+// map API response to meanings
+const PRICE = {
+	bestBid: 'b',
+	bestAsk: 'k',
+	latestTrade: 'a',
+};
+
+const ACTIONS = {
+	DO_NOTHING: 'DO_NOTHING',
+	BUY: 'BUY',
+	SELL: 'SELL',
+};
 
 
 /**
@@ -25,7 +40,15 @@ const SELL_PERCENTAGE_DECIMAL = SELL_PERCENTAGE / 100;
  * - Market OR limit buying/selling? - note market buy/sell is usually instant, safer/easier?
  */
 
-exports.main = async function (event) { // eslint-disable-line func-names
+
+/**
+ * Lambda handler function!
+ *
+ * @param {object} event - AWS Lambda function event
+ * @param {object} [mockFunctions=null] - optional, used for debugging/analysis in INTERNAL_RUN mode
+ * @returns
+ */
+exports.main = async function (event, mockFunctions = null) { // eslint-disable-line func-names
 
 	// Scheduled job (CloudWatch)
 	if (!isScheduledEvent(event)) {
@@ -37,75 +60,123 @@ exports.main = async function (event) { // eslint-disable-line func-names
 		return 'Nothing to see here :)';
 	}
 
+
+	if (INTERNAL_RUN) {
+		// replace the functions that get external data with mock functions
+		if (!mockFunctions) { throw new Error('INTERNAL_RUN mode is true but no mock functions passed in'); }
+
+		getAccountSummary = mockFunctions.getAccountSummary();
+		loadInvestmentState = mockFunctions.loadInvestmentState(); // eslint-disable-line no-func-assign
+	}
+
 	try {
 
-		const investmentState = await loadInvestmentState();
+		// TODO
+		// - get database investment state
+		// - API call - get the current price of whatever crypto I'm buying/selling
+		// - get account details from API
+		//     - compare details with database state? - see if orders have gone through?
+		//     - compare avail balance with database state & what API says my balance is
+		//     - check time of last buy/sell order? - could limit no. of orders per day or whatever
 
+		const investmentState = await loadInvestmentState();
 		validateInvestmentData(investmentState);
 
-		// const accountSummary = await getAccountSummary();
-		// saveJsonFile(accountSummary, 'account-summary1');
-
-
-		const tickerEndpoint = 'public/get-ticker?instrument_name=CRO_USDT'; // get coin value
-		const instrumentsEndpoint = 'public/get-instruments';
-		const getCandlestick = 'public/get-candlestick?instrument_name=BTC_USDT&timeframe=1h';
-
-		const res = await axios(`https://api.crypto.com/v2/${getCandlestick}`);
-
-		const cryptoData = res.data.result.data;
-
-		// map API response to meanings
-		const PRICE = {
-			bestBid: 'b',
-			bestAsk: 'k',
-			latestTrade: 'a',
+		const actionToTake = {
+			action: ACTIONS.DO_NOTHING,
+			details: 'Investment state action is paused',
 		};
 
-
-		if (investmentState.action === 'BUY') {
-
-			if (investmentState.firstTimeBuy) {
-				// buy @ market price?
-
-				investmentState.firstTimeBuy = false;
-				investmentState.latest.targetSellPrice = cryptoData[PRICE.bestAsk] * (1 + SELL_PERCENTAGE_DECIMAL);
-
-				// TODO - update database config
-				return;
-			}
-
-			const lastSellPrice = 70567.101; // 57736.719;
-			const cryptoValue = cryptoData[PRICE.bestAsk];
-
-			const percentageDiff = calculateDiffPerc(lastSellPrice, cryptoValue);
-
-			console.log(percentageDiff);
-
-			// if best ask price is X percent less than the sell price, BUY!
-			if (percentageDiff > SELL_PERCENTAGE) {
-
-				// TODO - how to avoid early before a big spike?
-				// maybe look at smaller intervals of the crypto price and if its incrementing
-				// high percentages then don't buy yet - NOTE: consider the lambda function invocation cycle
-
-				// TODO - buy!
-				console.log('BUY!');
-
-			}
-
-		} else {
-			// sell
-			console.log(cryptoData[PRICE.bestBid]);
-
-			// TODO - if best bid price is X percent higher than our last buy price, SELL!
+		if (investmentState.action === 'PAUSED') {
+			postToDiscord();
+			return actionToTake;
 		}
 
-		// console.log(res.data);
+		const accountSummary = await getAccountSummary();
+
+		if (!accountSummary || Object.keys(accountSummary).length) {
+			throw new Error('No accounts returned');
+		}
+
+		if (accountSummary.USDT.available > 0) {
+			// TODO - money available, try buy!
+
+			// loop through the database listed crypto currencies
+			// compare the brought price of the crypto in the database
+			// with the accountSummary crypto, if up X percent buy!
+
+			for (let i = 0; i < accountSummary.currenciesTargeted.length; i++) {
+				const currentCryptoName = accountSummary.currenciesTargeted[i];
+
+				const cryptoPrices = await getCryptoValue(`${currentCryptoName}_USDT`);
+
+			}
+
+		}
+
+
+		// const shouldBuy = investmentState.action === 'BUY';
+
+		const currencyString = shouldBuy // TODO - configurable via db config
+			? 'CRO_USDT'
+			: 'USDT_CRO';
+
+		const cryptoPrices = await getCryptoValue(currencyString);
+
+		if (shouldBuy && investmentState.firstTimeBuy) {
+
+			// buy @ market price?
+			investmentState.firstTimeBuy = false;
+			investmentState.latest.targetSellPrice = cryptoData[PRICE.bestAsk] * (1 + SELL_PERCENTAGE_DECIMAL);
+
+			// TODO - update database config, post to discord
+
+			// actionToTake.action = 'BUY';
+			// actionToTake.details = 'Buy at market price';
+
+			return actionToTake;
+		}
+
+
+		const cryptoPrice = shouldBuy
+			? cryptoPrices[PRICE.bestAsk]
+			: cryptoPrices[PRICE.bestBid];
+
+		const buyPrice = cryptoPrice * (1 + BUY_PERCENTAGE_DECIMAL);
+		const sellPrice = cryptoPrice * (1 - SELL_PERCENTAGE_DECIMAL);
+
+		const percentageDiff = calculateDiffPerc(targetPrice, cryptoPrice);
+
+		if (shouldBuy) {
+			if (cryptoPrice < targetPrice) {
+				// BUY
+			}
+
+			if (cryptoPrice > targetPrice) {
+				// sell
+			}
+		}
+
+		// if (shouldPlaceOrder(shouldBuy, cryptoPrice, targetPrice)) {
+		// 	// TODO
+		// }
+
+		// if best ask price is X percent less than the sell price, BUY!
+		if (percentageDiff > SELL_PERCENTAGE) {
+
+			// TODO - how to avoid early before a big spike?
+			// maybe look at smaller intervals of the crypto price and if its incrementing
+			// high percentages then don't buy yet - NOTE: consider the lambda function invocation cycle
+
+			// TODO - buy!
+			console.log('BUY!');
+
+		}
+
 
 	} catch (err) {
-
-		// TODO - in this generic error scenario should the database config 'action' be updated to 'PAUSED'?
+		// TODO - in this generic error scenario should the
+		// database config 'action' be updated to 'PAUSED'?
 
 		console.log(err.response.data);
 	}
@@ -122,10 +193,10 @@ const isScheduledEvent = event => event['detail-type'] && event['detail-type'] =
 async function loadInvestmentState() {
 
 	// const params = {
-	// 	TableName: DATABASE_TABLE,
-	// 	Key: {
-	// 		id: 'configuration',
-	// 	},
+	// TableName: DATABASE_TABLE,
+	// Key: {
+	// id: 'configuration',
+	// },
 	// };
 
 	// const a = await dynamoClient.get(params).promise();
@@ -148,6 +219,20 @@ function validateInvestmentData() {
 
 
 /**
+ * @param {boolean} isBuyOrder
+ * @param {number} cryptoPrice
+ * @returns {boolean}
+ */
+function shouldPlaceOrder(isBuyOrder, cryptoPrice) {
+
+	const percentageDiff = calculateDiffPerc(lastSellPrice, cryptoPrice);
+
+
+	return true;
+}
+
+
+/**
  * Saves a transaction to the database
  */
 async function saveTransaction(transaction) {
@@ -162,4 +247,3 @@ async function saveTransaction(transaction) {
 	const a = await dynamoClient.put(params).promise();
 	return a;
 }
-
