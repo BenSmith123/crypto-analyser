@@ -6,9 +6,7 @@ const lambda = require('./src/index');
 
 // const mockEvent = require('./resources/example-lambda-cron.json');
 
-const scheduledEventMock = {
-	event: { 'detail-type': 'Scheduled Event' },
-};
+const scheduledEventMock = { 'detail-type': 'Scheduled Event' };
 
 
 (async () => {

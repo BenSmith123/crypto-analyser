@@ -69,9 +69,7 @@ const accountSummary = { // mock of what crypto API account summary should retur
 
 const INTERVAL_NUM = parseInt(intervalStr);
 
-const scheduledEventMock = {
-	event: { 'detail-type': 'Scheduled Event' },
-};
+const scheduledEventMock = { 'detail-type': 'Scheduled Event' };
 
 
 (async () => {
