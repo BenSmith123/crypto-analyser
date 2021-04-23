@@ -5,7 +5,7 @@ const crypto = require('crypto-js');
 const { API_URL, API_KEY, API_SECRET } = require('./environment');
 
 // const API_ENDPOINTS = {
-// 	getTicker: 'public/get-ticker?instrument_name=CRO_USDT',
+// getTicker: 'public/get-ticker?instrument_name=CRO_USDT',
 // const instrumentsEndpoint = 'public/get-instruments';
 // const getCandlestick = 'public/get-candlestick?instrument_name=BTC_USDT&timeframe=1h';
 // };
@@ -68,7 +68,7 @@ async function getCryptoValue(instrumentName) {
 
 	const res = await axios(API_URL + tickerEndpoint);
 
-	return res.data.result.data;
+	return res.data.result;
 }
 
 
@@ -97,6 +97,40 @@ async function getAccountSummary(currency) {
 		.reduce((acc, curr) => ( // eslint-disable-line no-return-assign
 			acc[curr.currency] = { ...curr }, acc),
 		{});
+}
+
+
+/**
+ * Returns an object with simplified currency values by currency name
+ *
+ * @param {array<string>} currenciesTargeted - list of currencies to get the value of e.g. ['CRO', ]
+ * @returns {object}
+ * @example { CRO: { bestBid: 0.159, bestAsk: 0.15916, latestTrade: 0.15916 }, ... }
+ */
+async function getAllCryptoValues(currenciesTargeted) {
+
+	const cryptoPricesPromiseArr = [];
+
+	for (let i = 0; i < currenciesTargeted.length; i++) {
+		const currentCryptoName = currenciesTargeted[i];
+
+		if (currentCryptoName !== 'USDT') { // USDT shouldn't be listed in currenciesTargeted
+			cryptoPricesPromiseArr.push(getCryptoValue(`${currentCryptoName}_USDT`));
+		}
+	}
+
+	// get the current price in USDT value of each currency
+	const currValuesRaw = await Promise.all(cryptoPricesPromiseArr);
+
+	// eslint-disable-next-line no-return-assign
+	return currValuesRaw.reduce((currValuesFormatted, valueRaw) => (
+		// split key name by _ (e.g. CRO_USDT becomes CRO)
+		currValuesFormatted[valueRaw.instrument_name.split('_')[0]] = { // eslint-disable-line
+			bestBid: valueRaw.data.b,
+			bestAsk: valueRaw.data.k,
+			latestTrade: valueRaw.data.a,
+		}, currValuesFormatted), // eslint-disable-line no-sequences
+	{});
 }
 
 
@@ -141,6 +175,7 @@ async function sellCryptoExample() {
 
 
 module.exports = {
-	getCryptoValue,
 	getAccountSummary,
+	// getCryptoValue, - export if needed
+	getAllCryptoValues,
 };

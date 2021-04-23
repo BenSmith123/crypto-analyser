@@ -1,11 +1,11 @@
 {
 	"id": "configuration",
 	"inputDate": 0, // TODO
-	"currenciesTargeted": [
-
+	"isPaused": false, // don't do processing or buying/selling - set this to true under any error scenarios to avoid making invalid transactions etc.
+	"currenciesTargeted": [ // currencies to get values of and determine whether to buy or sell
+		// don't include USDT since that's the stable coin used to trade in/out of
+		"CRO"
 	],
-	"action": "BUY", // BUY, SELL or PAUSED (paused = don't do anything!)
-	"firstTimeBuy": true, // buy at market price (no price comparisons etc.)
 	"sellPercentage": 10,
 	"buyPercentage": 10,
 	"latest": {
