@@ -9,7 +9,7 @@ const { name, version } = require('../package.json');
 const discordApi = 'https://discord.com/api/webhooks';
 
 
-const calculateDiffPerc = (a, b) => 100 * ((a - b) / ((a + b) / 2));
+const calculatePercDiff = (a, b) => 100 * ((a - b) / ((a + b) / 2));
 
 /**
  * @param {object} data
@@ -63,7 +63,7 @@ async function postToDiscord(message, isTransaction = false) {
 
 
 module.exports = {
-	calculateDiffPerc,
+	calculatePercDiff,
 	saveJsonFile,
 	postToDiscord,
 };

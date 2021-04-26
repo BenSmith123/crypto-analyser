@@ -2,8 +2,8 @@
 const { DynamoDB } = require('aws-sdk');
 
 const { INTERNAL_RUN } = require('./environment');
-const { calculateDiffPerc, saveJsonFile, postToDiscord } = require('./helpers');
-let { getCryptoValue, getAccountSummary } = require('./crypto');
+const { calculatePercDiff, saveJsonFile, postToDiscord } = require('./helpers');
+const { getAccountSummary, getAllCryptoValues } = require('./crypto');
 
 const dynamoClient = new DynamoDB.DocumentClient({ region: 'ap-southeast-2' });
 const DATABASE_TABLE = 'CRYPTO_TRANSACTIONS_TEST';
@@ -12,16 +12,9 @@ const DATABASE_TABLE = 'CRYPTO_TRANSACTIONS_TEST';
 const BUY_PERCENTAGE = 5;
 const SELL_PERCENTAGE = 5;
 
-const BUY_PERCENTAGE_DECIMAL = BUY_PERCENTAGE / 100;
-const SELL_PERCENTAGE_DECIMAL = SELL_PERCENTAGE / 100;
+// const BUY_PERCENTAGE_DECIMAL = BUY_PERCENTAGE / 100;
+// const SELL_PERCENTAGE_DECIMAL = SELL_PERCENTAGE / 100;
 
-
-// map API response to meanings
-const PRICE = {
-	bestBid: 'b',
-	bestAsk: 'k',
-	latestTrade: 'a',
-};
 
 const ACTIONS = {
 	DO_NOTHING: 'DO_NOTHING',
@@ -87,98 +80,84 @@ exports.main = async function (event, mockFunctions = null) { // eslint-disable-
 			details: 'Investment state action is paused',
 		};
 
-		if (investmentState.action === 'PAUSED') {
-			postToDiscord();
+		if (investmentState.isPaused) {
+			postToDiscord(actionToTake); // TODO - message
 			return actionToTake;
 		}
 
 		const accountSummary = await getAccountSummary();
 
-		if (!accountSummary || Object.keys(accountSummary).length) {
+		if (!accountSummary || !Object.keys(accountSummary).length) {
 			throw new Error('No accounts returned');
 		}
 
-		if (accountSummary.USDT.available > 0) {
-			// TODO - money available, try buy!
+		// can try buy if there is USDT funds
+		let canBuy = accountSummary.USDT.available > 0;
 
-			// loop through the database listed crypto currencies
-			// compare the brought price of the crypto in the database
-			// with the accountSummary crypto, if up X percent buy!
+		// can try sell if there are any cryptos that aren't just USDT
+		const canSell = Object.keys(accountSummary).length > 1 || !accountSummary.USDT;
 
-			for (let i = 0; i < accountSummary.currenciesTargeted.length; i++) {
-				const currentCryptoName = accountSummary.currenciesTargeted[i];
+		if (!canBuy && !canSell) {
+			// TODO - STALE END - log to discord, end lambda function
+		}
 
-				const cryptoPrices = await getCryptoValue(`${currentCryptoName}_USDT`);
+		// get crypto value of each crypto targetted
+		const cryptoValues = await getAllCryptoValues(investmentState.currenciesTargeted);
+		const cryptoValueNames = Object.keys(cryptoValues);
 
+		for (let i = 0; i < cryptoValueNames.length; i++) {
+			const currCryptoName = cryptoValueNames[i];
+			const currCryptoValue = cryptoValues[currCryptoName];
+
+			// database transaction record of the crypto
+			const cryptoRecord = investmentState.transactionsLatest[currCryptoName];
+
+			// if there is no buy or sell record of the crypto
+			if (!cryptoRecord) {
+				// TODO - place order @ market price!
+				canBuy = false; // order placed, make no more
+				continue;
+			}
+
+			if (!cryptoRecord.lastSellPrice && !cryptoRecord.lastBuyPrice) {
+				// TODO - post to discord an error:
+				// Crypto currency record has no last sell or last buy price
+				continue;
+			}
+
+			// check for BUY condition
+			if (cryptoRecord.lastSellPrice) {
+				// if previously brought, buy back in if price is < x percent less than last sell price
+
+				const percentageDiff = calculatePercDiff(currCryptoValue.bestAsk, cryptoRecord.lastSellPrice);
+
+				if (percentageDiff < SELL_PERCENTAGE) { // crypto is down more than x %
+					// TODO - buy back in!
+					canBuy = false;
+					continue;
+				}
+			}
+
+			// check for SELL condition
+			const percentageDiff = calculatePercDiff(currCryptoValue.bestBid, cryptoRecord.lastBuyPrice);
+
+			if (percentageDiff > BUY_PERCENTAGE) { // crypto is up more than x %
+				// TODO - get more details of the crypto and see if it has gone down in the last x minutes
+				// TODO - place sell order!
+				continue;
 			}
 
 		}
-
-
-		// const shouldBuy = investmentState.action === 'BUY';
-
-		const currencyString = shouldBuy // TODO - configurable via db config
-			? 'CRO_USDT'
-			: 'USDT_CRO';
-
-		const cryptoPrices = await getCryptoValue(currencyString);
-
-		if (shouldBuy && investmentState.firstTimeBuy) {
-
-			// buy @ market price?
-			investmentState.firstTimeBuy = false;
-			investmentState.latest.targetSellPrice = cryptoData[PRICE.bestAsk] * (1 + SELL_PERCENTAGE_DECIMAL);
-
-			// TODO - update database config, post to discord
-
-			// actionToTake.action = 'BUY';
-			// actionToTake.details = 'Buy at market price';
-
-			return actionToTake;
-		}
-
-
-		const cryptoPrice = shouldBuy
-			? cryptoPrices[PRICE.bestAsk]
-			: cryptoPrices[PRICE.bestBid];
-
-		const buyPrice = cryptoPrice * (1 + BUY_PERCENTAGE_DECIMAL);
-		const sellPrice = cryptoPrice * (1 - SELL_PERCENTAGE_DECIMAL);
-
-		const percentageDiff = calculateDiffPerc(targetPrice, cryptoPrice);
-
-		if (shouldBuy) {
-			if (cryptoPrice < targetPrice) {
-				// BUY
-			}
-
-			if (cryptoPrice > targetPrice) {
-				// sell
-			}
-		}
-
-		// if (shouldPlaceOrder(shouldBuy, cryptoPrice, targetPrice)) {
-		// 	// TODO
-		// }
-
-		// if best ask price is X percent less than the sell price, BUY!
-		if (percentageDiff > SELL_PERCENTAGE) {
-
-			// TODO - how to avoid early before a big spike?
-			// maybe look at smaller intervals of the crypto price and if its incrementing
-			// high percentages then don't buy yet - NOTE: consider the lambda function invocation cycle
-
-			// TODO - buy!
-			console.log('BUY!');
-
-		}
-
 
 	} catch (err) {
-		// TODO - in this generic error scenario should the
-		// database config 'action' be updated to 'PAUSED'?
+		// TODO:
+		// update database config:
+		// investmentState.isPaused = true;
+		// upload config to database
+		// post to discord
+		// end lambda
 
-		console.log(err.response.data);
+		console.log(err);
 	}
 
 };
@@ -214,20 +193,6 @@ function validateInvestmentData() {
 
 	// TODO return false if data.action = 'PAUSED'
 	// in error scenarios that might need looking at manually, stop further trading
-	return true;
-}
-
-
-/**
- * @param {boolean} isBuyOrder
- * @param {number} cryptoPrice
- * @returns {boolean}
- */
-function shouldPlaceOrder(isBuyOrder, cryptoPrice) {
-
-	const percentageDiff = calculateDiffPerc(lastSellPrice, cryptoPrice);
-
-
 	return true;
 }
 
