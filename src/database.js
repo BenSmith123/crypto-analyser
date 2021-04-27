@@ -44,7 +44,7 @@ function validateInvestmentState(data) {
 /**
  * Updates the investment configuration data in the database
  */
-async function updateInvestmentState() {
+async function updateInvestmentConfig() {
 
 	return null;
 }
@@ -52,5 +52,5 @@ async function updateInvestmentState() {
 module.exports = {
 	loadInvestmentConfig,
 	validateInvestmentState,
-	updateInvestmentState,
+	updateInvestmentConfig,
 };
