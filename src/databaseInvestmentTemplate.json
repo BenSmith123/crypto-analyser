@@ -7,7 +7,7 @@
 	],
 	"sellPercentage": 10,
 	"buyPercentage": 10,
-	"transactionsLatest": {
+	"transactions": {
 		"CRO": {
 			"lastBuyPrice": 0.1
 		}

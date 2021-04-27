@@ -1,14 +1,9 @@
 
-const { DynamoDB } = require('aws-sdk');
-
 const { INTERNAL_RUN } = require('./environment');
-const { validateInvestmentData } = require('./database');
-let { loadInvestmentState, updateInvestmentConfig } = require('./database');
+const { validateInvestmentConfig } = require('./database');
+let { loadInvestmentConfig, updateInvestmentConfig } = require('./database');
 let { getAccountSummary, getAllCryptoValues } = require('./crypto');
 const { calculatePercDiff, postToDiscord } = require('./helpers');
-
-const dynamoClient = new DynamoDB.DocumentClient({ region: 'ap-southeast-2' });
-const DATABASE_TABLE = 'CRYPTO_TRANSACTIONS_TEST';
 
 
 /**
@@ -48,7 +43,7 @@ exports.main = async function (event, mockFunctions = null) { // eslint-disable-
 		if (!mockFunctions) { throw new Error('INTERNAL_RUN mode is true but no mock functions passed in'); }
 
 		getAccountSummary = mockFunctions.getAccountSummary();
-		loadInvestmentState = mockFunctions.loadInvestmentState();
+		loadInvestmentConfig = mockFunctions.loadInvestmentState();
 		updateInvestmentConfig = mockFunctions.updateInvestmentConfig();
 		getAllCryptoValues = mockFunctions.getAllCryptoValues();
 	}
@@ -66,7 +61,10 @@ exports.main = async function (event, mockFunctions = null) { // eslint-disable-
 		// post to discord
 		// end lambda
 
+		// updateInvestmentConfig();
+
 		console.log(err);
+		return 'TODO - error message'; // TODO
 	}
 
 };
@@ -75,14 +73,15 @@ exports.main = async function (event, mockFunctions = null) { // eslint-disable-
 // main function for handling the buying/selling of the crypto currencies
 async function makeCryptoCurrenciesTrades() {
 
-	const investmentConfig = await loadInvestmentState();
-	validateInvestmentData(investmentConfig);
+	const investmentConfig = await loadInvestmentConfig();
+	validateInvestmentConfig(investmentConfig);
 
 	if (investmentConfig.isPaused) {
 		postToDiscord('ERROR! AHH'); // TODO - message
 		return;
 	}
 
+	// TODO - wrap this in a try/catch and retry on error?
 	const accountSummary = await getAccountSummary();
 
 	if (!accountSummary || !Object.keys(accountSummary).length) {
@@ -105,11 +104,11 @@ async function makeCryptoCurrenciesTrades() {
 	const cryptoValueNames = Object.keys(cryptoValues);
 
 	for (let i = 0; i < cryptoValueNames.length; i++) {
-		const currCryptoName = cryptoValueNames[i];
-		const currCryptoValue = cryptoValues[currCryptoName];
+		const cryptoName = cryptoValueNames[i];
+		const cryptoValue = cryptoValues[cryptoName];
 
 		// database transaction record of the crypto
-		const cryptoRecord = investmentConfig.transactionsLatest[currCryptoName];
+		const cryptoRecord = investmentConfig.transactions[cryptoName];
 
 		// if there is no buy or sell record of the crypto
 		if (!cryptoRecord) {
@@ -128,17 +127,26 @@ async function makeCryptoCurrenciesTrades() {
 		if (cryptoRecord.lastSellPrice) {
 			// if previously brought, buy back in if price is < x percent less than last sell price
 
-			const percentageDiff = calculatePercDiff(currCryptoValue.bestAsk, cryptoRecord.lastSellPrice);
+			const percentageDiff = calculatePercDiff(cryptoValue.bestAsk, cryptoRecord.lastSellPrice);
 
 			if (percentageDiff < investmentConfig.sellPercentage) { // crypto is down more than x %
 				// TODO - buy back in!
+
+				// update transaction record of the current
+				investmentConfig.transactions[cryptoValue] = {
+					lastBuyPrice: cryptoValue.bestAsk,
+					orderPlaced: new Date(),
+				};
+
+				updateInvestmentConfig(investmentConfig);
+
 				canBuy = false;
 				continue;
 			}
 		}
 
 		// check for SELL condition
-		const percentageDiff = calculatePercDiff(currCryptoValue.bestBid, cryptoRecord.lastBuyPrice);
+		const percentageDiff = calculatePercDiff(cryptoValue.bestBid, cryptoRecord.lastBuyPrice);
 
 		if (percentageDiff > investmentConfig.buyPercentage) { // crypto is up more than x %
 			// TODO - get more details of the crypto and see if it has gone down in the last x minutes
@@ -151,20 +159,3 @@ async function makeCryptoCurrenciesTrades() {
 
 
 const isScheduledEvent = event => event['detail-type'] && event['detail-type'] === 'Scheduled Event';
-
-
-/**
- * Saves a transaction to the database
- */
-async function saveTransaction(transaction) {
-
-	if (!transaction.id) { throw new Error('Missing transaction id'); }
-
-	const params = {
-		TableName: DATABASE_TABLE,
-		Item: transaction,
-	};
-
-	const a = await dynamoClient.put(params).promise();
-	return a;
-}
