@@ -2,25 +2,12 @@
 const { DynamoDB } = require('aws-sdk');
 
 const { INTERNAL_RUN } = require('./environment');
-const { calculatePercDiff, saveJsonFile, postToDiscord } = require('./helpers');
+const { validateInvestmentData, loadInvestmentState } = require('./database');
 const { getAccountSummary, getAllCryptoValues } = require('./crypto');
+const { calculatePercDiff, postToDiscord } = require('./helpers');
 
 const dynamoClient = new DynamoDB.DocumentClient({ region: 'ap-southeast-2' });
 const DATABASE_TABLE = 'CRYPTO_TRANSACTIONS_TEST';
-
-// TODO - configurable via database
-const BUY_PERCENTAGE = 5;
-const SELL_PERCENTAGE = 5;
-
-// const BUY_PERCENTAGE_DECIMAL = BUY_PERCENTAGE / 100;
-// const SELL_PERCENTAGE_DECIMAL = SELL_PERCENTAGE / 100;
-
-
-const ACTIONS = {
-	DO_NOTHING: 'DO_NOTHING',
-	BUY: 'BUY',
-	SELL: 'SELL',
-};
 
 
 /**
@@ -31,6 +18,7 @@ const ACTIONS = {
  * - Check last purchase time & number of purchases - don't buy/sell too often
  * - Check if there are already outstanding buy/sell orders?
  * - Market OR limit buying/selling? - note market buy/sell is usually instant, safer/easier?
+ * - AUDITER lambda to watch orders placed and update database config
  */
 
 
@@ -64,25 +52,12 @@ exports.main = async function (event, mockFunctions = null) { // eslint-disable-
 
 	try {
 
-		// TODO
-		// - get database investment state
-		// - API call - get the current price of whatever crypto I'm buying/selling
-		// - get account details from API
-		//     - compare details with database state? - see if orders have gone through?
-		//     - compare avail balance with database state & what API says my balance is
-		//     - check time of last buy/sell order? - could limit no. of orders per day or whatever
+		const investmentConfig = await loadInvestmentState();
+		validateInvestmentData(investmentConfig);
 
-		const investmentState = await loadInvestmentState();
-		validateInvestmentData(investmentState);
-
-		const actionToTake = {
-			action: ACTIONS.DO_NOTHING,
-			details: 'Investment state action is paused',
-		};
-
-		if (investmentState.isPaused) {
-			postToDiscord(actionToTake); // TODO - message
-			return actionToTake;
+		if (investmentConfig.isPaused) {
+			postToDiscord('ERROR! AHH'); // TODO - message
+			return;
 		}
 
 		const accountSummary = await getAccountSummary();
@@ -99,10 +74,11 @@ exports.main = async function (event, mockFunctions = null) { // eslint-disable-
 
 		if (!canBuy && !canSell) {
 			// TODO - STALE END - log to discord, end lambda function
+			return;
 		}
 
 		// get crypto value of each crypto targetted
-		const cryptoValues = await getAllCryptoValues(investmentState.currenciesTargeted);
+		const cryptoValues = await getAllCryptoValues(investmentConfig.currenciesTargeted);
 		const cryptoValueNames = Object.keys(cryptoValues);
 
 		for (let i = 0; i < cryptoValueNames.length; i++) {
@@ -110,7 +86,7 @@ exports.main = async function (event, mockFunctions = null) { // eslint-disable-
 			const currCryptoValue = cryptoValues[currCryptoName];
 
 			// database transaction record of the crypto
-			const cryptoRecord = investmentState.transactionsLatest[currCryptoName];
+			const cryptoRecord = investmentConfig.transactionsLatest[currCryptoName];
 
 			// if there is no buy or sell record of the crypto
 			if (!cryptoRecord) {
@@ -131,7 +107,7 @@ exports.main = async function (event, mockFunctions = null) { // eslint-disable-
 
 				const percentageDiff = calculatePercDiff(currCryptoValue.bestAsk, cryptoRecord.lastSellPrice);
 
-				if (percentageDiff < SELL_PERCENTAGE) { // crypto is down more than x %
+				if (percentageDiff < investmentConfig.sellPercentage) { // crypto is down more than x %
 					// TODO - buy back in!
 					canBuy = false;
 					continue;
@@ -141,7 +117,7 @@ exports.main = async function (event, mockFunctions = null) { // eslint-disable-
 			// check for SELL condition
 			const percentageDiff = calculatePercDiff(currCryptoValue.bestBid, cryptoRecord.lastBuyPrice);
 
-			if (percentageDiff > BUY_PERCENTAGE) { // crypto is up more than x %
+			if (percentageDiff > investmentConfig.buyPercentage) { // crypto is up more than x %
 				// TODO - get more details of the crypto and see if it has gone down in the last x minutes
 				// TODO - place sell order!
 				continue;
@@ -164,37 +140,6 @@ exports.main = async function (event, mockFunctions = null) { // eslint-disable-
 
 
 const isScheduledEvent = event => event['detail-type'] && event['detail-type'] === 'Scheduled Event';
-
-
-/**
- * Returns the investment state from the database
- */
-async function loadInvestmentState() {
-
-	// const params = {
-	// TableName: DATABASE_TABLE,
-	// Key: {
-	// id: 'configuration',
-	// },
-	// };
-
-	// const a = await dynamoClient.get(params).promise();
-	// console.log(a.Item);
-
-
-	// TODO - replace with database call
-	// - move the databaseInvestmentTemplate out of src so its not deployed to lambda
-	return require('./databaseInvestmentTemplate.json'); // eslint-disable-line
-}
-
-
-function validateInvestmentData() {
-	// TODO - validate the database data & structure
-
-	// TODO return false if data.action = 'PAUSED'
-	// in error scenarios that might need looking at manually, stop further trading
-	return true;
-}
 
 
 /**

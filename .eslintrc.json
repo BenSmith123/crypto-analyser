@@ -12,6 +12,7 @@
     },
     "rules": {
         "radix": "off",
+		"no-continue": "off",
 		"no-plusplus": "off",
         "padded-blocks": "off",
         "object-curly-newline": "off",
