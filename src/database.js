@@ -47,6 +47,38 @@ function validateInvestmentConfig(data) {
 
 
 /**
+ * Returns the database investment configuration with the updated transactions data
+ *
+ * @param {object} investmentConfig
+ * @param {string} name - currency name
+ * @param {object} value
+ * @param {boolean} isBuyOrder
+ * @returns
+ */
+function updateTransactions(investmentConfig, name, value, isBuyOrder) {
+
+	const buyOrSellKey = isBuyOrder
+		? 'lastBuyPrice'
+		: 'lastSellPrice';
+
+	const buyOrSellValue = isBuyOrder
+		? value.bestAsk
+		: value.bestBid;
+
+	const updatedConfig = investmentConfig;
+
+	// update transaction record of the current
+	updatedConfig.transactions[name] = {
+		[buyOrSellKey]: buyOrSellValue,
+		orderPlaced: Date.now(), // new Date(),
+		// TODO - add order Id etc. to this
+	};
+
+	return updatedConfig;
+}
+
+
+/**
  * Updates the investment configuration data in the database and uploads
  * to the database if the config is valid
  */
@@ -82,6 +114,7 @@ async function saveTransaction(transaction) {
 module.exports = {
 	loadInvestmentConfig,
 	validateInvestmentConfig,
+	updateTransactions,
 	updateInvestmentConfig,
 	saveTransaction,
 };

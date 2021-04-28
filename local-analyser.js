@@ -1,5 +1,12 @@
 /**
  * Simulate running the code over x time period to see how it would have performed
+ *
+ * NOTE:
+ * this is not 100% accurate as the candlestick data for a crypto currency does not map 1-to-1
+ * to the bestAsk and bestBid prices returned in the ticker crypto currency values.
+ *
+ * This also simulates that the buy/sell orders go through at the exact prices the order was placed,
+ * The price can vary slightly since orders are not always filled instantly!
  */
 
 /* eslint-disable no-console */
@@ -15,9 +22,6 @@ const { saveJsonFile } = require('./src/helpers');
 const outputDirectory = 'analysis-output.private/';
 const resultsFileName = 'crypto-api-results.json';
 
-// ensure no external API or database calls are made
-process.env.INTERNAL_RUN = true;
-process.env.DISCORD_ENABLED = false;
 
 fs.mkdir(outputDirectory, { recursive: true }, err => { if (err) throw err; });
 
@@ -37,27 +41,29 @@ const instrumentName = 'BTC_USDT'; // crypto currency to look at and it's value 
 const intervalStr = '15m'; // interval used in the crypto-api query (also the mock scheduled time for every lambda invocation)
 // interval options: 1m, 5m, 15m, 30m, 1h, 4h, 6h, 12h, 1D, 7D, 14D, 1M
 
+const initialUSDT = 100; // account balance in USD ($100)
+
 let databaseConfiguration = {
 	id: 'configuration',
-	inputDate: 0,
+	inputDate: 10,
 	isPaused: false,
 	currenciesTargeted: [
 		'CRO',
 	],
-	sellPercentage: 10,
-	buyPercentage: 10,
+	sellPercentage: 5,
+	buyPercentage: 5,
 	transactions: {
-		CRO: {
-			lastBuyPrice: 0.1,
-		},
+		// CRO: {
+		// lastBuyPrice: 0.1,
+		// },
 	},
 };
 
-const accountSummary = { // mock of what crypto API account summary should return
+let accountSummary = { // mock of what crypto API account summary should return
 	accounts: [
 		{
 			balance: 0,
-			available: 100, // $100 USD
+			available: initialUSDT,
 			order: 0,
 			stake: 0,
 			currency: 'USDT',
@@ -68,7 +74,7 @@ const accountSummary = { // mock of what crypto API account summary should retur
 /// /////////////////////////////////////////////////
 
 
-const INTERVAL_NUM = parseInt(intervalStr);
+const cryptoName = instrumentName.split('_')[0]; // e.g. CRO_USDT becomes CRO
 let currMockCryptoValue = null; // the current mock crypto values for this iteration
 
 const scheduledEventMock = { 'detail-type': 'Scheduled Event' };
@@ -96,10 +102,16 @@ const scheduledEventMock = { 'detail-type': 'Scheduled Event' };
 		currMockCryptoValue = cryptoValueList[i];
 
 		// invoke the lambda function and pass in the mock functions
-		const results = lambda.main(scheduledEventMock, mockFunctions);
+		const results = await lambda.main(scheduledEventMock, mockFunctions); // eslint-disable-line no-await-in-loop
+
+		// if buy or sell order was made, update account summary for next iteration
+		if (results) {
+			updateAccountSummary(results, currMockCryptoValue.l);
+		}
 
 		const resultDetails = {
 			num: i + 1,
+			mockValue: currMockCryptoValue,
 			output: results,
 		};
 
@@ -109,6 +121,7 @@ const scheduledEventMock = { 'detail-type': 'Scheduled Event' };
 	const analysisSummary = {
 		timeExecuted: formatTime(Date.now()),
 		mockDataUrl: cryptoDataSource,
+		currencyTargetted: instrumentName,
 		executionResults,
 	};
 
@@ -150,6 +163,63 @@ function updateInvestmentConfig(config) {
 	databaseConfiguration = config;
 }
 
+/**
+ * Simulate the order being placed and override crypto API response
+ */
+function updateAccountSummary(orderPlaced, pricePerCoin) {
+
+	const { accounts } = accountSummary;
+
+
+	if (orderPlaced === 'buy') {
+
+		// const usdtValue = accountSummary[0].available;
+		const availableCoin = accounts[0].available / pricePerCoin;
+
+		// simulate all USDT being sold for new coin
+		accounts[0] = {
+			balance: 0,
+			available: 0,
+			order: 0,
+			stake: 0,
+			currency: 'USDT',
+		};
+
+		accounts[1] = {
+			balance: 0,
+			available: availableCoin,
+			order: 0,
+			stake: 0,
+			currency: cryptoName,
+		};
+	}
+
+	if (orderPlaced === 'sell') {
+		// const usdtValue = accountSummary[0].available;
+		const availableUSDT = accounts[1].available * pricePerCoin;
+
+		// simulate all USDT being sold for new coin
+		accounts[0] = {
+			balance: 0,
+			available: availableUSDT,
+			order: 0,
+			stake: 0,
+			currency: 'USDT',
+		};
+
+		accounts[1] = {
+			balance: 0,
+			available: 0,
+			order: 0,
+			stake: 0,
+			currency: cryptoName,
+		};
+	}
+
+	console.log(accountSummary);
+
+}
+
 
 /**
  * Returns an object of a single currency value for each iteration
@@ -159,14 +229,21 @@ function updateInvestmentConfig(config) {
  */
 function getAllCryptoValues() {
 
-	// eslint-disable-next-line no-return-assign
-	return currMockCryptoValue.reduce((currValuesFormatted, valueRaw) => (
-		// split key name by _ (e.g. CRO_USDT becomes CRO)
-		currValuesFormatted[valueRaw.instrument_name.split('_')[0]] = { // eslint-disable-line
-			bestBid: valueRaw.data.b,
-			bestAsk: valueRaw.data.k,
-			latestTrade: valueRaw.data.a,
-		}, currValuesFormatted), // eslint-disable-line no-sequences
-	{});
+	// NOTE - the candlestick data isn't 1-to-1 with the ticker data
+	// map the bestBid and bestAsk values to low (l) or high (h) values for most accurate result
+	return {
+		[cryptoName]: {
+			bestBid: currMockCryptoValue.l, // low value
+			bestAsk: currMockCryptoValue.l,
+		},
+	};
+
+	// return currMockCryptoValue.reduce((currValuesFormatted, valueRaw) => (
+	// currValuesFormatted[valueRaw.instrument_name.split('_')[0]] = { // eslint-disable-line
+	// bestBid: valueRaw.data.b,
+	// bestAsk: valueRaw.data.k,
+	// latestTrade: valueRaw.data.a,
+	// }, currValuesFormatted), // eslint-disable-line no-sequences
+	// {});
 }
 

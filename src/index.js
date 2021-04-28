@@ -1,6 +1,6 @@
 
 const { INTERNAL_RUN } = require('./environment');
-const { validateInvestmentConfig } = require('./database');
+const { validateInvestmentConfig, updateTransactions } = require('./database');
 let { loadInvestmentConfig, updateInvestmentConfig } = require('./database');
 let { getAccountSummary, getAllCryptoValues } = require('./crypto');
 const { calculatePercDiff, postToDiscord } = require('./helpers');
@@ -42,10 +42,10 @@ exports.main = async function (event, mockFunctions = null) { // eslint-disable-
 		// replace the functions that get external data with mock functions
 		if (!mockFunctions) { throw new Error('INTERNAL_RUN mode is true but no mock functions passed in'); }
 
-		getAccountSummary = mockFunctions.getAccountSummary();
-		loadInvestmentConfig = mockFunctions.loadInvestmentState();
-		updateInvestmentConfig = mockFunctions.updateInvestmentConfig();
-		getAllCryptoValues = mockFunctions.getAllCryptoValues();
+		loadInvestmentConfig = mockFunctions.loadInvestmentConfig;
+		getAccountSummary = mockFunctions.getAccountSummary;
+		updateInvestmentConfig = mockFunctions.updateInvestmentConfig;
+		getAllCryptoValues = mockFunctions.getAllCryptoValues;
 	}
 
 	try {
@@ -73,7 +73,7 @@ exports.main = async function (event, mockFunctions = null) { // eslint-disable-
 // main function for handling the buying/selling of the crypto currencies
 async function makeCryptoCurrenciesTrades() {
 
-	const investmentConfig = await loadInvestmentConfig();
+	let investmentConfig = await loadInvestmentConfig();
 	validateInvestmentConfig(investmentConfig);
 
 	if (investmentConfig.isPaused) {
@@ -89,21 +89,25 @@ async function makeCryptoCurrenciesTrades() {
 	}
 
 	// can try buy if there is USDT funds
-	let canBuy = accountSummary.USDT.available > 0;
+	let canBuy = (accountSummary.USDT && accountSummary.USDT.available > 0) || false;
 
 	// can try sell if there are any cryptos that aren't just USDT
 	const canSell = Object.keys(accountSummary).length > 1 || !accountSummary.USDT;
 
-	if (!canBuy && !canSell) {
-		// TODO - STALE END - log to discord, end lambda function
-		return;
-	}
+	let orderPlaced = false;
+	let result; // TEMP - used for local-analyse
 
 	// get crypto value of each crypto targetted
 	const cryptoValues = await getAllCryptoValues(investmentConfig.currenciesTargeted);
 	const cryptoValueNames = Object.keys(cryptoValues);
 
 	for (let i = 0; i < cryptoValueNames.length; i++) {
+
+		if (!canBuy && !canSell) {
+			// TODO - STALE END - log to discord, end lambda function
+			break;
+		}
+
 		const cryptoName = cryptoValueNames[i];
 		const cryptoValue = cryptoValues[cryptoName];
 
@@ -113,6 +117,11 @@ async function makeCryptoCurrenciesTrades() {
 		// if there is no buy or sell record of the crypto
 		if (!cryptoRecord) {
 			// TODO - place order @ market price!
+
+			investmentConfig = updateTransactions(investmentConfig, cryptoName, cryptoValue, true);
+
+			result = 'buy';
+			orderPlaced = true;
 			canBuy = false; // order placed, make no more
 			continue;
 		}
@@ -128,18 +137,15 @@ async function makeCryptoCurrenciesTrades() {
 			// if previously brought, buy back in if price is < x percent less than last sell price
 
 			const percentageDiff = calculatePercDiff(cryptoValue.bestAsk, cryptoRecord.lastSellPrice);
+			console.log(`value has changed: ${percentageDiff}`);
 
-			if (percentageDiff < investmentConfig.sellPercentage) { // crypto is down more than x %
+			if (percentageDiff < investmentConfig.buyPercentage) { // crypto is down more than x %
 				// TODO - buy back in!
 
-				// update transaction record of the current
-				investmentConfig.transactions[cryptoValue] = {
-					lastBuyPrice: cryptoValue.bestAsk,
-					orderPlaced: new Date(),
-				};
+				investmentConfig = updateTransactions(investmentConfig, cryptoName, cryptoValue, true);
 
-				updateInvestmentConfig(investmentConfig);
-
+				result = 'buy';
+				orderPlaced = true;
 				canBuy = false;
 				continue;
 			}
@@ -147,13 +153,25 @@ async function makeCryptoCurrenciesTrades() {
 
 		// check for SELL condition
 		const percentageDiff = calculatePercDiff(cryptoValue.bestBid, cryptoRecord.lastBuyPrice);
+		console.log(`value has changed: ${percentageDiff}`);
 
-		if (percentageDiff > investmentConfig.buyPercentage) { // crypto is up more than x %
+		if (percentageDiff > investmentConfig.sellPercentage) { // crypto is up more than x %
 			// TODO - get more details of the crypto and see if it has gone down in the last x minutes
 			// TODO - place sell order!
+
+			investmentConfig = updateTransactions(investmentConfig, cryptoName, cryptoValue, false);
+			result = 'sell';
+			orderPlaced = true;
 			continue;
 		}
 
+	}
+
+	// after going through all crypto, if any orders were made, update the database config
+	if (orderPlaced) {
+		await updateInvestmentConfig(investmentConfig);
+
+		return result;
 	}
 }
 
