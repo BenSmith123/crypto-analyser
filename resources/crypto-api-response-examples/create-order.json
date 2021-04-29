@@ -1,8 +1,9 @@
 {
-    "id": -1,
+    "id": 11,
     "method": "private/create-order",
     "code": 0,
     "result": {
-        "order_id": "1369183908085945986"
+        "order_id": "1405957663751236930",
+        "client_oid": "my_order00234"
     }
 }
