@@ -4,11 +4,13 @@ const crypto = require('crypto-js');
 
 const { API_URL, API_KEY, API_SECRET } = require('./environment');
 
-// const API_ENDPOINTS = {
-// getTicker: 'public/get-ticker?instrument_name=CRO_USDT',
-// const instrumentsEndpoint = 'public/get-instruments';
-// const getCandlestick = 'public/get-candlestick?instrument_name=BTC_USDT&timeframe=1h';
-// };
+const API_ENDPOINTS = {
+	getTicker: 'public/get-ticker?instrument_name=CRO_USDT',
+	getInstruments: 'public/get-instruments',
+	getCandlestick: 'public/get-candlestick?instrument_name=BTC_USDT&timeframe=1h',
+	getAccountSummary: 'private/get-account-summary',
+	createOrder: 'private/create-order',
+};
 
 
 function signRequest(request, apiKey, apiSecret) {
@@ -63,7 +65,7 @@ async function getCryptoValue(instrumentName) {
 
 	if (!instrumentName) { throw new Error('No instrument name provided'); }
 
-	const tickerEndpoint = `public/get-ticker?instrument_name=${instrumentName}`;
+	const tickerEndpoint = `${API_ENDPOINTS.getTicker}?instrument_name=${instrumentName}`;
 	// TODO - any use case for getting all crypto values? (remove the instrument_name param)
 
 	const res = await axios(API_URL + tickerEndpoint);
@@ -82,7 +84,7 @@ async function getAccountSummary(currency) {
 
 	const request = {
 		id: 11,
-		method: 'private/get-account-summary',
+		method: API_ENDPOINTS.getAccountSummary,
 		api_key: API_KEY,
 		params: currency
 			? { currency }
@@ -134,18 +136,18 @@ async function getAllCryptoValues(currenciesTargeted) {
 }
 
 
-// THIS ISN'T WORKING ATM!
-async function buyCryptoExample() {
+async function placeBuyOrder() {
 
 	const request = {
 		id: 11,
-		method: 'private/create-order',
+		method: API_ENDPOINTS.createOrder,
+		api_key: API_KEY,
 		params: {
-			instrument_name: 'CRO_USDT',
+			instrument_name: 'CRO_USDT', // buy {crypto} with USDT
 			side: 'BUY',
 			type: 'MARKET',
-			notional: 10, // amount to spend
-			client_oid: 'my_order00234', // optional client order ID
+			notional: 1, // amount of USDT
+			client_oid: 'my_ordtfg', // optional client order ID
 		},
 		nonce: Date.now(),
 	};
@@ -154,18 +156,18 @@ async function buyCryptoExample() {
 }
 
 
-async function sellCryptoExample() {
+async function placeSellOrder() {
 
 	const request = {
 		id: 11,
-		method: 'private/create-order',
+		method: API_ENDPOINTS.createOrder,
 		api_key: API_KEY,
 		params: {
-			instrument_name: 'CRO_USDT',
+			instrument_name: 'CRO_USDT', // sell {crypto} for USDT
 			side: 'SELL',
 			type: 'MARKET',
-			quantity: 5,
-			// client_oid: 'my_order00234', // optional client order ID
+			quantity: 5, // amount of {crypto}
+			client_oid: 'my_order00234', // optional client order ID
 		},
 		nonce: Date.now(),
 	};
@@ -178,4 +180,6 @@ module.exports = {
 	getAccountSummary,
 	// getCryptoValue, - export if needed
 	getAllCryptoValues,
+	placeBuyOrder,
+	placeSellOrder,
 };
