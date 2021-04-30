@@ -24,15 +24,15 @@ const saveJsonFile = (data, fileName) => {
  * Sends a POST request message to discord
  *
  * @param {string|object} message
- * @param {boolean} [isTransaction=false] - optional: log to #transactions instead of #logs channel
+ * @param {boolean} [isAlert=false] - optional: log to #alerts instead of #logs channel
  */
-async function postToDiscord(message, isTransaction = false) {
+async function logToDiscord(message, isAlert = false) {
 
 	if (!DISCORD_ENABLED) { return null; }
 
 	if (!message) { throw new Error('No message content'); }
 
-	const url = isTransaction
+	const url = isAlert
 		? `${discordApi}/834201420302647306/3UyU72vcsRwstQmYjiMxb-5d7YSIDNDu1QWz2vMg_Y5nQsP5X05vgMr-PvYqma15MinZ`
 		: `${discordApi}/834182612419346432/0cvHHmrCE0tXAGmzr_l4RgGvEl7LhVgd4cej0g_rOjSrhcKcEjoyAYkRIh-lJHa0FnPy`;
 
@@ -42,6 +42,8 @@ async function postToDiscord(message, isTransaction = false) {
 	};
 
 	if (typeof message !== 'string') { data.content = JSON.stringify(message); }
+
+	if (isAlert) { console.log(data.content); } // console log any alerts
 
 	const params = {
 		url,
@@ -53,7 +55,7 @@ async function postToDiscord(message, isTransaction = false) {
 	};
 
 	try {
-		return axios(params);
+		return await axios(params);
 	} catch (err) {
 		// suppress error
 		console.log('Error sending message to discord: ', err);
@@ -65,5 +67,5 @@ async function postToDiscord(message, isTransaction = false) {
 module.exports = {
 	calculatePercDiff,
 	saveJsonFile,
-	postToDiscord,
+	logToDiscord,
 };

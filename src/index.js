@@ -2,20 +2,8 @@
 const { INTERNAL_RUN } = require('./environment');
 const { validateInvestmentConfig, updateTransactions } = require('./database');
 let { loadInvestmentConfig, updateInvestmentConfig } = require('./database');
-let { getAccountSummary, getAllCryptoValues } = require('./crypto');
-const { calculatePercDiff, postToDiscord } = require('./helpers');
-
-
-/**
- * TODO
- *
- * - Load database config, validate key/values
- *     - Store logs in memory and write them all out to database or S3 on lambda termination
- * - Check last purchase time & number of purchases - don't buy/sell too often
- * - Check if there are already outstanding buy/sell orders?
- * - Market OR limit buying/selling? - note market buy/sell is usually instant, safer/easier?
- * - AUDITER lambda to watch orders placed and update database config
- */
+let { getAccountSummary, getAllCryptoValues, placeBuyOrder, placeSellOrder } = require('./crypto');
+const { calculatePercDiff, logToDiscord } = require('./helpers');
 
 
 /**
@@ -46,40 +34,52 @@ exports.main = async function (event, mockFunctions = null) { // eslint-disable-
 		getAccountSummary = mockFunctions.getAccountSummary;
 		updateInvestmentConfig = mockFunctions.updateInvestmentConfig;
 		getAllCryptoValues = mockFunctions.getAllCryptoValues;
+		placeBuyOrder = () => {}; // TODO - replace with mock
+		placeSellOrder = () => {}; // TODO - replace with mock
 	}
 
+	let investmentConfig;
+
+
 	try {
-		const results = await makeCryptoCurrenciesTrades();
+		investmentConfig = await loadInvestmentConfig();
+		validateInvestmentConfig(investmentConfig);
+
+		if (investmentConfig.isPaused) {
+			// don't send as alert since whatever caused the pause would have done that already
+			await logToDiscord('Paused - no action taken');
+			return; // end lambda // TODO - return data
+		}
+
+	} catch (err) {
+		// log error and end lambda (without updating to a paused state)
+		// await log to ensure lambda doesn't terminate before log is properly sent
+		await logToDiscord(`An error occurred loading/validating database config: ${err.message}\n\nStack: ${err.stack}`, true);
+		return; // end lambda // TODO - return data
+	}
+
+
+	try {
+		const results = await makeCryptoCurrenciesTrades(investmentConfig);
 
 		return results;
 
 	} catch (err) {
-		// TODO:
-		// update database config:
-		// investmentState.isPaused = true;
-		// upload config to database
-		// post to discord
-		// end lambda
+		// generic unexpected error scenario - log, update database config to paused, end lambda
 
-		// updateInvestmentConfig();
+		await logToDiscord(`An unexpected error has occurred: ${err.message}\n\nStack: ${err.stack}`, true);
 
-		console.log(err);
-		return 'TODO - error message'; // TODO
+		investmentConfig.isPaused = true;
+		await updateInvestmentConfig(investmentConfig);
+
+		return ''; // TODO
 	}
 
 };
 
 
 // main function for handling the buying/selling of the crypto currencies
-async function makeCryptoCurrenciesTrades() {
-
-	let investmentConfig = await loadInvestmentConfig();
-	validateInvestmentConfig(investmentConfig);
-
-	if (investmentConfig.isPaused) {
-		postToDiscord('ERROR! AHH'); // TODO - message
-		return;
-	}
+async function makeCryptoCurrenciesTrades(investmentConfig) {
 
 	// TODO - wrap this in a try/catch and retry on error?
 	const accountSummary = await getAccountSummary();
@@ -104,7 +104,8 @@ async function makeCryptoCurrenciesTrades() {
 	for (let i = 0; i < cryptoValueNames.length; i++) {
 
 		if (!canBuy && !canSell) {
-			// TODO - STALE END - log to discord, end lambda function
+			// no more actions to take, log to discord and return
+			logToDiscord('Paused - no action taken'); // TODO - just log later
 			break;
 		}
 
@@ -127,8 +128,8 @@ async function makeCryptoCurrenciesTrades() {
 		}
 
 		if (!cryptoRecord.lastSellPrice && !cryptoRecord.lastBuyPrice) {
-			// TODO - post to discord an error:
-			// Crypto currency record has no last sell or last buy price
+			// if price then log and skip to the next crypto
+			logToDiscord(`${cryptoName} database record has no last sell or last buy price`, true);
 			continue;
 		}
 

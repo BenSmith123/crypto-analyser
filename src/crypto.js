@@ -97,7 +97,7 @@ async function getAccountSummary(currency) {
 	return response.result.accounts
 		.filter(account => account.available > 0) // filter out accounts that have no crypto balance
 		.reduce((acc, curr) => ( // eslint-disable-line no-return-assign
-			acc[curr.currency] = { ...curr }, acc),
+			acc[curr.currency] = { ...curr }, acc), // eslint-disable-line no-sequences
 		{});
 }
 
