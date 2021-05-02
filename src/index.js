@@ -2,7 +2,7 @@
 const { INTERNAL_RUN } = require('./environment');
 const { validateInvestmentConfig, updateTransactions } = require('./database');
 let { loadInvestmentConfig, updateInvestmentConfig } = require('./database');
-let { getAccountSummary, getAllCryptoValues, placeBuyOrder, placeSellOrder } = require('./crypto');
+let { getAccountSummary, getAllCryptoValues, getCryptoCandlestick, placeBuyOrder, placeSellOrder } = require('./crypto');
 const { calculatePercDiff, round, formatOrder, logToDiscord } = require('./helpers');
 
 
@@ -39,7 +39,6 @@ exports.main = async function (event, mockFunctions = null) { // eslint-disable-
 	}
 
 	let investmentConfig;
-
 
 	try {
 
@@ -103,7 +102,6 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 		: 0;
 
 	const ordersPlaced = [];
-	let result; // TEMP - used for local-analyse
 
 	// get crypto value of each crypto targetted
 	const cryptoValues = await getAllCryptoValues(config.currenciesTargeted);
@@ -113,7 +111,7 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 
 		if (!canBuy && !canSell) {
 			// no more actions to take, log to discord and return
-			logToDiscord('Paused - no action taken'); // TODO - just log later
+			logToDiscord('No funds or crypto currencies to trade');
 			break;
 		}
 
@@ -130,9 +128,6 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 			const order = await placeBuyOrder(cryptoName, availableUSDT);
 
 			config = updateTransactions(config, cryptoName, cryptoValue, true);
-
-			result = 'buy';
-
 			ordersPlaced.push(formatOrder('buy', cryptoName, availableUSDT, cryptoValue.bestAsk));
 
 			canBuy = false; // order placed, make no more
@@ -154,14 +149,16 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 
 			if (percentageDiff < config.buyPercentage) { // crypto is down more than x %
 
+				const candlestick = await getCryptoCandlestick(`${currentCryptoName}_USDT`);
+
+				candlestick.data.slice(Math.max(candlestick.length - 5, 1));
+
 				// TODO - stack promises.all?
 				const order = await placeBuyOrder(cryptoName, availableUSDT);
 
+				config = updateTransactions(config, cryptoName, cryptoValue, true);
 				ordersPlaced.push(formatOrder('buy', cryptoName, availableUSDT, cryptoValue.bestAsk));
 
-				config = updateTransactions(config, cryptoName, cryptoValue, true);
-
-				result = 'buy';
 				canBuy = false;
 				continue;
 			}
@@ -174,15 +171,13 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 		if (percentageDiff > config.sellPercentage) { // crypto is up more than x %
 			// TODO - get more details of the crypto and see if it has gone down in the last x minutes
 
-			const cryptoAccount = accountSummary.accounts.find(acc => acc.currency === cryptoName);
-
-			const availableCrypto = round(cryptoAccount.available, cryptoName);
+			const availableCrypto = round(accountSummary[cryptoName].available, cryptoName);
 
 			const order = await placeSellOrder(cryptoName, availableCrypto); // TODO - stack promises.all?
 
+			config = updateTransactions(config, cryptoName, cryptoValue, false);
 			ordersPlaced.push(formatOrder('sell', cryptoName, availableUSDT, cryptoValue.bestBid));
 
-			config = updateTransactions(config, cryptoName, cryptoValue, false);
 			continue;
 		}
 
@@ -194,7 +189,7 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 
 		await logToDiscord(ordersPlaced, true);
 
-		return result;
+		return ordersPlaced;
 	}
 }
 

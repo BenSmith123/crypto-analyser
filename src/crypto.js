@@ -7,7 +7,7 @@ const { API_URL, API_KEY, API_SECRET, TRANSACTIONS_ENABLED } = require('./enviro
 const API_ENDPOINTS = {
 	getTicker: 'public/get-ticker',
 	getInstruments: 'public/get-instruments',
-	getCandlestick: 'public/get-candlestick?instrument_name=BTC_USDT&timeframe=1h', // TODO - implement
+	getCandlestick: 'public/get-candlestick',
 	getAccountSummary: 'private/get-account-summary',
 	createOrder: 'private/create-order',
 };
@@ -66,7 +66,6 @@ async function getCryptoValue(instrumentName) {
 	if (!instrumentName) { throw new Error('No instrument name provided'); }
 
 	const tickerEndpoint = `${API_ENDPOINTS.getTicker}?instrument_name=${instrumentName}`;
-	// TODO - any use case for getting all crypto values? (remove the instrument_name param)
 
 	const res = await axios(API_URL + tickerEndpoint);
 
@@ -137,6 +136,23 @@ async function getAllCryptoValues(currenciesTargeted) {
 
 
 /**
+ * Returns the crypto API candlestick data of a crypto currency
+ *
+ * @param {string} instrumentName - crypto and currency of the coin
+ */
+async function getCryptoCandlestick(instrumentName) {
+
+	if (!instrumentName) { throw new Error('No instrument name provided'); }
+
+	const tickerEndpoint = `${API_ENDPOINTS.getCandlestick}?instrument_name=${instrumentName}&timeframe=1m`;
+
+	const res = await axios(API_URL + tickerEndpoint);
+
+	return res.data.result;
+}
+
+
+/**
  * Places a market buy order, returns crypto API response
  *
  * @param {string} cryptoName
@@ -196,6 +212,7 @@ module.exports = {
 	getAccountSummary,
 	// getCryptoValue, - export if needed
 	getAllCryptoValues,
+	getCryptoCandlestick,
 	placeBuyOrder,
 	placeSellOrder,
 };
