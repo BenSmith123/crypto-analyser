@@ -1,0 +1,518 @@
+[
+    {
+        "instrument_name": "REN_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "REN",
+        "price_decimals": 5,
+        "quantity_decimals": 2
+    },
+    {
+        "instrument_name": "BTC_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "BTC",
+        "price_decimals": 2,
+        "quantity_decimals": 6,
+        "margin_trading_enabled": true
+    },
+    {
+        "instrument_name": "NKN_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "NKN",
+        "price_decimals": 5,
+        "quantity_decimals": 1
+    },
+    {
+        "instrument_name": "DOT_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "DOT",
+        "price_decimals": 4,
+        "quantity_decimals": 3
+    },
+    {
+        "instrument_name": "OMG_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "OMG",
+        "price_decimals": 4,
+        "quantity_decimals": 4
+    },
+    {
+        "instrument_name": "BNT_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "BNT",
+        "price_decimals": 4,
+        "quantity_decimals": 3
+    },
+    {
+        "instrument_name": "ONE_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "ONE",
+        "price_decimals": 5,
+        "quantity_decimals": 1
+    },
+    {
+        "instrument_name": "NEO_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "NEO",
+        "price_decimals": 3,
+        "quantity_decimals": 4
+    },
+    {
+        "instrument_name": "CHZ_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "CHZ",
+        "price_decimals": 5,
+        "quantity_decimals": 2
+    },
+    {
+        "instrument_name": "SKL_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "SKL",
+        "price_decimals": 5,
+        "quantity_decimals": 2
+    },
+    {
+        "instrument_name": "SOL_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "SOL",
+        "price_decimals": 3,
+        "quantity_decimals": 3
+    },
+    {
+        "instrument_name": "CHR_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "CHR",
+        "price_decimals": 5,
+        "quantity_decimals": 1
+    },
+    {
+        "instrument_name": "CRV_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "CRV",
+        "price_decimals": 4,
+        "quantity_decimals": 4
+    },
+    {
+        "instrument_name": "VET_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "VET",
+        "price_decimals": 6,
+        "quantity_decimals": 0,
+        "margin_trading_enabled": true
+    },
+    {
+        "instrument_name": "LRC_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "LRC",
+        "price_decimals": 5,
+        "quantity_decimals": 2
+    },
+    {
+        "instrument_name": "YFI_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "YFI",
+        "price_decimals": 2,
+        "quantity_decimals": 6
+    },
+    {
+        "instrument_name": "FIL_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "FIL",
+        "price_decimals": 3,
+        "quantity_decimals": 3
+    },
+    {
+        "instrument_name": "EOS_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "EOS",
+        "price_decimals": 4,
+        "quantity_decimals": 2
+    },
+    {
+        "instrument_name": "KNC_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "KNC",
+        "price_decimals": 4,
+        "quantity_decimals": 3
+    },
+    {
+        "instrument_name": "SNX_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "SNX",
+        "price_decimals": 3,
+        "quantity_decimals": 3
+    },
+    {
+        "instrument_name": "XLM_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "XLM",
+        "price_decimals": 5,
+        "quantity_decimals": 1
+    },
+    {
+        "instrument_name": "ONT_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "ONT",
+        "price_decimals": 4,
+        "quantity_decimals": 2
+    },
+    {
+        "instrument_name": "GRT_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "GRT",
+        "price_decimals": 5,
+        "quantity_decimals": 2
+    },
+    {
+        "instrument_name": "ENJ_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "ENJ",
+        "price_decimals": 5,
+        "quantity_decimals": 1
+    },
+    {
+        "instrument_name": "ZRX_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "ZRX",
+        "price_decimals": 4,
+        "quantity_decimals": 2
+    },
+    {
+        "instrument_name": "XTZ_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "XTZ",
+        "price_decimals": 4,
+        "quantity_decimals": 2
+    },
+    {
+        "instrument_name": "HOT_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "HOT",
+        "price_decimals": 6,
+        "quantity_decimals": 0
+    },
+    {
+        "instrument_name": "UMA_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "UMA",
+        "price_decimals": 3,
+        "quantity_decimals": 4
+    },
+    {
+        "instrument_name": "RLY_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "RLY",
+        "price_decimals": 5,
+        "quantity_decimals": 2
+    },
+    {
+        "instrument_name": "MKR_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "MKR",
+        "price_decimals": 2,
+        "quantity_decimals": 6
+    },
+    {
+        "instrument_name": "DAI_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "DAI",
+        "price_decimals": 4,
+        "quantity_decimals": 3
+    },
+    {
+        "instrument_name": "ZIL_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "ZIL",
+        "price_decimals": 5,
+        "quantity_decimals": 1
+    },
+    {
+        "instrument_name": "LTC_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "LTC",
+        "price_decimals": 2,
+        "quantity_decimals": 5
+    },
+    {
+        "instrument_name": "ETH_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "ETH",
+        "price_decimals": 2,
+        "quantity_decimals": 5,
+        "margin_trading_enabled": true
+    },
+    {
+        "instrument_name": "XRP_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "XRP",
+        "price_decimals": 5,
+        "quantity_decimals": 1
+    },
+    {
+        "instrument_name": "BAT_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "BAT",
+        "price_decimals": 4,
+        "quantity_decimals": 2
+    },
+    {
+        "instrument_name": "UNI_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "UNI",
+        "price_decimals": 4,
+        "quantity_decimals": 4
+    },
+    {
+        "instrument_name": "BAL_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "BAL",
+        "price_decimals": 3,
+        "quantity_decimals": 3
+    },
+    {
+        "instrument_name": "BCH_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "BCH",
+        "price_decimals": 2,
+        "quantity_decimals": 5
+    },
+    {
+        "instrument_name": "KSM_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "KSM",
+        "price_decimals": 3,
+        "quantity_decimals": 3
+    },
+    {
+        "instrument_name": "CRO_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "CRO",
+        "price_decimals": 5,
+        "quantity_decimals": 3,
+        "margin_trading_enabled": true
+    },
+    {
+        "instrument_name": "ICX_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "ICX",
+        "price_decimals": 4,
+        "quantity_decimals": 2
+    },
+    {
+        "instrument_name": "ADA_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "ADA",
+        "price_decimals": 5,
+        "quantity_decimals": 1,
+        "margin_trading_enabled": true
+    },
+    {
+        "instrument_name": "STX_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "STX",
+        "price_decimals": 4,
+        "quantity_decimals": 2
+    },
+    {
+        "instrument_name": "OGN_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "OGN",
+        "price_decimals": 4,
+        "quantity_decimals": 2
+    },
+    {
+        "instrument_name": "MANA_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "MANA",
+        "price_decimals": 5,
+        "quantity_decimals": 2
+    },
+    {
+        "instrument_name": "KAVA_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "KAVA",
+        "price_decimals": 4,
+        "quantity_decimals": 2
+    },
+    {
+        "instrument_name": "ANKR_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "ANKR",
+        "price_decimals": 6,
+        "quantity_decimals": 1
+    },
+    {
+        "instrument_name": "LINK_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "LINK",
+        "price_decimals": 3,
+        "quantity_decimals": 2
+    },
+    {
+        "instrument_name": "ATOM_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "ATOM",
+        "price_decimals": 3,
+        "quantity_decimals": 2
+    },
+    {
+        "instrument_name": "COMP_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "COMP",
+        "price_decimals": 2,
+        "quantity_decimals": 5
+    },
+    {
+        "instrument_name": "AVAX_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "AVAX",
+        "price_decimals": 3,
+        "quantity_decimals": 3
+    },
+    {
+        "instrument_name": "PAXG_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "PAXG",
+        "price_decimals": 2,
+        "quantity_decimals": 5
+    },
+    {
+        "instrument_name": "USDC_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "USDC",
+        "price_decimals": 4,
+        "quantity_decimals": 2
+    },
+    {
+        "instrument_name": "ALGO_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "ALGO",
+        "price_decimals": 4,
+        "quantity_decimals": 2
+    },
+    {
+        "instrument_name": "AAVE_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "AAVE",
+        "price_decimals": 3,
+        "quantity_decimals": 4
+    },
+    {
+        "instrument_name": "FLOW_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "FLOW",
+        "price_decimals": 3,
+        "quantity_decimals": 4
+    },
+    {
+        "instrument_name": "CELR_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "CELR",
+        "price_decimals": 6,
+        "quantity_decimals": 1
+    },
+    {
+        "instrument_name": "EGLD_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "EGLD",
+        "price_decimals": 4,
+        "quantity_decimals": 3
+    },
+    {
+        "instrument_name": "WBTC_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "WBTC",
+        "price_decimals": 2,
+        "quantity_decimals": 6
+    },
+    {
+        "instrument_name": "NEAR_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "NEAR",
+        "price_decimals": 4,
+        "quantity_decimals": 2
+    },
+    {
+        "instrument_name": "VTHO_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "VTHO",
+        "price_decimals": 6,
+        "quantity_decimals": 0
+    },
+    {
+        "instrument_name": "QTUM_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "QTUM",
+        "price_decimals": 4,
+        "quantity_decimals": 4
+    },
+    {
+        "instrument_name": "BAND_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "BAND",
+        "price_decimals": 4,
+        "quantity_decimals": 2
+    },
+    {
+        "instrument_name": "DOGE_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "DOGE",
+        "price_decimals": 5,
+        "quantity_decimals": 2
+    },
+    {
+        "instrument_name": "SAND_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "SAND",
+        "price_decimals": 5,
+        "quantity_decimals": 2
+    },
+    {
+        "instrument_name": "THETA_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "THETA",
+        "price_decimals": 4,
+        "quantity_decimals": 2
+    },
+    {
+        "instrument_name": "SUSHI_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "SUSHI",
+        "price_decimals": 3,
+        "quantity_decimals": 3
+    },
+    {
+        "instrument_name": "WAVES_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "WAVES",
+        "price_decimals": 3,
+        "quantity_decimals": 3
+    },
+    {
+        "instrument_name": "OCEAN_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "OCEAN",
+        "price_decimals": 4,
+        "quantity_decimals": 2
+    },
+    {
+        "instrument_name": "1INCH_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "1INCH",
+        "price_decimals": 4,
+        "quantity_decimals": 2
+    },
+    {
+        "instrument_name": "MATIC_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "MATIC",
+        "price_decimals": 5,
+        "quantity_decimals": 2
+    },
+    {
+        "instrument_name": "STORJ_USDT",
+        "quote_currency": "USDT",
+        "base_currency": "STORJ",
+        "price_decimals": 4,
+        "quantity_decimals": 2
+    }
+]

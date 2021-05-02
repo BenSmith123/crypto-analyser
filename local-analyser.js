@@ -27,7 +27,7 @@ fs.mkdir(outputDirectory, { recursive: true }, err => { if (err) throw err; });
 // mock functions passed in to the main code to replace external calls
 const mockFunctions = {
 	loadInvestmentConfig: () => databaseConfiguration,
-	getAccountSummary: () => accountSummary,
+	getAccountSummary,
 	updateInvestmentConfig,
 	getAllCryptoValues,
 };
@@ -57,7 +57,7 @@ let databaseConfiguration = {
 	},
 };
 
-let accountSummary = { // mock of what crypto API account summary should return
+const accountSummary = { // mock of what crypto API account summary should return
 	accounts: [
 		{
 			balance: 0,
@@ -168,6 +168,14 @@ function formatTime(unixTime) {
  */
 
 
+function getAccountSummary() {
+	return accountSummary.accounts
+		.filter(account => account.available > 0) // filter out accounts that have no crypto balance
+		.reduce((acc, curr) => ( // eslint-disable-line no-return-assign
+			acc[curr.currency] = { ...curr }, acc), // eslint-disable-line no-sequences
+		{});
+}
+
 /**
  * Override the function that updates the config in the database and just modify the object
  */
@@ -181,7 +189,6 @@ function updateInvestmentConfig(config) {
 function updateAccountSummary(orderPlaced, pricePerCoin) {
 
 	const { accounts } = accountSummary;
-
 
 	if (orderPlaced === 'buy') {
 
