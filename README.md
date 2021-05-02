@@ -1,6 +1,6 @@
 
 ### TODO
-- Create wrapper code to invoke lambda function and feed it crypto data - check outputs
+- AUDITER lambda or function to watch orders placed and update database config
 - Set up in AWS lambda
     - Need to set up trigger
     - Need lambda deploy script - don't forget env vars

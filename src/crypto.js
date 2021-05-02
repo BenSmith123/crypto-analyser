@@ -2,12 +2,12 @@
 const axios = require('axios');
 const crypto = require('crypto-js');
 
-const { API_URL, API_KEY, API_SECRET } = require('./environment');
+const { API_URL, API_KEY, API_SECRET, TRANSACTIONS_ENABLED } = require('./environment');
 
 const API_ENDPOINTS = {
-	getTicker: 'public/get-ticker?instrument_name=CRO_USDT',
+	getTicker: 'public/get-ticker',
 	getInstruments: 'public/get-instruments',
-	getCandlestick: 'public/get-candlestick?instrument_name=BTC_USDT&timeframe=1h',
+	getCandlestick: 'public/get-candlestick?instrument_name=BTC_USDT&timeframe=1h', // TODO - implement
 	getAccountSummary: 'private/get-account-summary',
 	createOrder: 'private/create-order',
 };
@@ -136,17 +136,25 @@ async function getAllCryptoValues(currenciesTargeted) {
 }
 
 
-async function placeBuyOrder() {
+/**
+ * Places a market buy order, returns crypto API response
+ *
+ * @param {string} cryptoName
+ * @param {number} amount
+ */
+async function placeBuyOrder(cryptoName, amount) {
+
+	if (!TRANSACTIONS_ENABLED) { return null; }
 
 	const request = {
 		id: 11,
 		method: API_ENDPOINTS.createOrder,
 		api_key: API_KEY,
 		params: {
-			instrument_name: 'CRO_USDT', // buy {crypto} with USDT
+			instrument_name: `${cryptoName}_USDT`, // buy {crypto} with USDT
 			side: 'BUY',
 			type: 'MARKET',
-			notional: 1, // amount of USDT
+			notional: amount, // amount of USDT
 			client_oid: 'my_ordtfg', // optional client order ID
 		},
 		nonce: Date.now(),
@@ -156,17 +164,25 @@ async function placeBuyOrder() {
 }
 
 
-async function placeSellOrder() {
+/**
+ * Places a market buy order, returns crypto API response
+ *
+ * @param {string} cryptoName
+ * @param {number} amount
+ */
+async function placeSellOrder(cryptoName, amount) {
+
+	if (!TRANSACTIONS_ENABLED) { return null; }
 
 	const request = {
 		id: 11,
 		method: API_ENDPOINTS.createOrder,
 		api_key: API_KEY,
 		params: {
-			instrument_name: 'CRO_USDT', // sell {crypto} for USDT
+			instrument_name: `${cryptoName}_USDT`, // sell {crypto} for USDT
 			side: 'SELL',
 			type: 'MARKET',
-			quantity: 5, // amount of {crypto}
+			quantity: amount, // amount of {crypto}
 			client_oid: 'my_order00234', // optional client order ID
 		},
 		nonce: Date.now(),

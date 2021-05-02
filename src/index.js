@@ -42,6 +42,10 @@ exports.main = async function (event, mockFunctions = null) { // eslint-disable-
 
 
 	try {
+
+		const order = await placeSellOrder('CRO'); // TODO - stack promises.all?
+		console.log(order);
+
 		investmentConfig = await loadInvestmentConfig();
 		validateInvestmentConfig(investmentConfig);
 
@@ -81,6 +85,8 @@ exports.main = async function (event, mockFunctions = null) { // eslint-disable-
 // main function for handling the buying/selling of the crypto currencies
 async function makeCryptoCurrenciesTrades(investmentConfig) {
 
+	let config = investmentConfig;
+
 	// TODO - wrap this in a try/catch and retry on error?
 	const accountSummary = await getAccountSummary();
 
@@ -88,17 +94,22 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 		throw new Error('No accounts returned');
 	}
 
-	// can try buy if there is USDT funds
-	let canBuy = (accountSummary.USDT && accountSummary.USDT.available > 0) || false;
+	// can try buy if there is USDT funds - $1 or more
+	let canBuy = (accountSummary.USDT && accountSummary.USDT.available >= 1) || false;
 
 	// can try sell if there are any cryptos that aren't just USDT
 	const canSell = Object.keys(accountSummary).length > 1 || !accountSummary.USDT;
+
+	// store amount of USDT available if it exists
+	const availableUSDT = canBuy
+		? Math.floor(accountSummary.USDT.available) // ignore fractions of cents
+		: 0;
 
 	let orderPlaced = false;
 	let result; // TEMP - used for local-analyse
 
 	// get crypto value of each crypto targetted
-	const cryptoValues = await getAllCryptoValues(investmentConfig.currenciesTargeted);
+	const cryptoValues = await getAllCryptoValues(config.currenciesTargeted);
 	const cryptoValueNames = Object.keys(cryptoValues);
 
 	for (let i = 0; i < cryptoValueNames.length; i++) {
@@ -113,13 +124,16 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 		const cryptoValue = cryptoValues[cryptoName];
 
 		// database transaction record of the crypto
-		const cryptoRecord = investmentConfig.transactions[cryptoName];
+		const cryptoRecord = config.transactions[cryptoName];
 
 		// if there is no buy or sell record of the crypto
 		if (!cryptoRecord) {
-			// TODO - place order @ market price!
 
-			investmentConfig = updateTransactions(investmentConfig, cryptoName, cryptoValue, true);
+			// const order = await placeBuyOrder(cryptoName, availableUSDT); // TODO - stack to promises.all?
+
+			// TODO - log to discord that order was placed
+
+			config = updateTransactions(config, cryptoName, cryptoValue, true);
 
 			result = 'buy';
 			orderPlaced = true;
@@ -140,10 +154,13 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 			const percentageDiff = calculatePercDiff(cryptoValue.bestAsk, cryptoRecord.lastSellPrice);
 			console.log(`value has changed: ${percentageDiff}`);
 
-			if (percentageDiff < investmentConfig.buyPercentage) { // crypto is down more than x %
-				// TODO - buy back in!
+			if (percentageDiff < config.buyPercentage) { // crypto is down more than x %
 
-				investmentConfig = updateTransactions(investmentConfig, cryptoName, cryptoValue, true);
+				// const order = await placeBuyOrder(cryptoName, availableUSDT); // TODO - stack promises.all?
+
+				// TODO - log to discord that order was placed
+
+				config = updateTransactions(config, cryptoName, cryptoValue, true);
 
 				result = 'buy';
 				orderPlaced = true;
@@ -156,11 +173,15 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 		const percentageDiff = calculatePercDiff(cryptoValue.bestBid, cryptoRecord.lastBuyPrice);
 		console.log(`value has changed: ${percentageDiff}`);
 
-		if (percentageDiff > investmentConfig.sellPercentage) { // crypto is up more than x %
+		if (percentageDiff > config.sellPercentage) { // crypto is up more than x %
 			// TODO - get more details of the crypto and see if it has gone down in the last x minutes
 			// TODO - place sell order!
+			const availableCrypto = accountSummary.accounts
+				.find(acc => acc.currency === cryptoName).available; // TODO - math.floor?
 
-			investmentConfig = updateTransactions(investmentConfig, cryptoName, cryptoValue, false);
+			const order = await placeSellOrder(cryptoName, availableCrypto); // TODO - stack promises.all?
+
+			config = updateTransactions(config, cryptoName, cryptoValue, false);
 			result = 'sell';
 			orderPlaced = true;
 			continue;
@@ -170,7 +191,7 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 
 	// after going through all crypto, if any orders were made, update the database config
 	if (orderPlaced) {
-		await updateInvestmentConfig(investmentConfig);
+		await updateInvestmentConfig(config);
 
 		return result;
 	}
