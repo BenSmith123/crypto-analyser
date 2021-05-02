@@ -6,10 +6,31 @@ const { DISCORD_ENABLED } = require('./environment');
 
 const { name, version } = require('../package.json');
 
+const decimalValueMap = require('./decimalValueMap.json');
+
 const discordApi = 'https://discord.com/api/webhooks';
 
 
 const calculatePercDiff = (a, b) => 100 * ((a - b) / ((a + b) / 2));
+
+// round DOWN to x decimal points
+function round(num, cryptoName) {
+	const dp = getTradeDecimalValue(cryptoName);
+	const wholeNumDigits = Math.floor(num).toString().length;
+	return parseFloat(num.toString().substring(0, dp + wholeNumDigits + 1)); // +1 for the decimal
+}
+
+
+/**
+ * Returns the max amount of decimal places that a given crypto can be traded at
+ *
+ * @param {string} cryptoName
+ * @returns {number}
+ */
+function getTradeDecimalValue(cryptoName) {
+	return decimalValueMap.find(crypto => crypto.base_currency === cryptoName).quantity_decimals;
+}
+
 
 /**
  * @param {object} data
@@ -18,6 +39,23 @@ const calculatePercDiff = (a, b) => 100 * ((a - b) / ((a + b) / 2));
 const saveJsonFile = (data, fileName) => {
 	writeFileSync(fileName || 'z-temp.json', JSON.stringify(data, null, 4));
 };
+
+
+/**
+ * @param {string} type - buy or sell
+ * @param {string} cryptoName
+ * @param {number} amount
+ * @param {number} value - value of the crypto
+ * @returns {object}
+ */
+function formatOrder(type, cryptoName, amount, value) {
+	return {
+		type,
+		name: cryptoName,
+		amount,
+		value,
+	};
+}
 
 
 /**
@@ -66,6 +104,8 @@ async function logToDiscord(message, isAlert = false) {
 
 module.exports = {
 	calculatePercDiff,
+	round,
 	saveJsonFile,
+	formatOrder,
 	logToDiscord,
 };
