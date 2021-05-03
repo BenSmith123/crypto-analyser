@@ -4,6 +4,7 @@ const { validateInvestmentConfig, updateTransactions } = require('./database');
 let { loadInvestmentConfig, updateInvestmentConfig } = require('./database');
 let { getAccountSummary, getAllCryptoValues, checkLatestValueTrend, placeBuyOrder, placeSellOrder } = require('./crypto');
 const { calculatePercDiff, round, formatOrder, logToDiscord } = require('./helpers');
+const { log, getLogs } = require('./logging');
 
 
 /**
@@ -42,37 +43,55 @@ exports.main = async function (event, mockFunctions = null) { // eslint-disable-
 	let investmentConfig;
 
 	try {
+
 		investmentConfig = await loadInvestmentConfig();
 		validateInvestmentConfig(investmentConfig);
 
 		if (investmentConfig.isPaused) {
 			// don't send as alert since whatever caused the pause would have done that already
 			await logToDiscord('Paused - no action taken');
-			return; // end lambda // TODO - return data
+			return ''; // end lambda // TODO - return data
 		}
 
 	} catch (err) {
 		// log error and end lambda (without updating to a paused state)
 		// await log to ensure lambda doesn't terminate before log is properly sent
 		await logToDiscord(`An error occurred loading/validating database config: ${err.message}\n\nStack: ${err.stack}`, true);
-		return; // end lambda // TODO - return data
+		return ''; // end lambda // TODO - return data
 	}
 
 
 	try {
 		const results = await makeCryptoCurrenciesTrades(investmentConfig);
 
-		return results;
+		// if any orders were made, update the database config and send transaction logs
+		if (results.ordersPlaced.length) {
+			await updateInvestmentConfig(results.config);
+			await logToDiscord(results.ordersPlaced, true);
+		}
+
+		return ''; // TODO
 
 	} catch (err) {
-		// generic unexpected error scenario - log, update database config to paused, end lambda
 
+		// generic unexpected error scenario - log, update database config to paused, end lambda
 		await logToDiscord(`An unexpected error has occurred: ${err.message}\n\nStack: ${err.stack}`, true);
 
 		investmentConfig.isPaused = true;
 		await updateInvestmentConfig(investmentConfig);
 
 		return ''; // TODO
+
+	} finally {
+
+		// send the runtime logs to discord
+		const runtimeLogs = getLogs();
+
+		if (runtimeLogs.length) {
+			await logToDiscord(runtimeLogs.join('\n'));
+		}
+
+		return ''; // eslint-disable-line no-unsafe-finally
 	}
 
 };
@@ -111,7 +130,7 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 
 		if (!canBuy && !canSell) {
 			// no more actions to take, log to discord and return
-			logToDiscord('No funds or crypto currencies to trade');
+			logToDiscord('No funds or crypto currencies to trade', true);
 			break;
 		}
 
@@ -123,6 +142,8 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 
 		// if there is no buy or sell record of the crypto
 		if (!cryptoRecord) {
+
+			if (!canBuy) { continue; }
 
 			// TODO - stack to promises.all?
 			const order = await placeBuyOrder(cryptoName, availableUSDT);
@@ -145,14 +166,14 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 			// if previously brought, buy back in if price is < x percent less than last sell price
 
 			const percentageDiff = calculatePercDiff(cryptoValue.bestAsk, cryptoRecord.lastSellPrice);
-			console.log(`value has changed: ${percentageDiff}`);
+
+			log(`${cryptoName} was sold at ${cryptoRecord.lastSellPrice} and is now ${cryptoValue.bestAsk} (${percentageDiff}%)`);
 
 			if (percentageDiff < config.buyPercentage) { // crypto is down more than x %
 
 				if (await checkLatestValueTrend(cryptoName, false)) {
 					// if the crypto value is still decreasing, hold off buying!
-
-					// TODO - log here?
+					log(`${cryptoName} is still decreasing, holding off buying..`);
 					continue;
 				}
 
@@ -169,14 +190,14 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 
 		// check for SELL condition
 		const percentageDiff = calculatePercDiff(cryptoValue.bestBid, cryptoRecord.lastBuyPrice);
-		console.log(`value has changed: ${percentageDiff}`);
+
+		log(`${cryptoName} was brought at ${cryptoRecord.lastBuyPrice} and is now ${cryptoValue.bestBid} (${percentageDiff}%)`);
 
 		if (percentageDiff > config.sellPercentage) { // crypto is up more than x %
 
 			if (await checkLatestValueTrend(cryptoName, true)) {
 				// if the crypto value is still increasing, hold the crypto!
-
-				// TODO - log here?
+				log(`${cryptoName} is still increasing, holding off selling..`);
 				continue;
 			}
 
@@ -186,21 +207,14 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 			const order = await placeSellOrder(cryptoName, availableCrypto); // TODO - stack promises.all?
 
 			config = updateTransactions(config, cryptoName, cryptoValue, false);
-			ordersPlaced.push(formatOrder('sell', cryptoName, availableUSDT, cryptoValue.bestBid));
+			ordersPlaced.push(formatOrder('sell', cryptoName, availableCrypto, cryptoValue.bestBid));
 
 			continue;
 		}
 
 	}
 
-	// after going through all crypto, if any orders were made, update the database config
-	if (ordersPlaced.length) {
-		await updateInvestmentConfig(config);
-
-		await logToDiscord(ordersPlaced, true);
-
-		return ordersPlaced;
-	}
+	return { ordersPlaced, config };
 }
 
 
