@@ -33,6 +33,24 @@ function signRequest(request, apiKey, apiSecret) {
 }
 
 
+// returns true if array values are increasing or the same
+function isIncreasing(elt, i, arr) {
+	const prev = arr[i - 1]
+		? arr[i - 1].o
+		: 0;
+	return !i || elt.o === prev || elt.o > prev;
+}
+
+
+// returns true if array values are decreasing or the same
+function isDecreasing(elt, i, arr) {
+	const prev = arr[i - 1]
+		? arr[i - 1].o
+		: 0;
+	return !i || elt.o === prev || elt.o > prev;
+}
+
+
 /**
  * Signs the request with the API keys - returns the Crypto.com API response
  *
@@ -140,15 +158,46 @@ async function getAllCryptoValues(currenciesTargeted) {
  *
  * @param {string} instrumentName - crypto and currency of the coin
  */
-async function getCryptoCandlestick(instrumentName) {
+async function getCryptoCandlestick(instrumentName, timeframe) {
 
 	if (!instrumentName) { throw new Error('No instrument name provided'); }
 
-	const tickerEndpoint = `${API_ENDPOINTS.getCandlestick}?instrument_name=${instrumentName}&timeframe=1m`;
+	const tickerEndpoint = `${API_ENDPOINTS.getCandlestick}?instrument_name=${instrumentName}&timeframe=${timeframe}`;
 
 	const res = await axios(API_URL + tickerEndpoint);
 
 	return res.data.result;
+}
+
+
+/**
+ * Gets the crypto API candlestick data and returns true if the crypto currency latest OPEN value
+ * is still increasing/descreasing. If any data is missing then log warning and default return false
+ *
+ * @param {string} cryptoName
+ * @param {boolean} [checkIncrease=true] - check for increase or decrease trend
+ */
+async function checkLatestValueTrend(cryptoName, checkIncrease = true) {
+
+	// compare last 3 intervals of 5mins
+	const timeframe = '5m';
+	const lookback = 3; // num of array elements to compare
+
+	try {
+		const candlestick = await getCryptoCandlestick(cryptoName, timeframe);
+
+		if (!candlestick.data || !candlestick.data.length) { throw new Error(`Missing candlestick data for ${cryptoName}`); }
+
+		const latest = candlestick.data.slice(candlestick.data.length - lookback);
+
+		return checkIncrease
+			? latest.every(isIncreasing)
+			: latest.every(isDecreasing);
+
+	} catch (err) {
+		// TODO - log error
+		return false;
+	}
 }
 
 
@@ -212,7 +261,8 @@ module.exports = {
 	getAccountSummary,
 	// getCryptoValue, - export if needed
 	getAllCryptoValues,
-	getCryptoCandlestick,
+	// getCryptoCandlestick, - export if needed
+	checkLatestValueTrend,
 	placeBuyOrder,
 	placeSellOrder,
 };

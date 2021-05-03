@@ -13,7 +13,15 @@ const discordApi = 'https://discord.com/api/webhooks';
 
 const calculatePercDiff = (a, b) => 100 * ((a - b) / ((a + b) / 2));
 
-// round DOWN to x decimal points
+
+/**
+ * Returns the rounded down floating point of a crypto based on the number
+ * of decimal values that the crypto can be traded at
+ *
+ * @param {number} num
+ * @param {string} cryptoName
+ * @returns {number}
+ */
 function round(num, cryptoName) {
 	const dp = getTradeDecimalValue(cryptoName);
 	const wholeNumDigits = Math.floor(num).toString().length;

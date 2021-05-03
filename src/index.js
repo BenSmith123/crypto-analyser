@@ -2,7 +2,7 @@
 const { INTERNAL_RUN } = require('./environment');
 const { validateInvestmentConfig, updateTransactions } = require('./database');
 let { loadInvestmentConfig, updateInvestmentConfig } = require('./database');
-let { getAccountSummary, getAllCryptoValues, getCryptoCandlestick, placeBuyOrder, placeSellOrder } = require('./crypto');
+let { getAccountSummary, getAllCryptoValues, checkLatestValueTrend, placeBuyOrder, placeSellOrder } = require('./crypto');
 const { calculatePercDiff, round, formatOrder, logToDiscord } = require('./helpers');
 
 
@@ -36,12 +36,12 @@ exports.main = async function (event, mockFunctions = null) { // eslint-disable-
 		getAllCryptoValues = mockFunctions.getAllCryptoValues;
 		placeBuyOrder = () => {}; // TODO - replace with mock
 		placeSellOrder = () => {}; // TODO - replace with mock
+		checkLatestValueTrend = () => false;
 	}
 
 	let investmentConfig;
 
 	try {
-
 		investmentConfig = await loadInvestmentConfig();
 		validateInvestmentConfig(investmentConfig);
 
@@ -149,9 +149,12 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 
 			if (percentageDiff < config.buyPercentage) { // crypto is down more than x %
 
-				const candlestick = await getCryptoCandlestick(`${currentCryptoName}_USDT`);
+				if (await checkLatestValueTrend(cryptoName, false)) {
+					// if the crypto value is still decreasing, hold off buying!
 
-				candlestick.data.slice(Math.max(candlestick.length - 5, 1));
+					// TODO - log here?
+					continue;
+				}
 
 				// TODO - stack promises.all?
 				const order = await placeBuyOrder(cryptoName, availableUSDT);
@@ -169,8 +172,15 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 		console.log(`value has changed: ${percentageDiff}`);
 
 		if (percentageDiff > config.sellPercentage) { // crypto is up more than x %
-			// TODO - get more details of the crypto and see if it has gone down in the last x minutes
 
+			if (await checkLatestValueTrend(cryptoName, true)) {
+				// if the crypto value is still increasing, hold the crypto!
+
+				// TODO - log here?
+				continue;
+			}
+
+			// otherwise, crypto value is up but not consistently, sell!
 			const availableCrypto = round(accountSummary[cryptoName].available, cryptoName);
 
 			const order = await placeSellOrder(cryptoName, availableCrypto); // TODO - stack promises.all?
