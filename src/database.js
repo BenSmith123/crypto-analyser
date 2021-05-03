@@ -2,7 +2,7 @@
 const { DynamoDB } = require('aws-sdk');
 
 const dynamoClient = new DynamoDB.DocumentClient({ region: 'ap-southeast-2' });
-const DATABASE_TABLE = 'CRYPTO_TRANSACTIONS_TEST';
+const DATABASE_TABLE = 'CRYPTO_TRANSACTIONS';
 
 
 /**
@@ -10,20 +10,20 @@ const DATABASE_TABLE = 'CRYPTO_TRANSACTIONS_TEST';
  */
 async function loadInvestmentConfig() {
 
-	// const params = {
-	// TableName: DATABASE_TABLE,
-	// Key: {
-	// id: 'configuration',
-	// },
-	// };
+	const params = {
+		TableName: DATABASE_TABLE,
+		Key: { id: 'configuration' },
+	};
 
-	// const a = await dynamoClient.get(params).promise();
-	// console.log(a.Item);
-
-
-	// TODO - replace with database call
-	// - move the databaseInvestmentTemplate out of src so its not deployed to lambda
-	return require('./databaseInvestmentTemplate.json'); // eslint-disable-line
+	return new Promise((resolve, reject) => {
+		dynamoClient.get(params, (err, data) => {
+			if (err) {
+				reject(err);
+			} else {
+				resolve(data.Item);
+			}
+		});
+	});
 }
 
 
