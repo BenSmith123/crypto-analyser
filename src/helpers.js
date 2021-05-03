@@ -4,7 +4,7 @@ const { writeFileSync } = require('fs');
 
 const { DISCORD_ENABLED } = require('./environment');
 
-const { name, version } = require('../package.json');
+const { version } = require('../package.json');
 
 const decimalValueMap = require('./decimalValueMap.json');
 
@@ -83,7 +83,7 @@ async function logToDiscord(message, isAlert = false) {
 		: `${discordApi}/834182612419346432/0cvHHmrCE0tXAGmzr_l4RgGvEl7LhVgd4cej0g_rOjSrhcKcEjoyAYkRIh-lJHa0FnPy`;
 
 	const data = {
-		username: `${name} v${version}`,
+		username: `Analyser v${version}`,
 		content: message,
 	};
 

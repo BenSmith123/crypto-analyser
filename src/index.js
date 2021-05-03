@@ -167,7 +167,8 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 
 			const percentageDiff = calculatePercDiff(cryptoValue.bestAsk, cryptoRecord.lastSellPrice);
 
-			log(`${cryptoName} was sold at ${cryptoRecord.lastSellPrice} and is now ${cryptoValue.bestAsk} (${percentageDiff}%)`);
+			const sym = percentageDiff > 0 ? '+' : '-';
+			log(`${cryptoName} was sold at ${cryptoRecord.lastSellPrice} and is now ${cryptoValue.bestAsk} (${sym}${percentageDiff.toFixed(2)}%)`);
 
 			if (percentageDiff < config.buyPercentage) { // crypto is down more than x %
 
@@ -191,7 +192,7 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 		// check for SELL condition
 		const percentageDiff = calculatePercDiff(cryptoValue.bestBid, cryptoRecord.lastBuyPrice);
 
-		log(`${cryptoName} was brought at ${cryptoRecord.lastBuyPrice} and is now ${cryptoValue.bestBid} (${percentageDiff}%)`);
+		log(`${cryptoName} was brought at ${cryptoRecord.lastBuyPrice} and is now ${cryptoValue.bestBid} (${percentageDiff.toFixed(2)}%)`);
 
 		if (percentageDiff > config.sellPercentage) { // crypto is up more than x %
 

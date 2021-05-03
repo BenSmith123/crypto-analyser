@@ -1,6 +1,12 @@
 
 ### TODO
-- AUDITER lambda or function to watch orders placed and update database config
+- AUDITER lambda or function to watch orders placed and update database config?
+- Add a second crypto and test - no logic around ratios to split USDT into different coins - if a coin is sold and is now in USDT, 100% of it will go into the next buy
+- ^ Add weights to each crypto (percentages of how much USD to spent)
+- Change option to just buy at market price when there is no record of it - make it only buy in at a certain %
+- Icon or emoji for discord bot
+- Better format for transaction logs
+- Compare transaction logs and actual orders-filled and see if there are any discrepencies (https://crypto.com/exchange/wallets/spot/order-history)
 - Set up in AWS lambda
     - Need to set up trigger
     - Need lambda deploy script - don't forget env vars
