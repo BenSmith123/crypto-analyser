@@ -104,7 +104,7 @@ const scheduledEventMock = { 'detail-type': 'Scheduled Event' };
 		const results = await lambda.main(scheduledEventMock, mockFunctions); // eslint-disable-line no-await-in-loop
 
 		// if buy or sell order was made, update account summary for next iteration
-		if (results && results.length) {
+		if (results.length) {
 			const account = updateAccountSummary(results[0].type, currMockCryptoValue.o);
 			transactionResults.push({
 				account,

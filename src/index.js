@@ -70,7 +70,7 @@ exports.main = async function (event, mockFunctions = null) { // eslint-disable-
 			await logToDiscord(results.ordersPlaced, true);
 		}
 
-		return ''; // TODO
+		return results.ordersPlaced || []; // TODO
 
 	} catch (err) {
 
@@ -90,8 +90,6 @@ exports.main = async function (event, mockFunctions = null) { // eslint-disable-
 		if (runtimeLogs.length) {
 			await logToDiscord(runtimeLogs.join('\n'));
 		}
-
-		return ''; // eslint-disable-line no-unsafe-finally
 	}
 
 };
