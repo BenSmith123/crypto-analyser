@@ -21,7 +21,7 @@
 				"AWS_PROFILE": "bensmith",
 				"DISCORD_ENABLED": "false",
 				"INTERNAL_RUN": "true", // ensure no external API or database calls are made
-				"ENABLE_TRANSACTIONS": "false" // buy/sell functions are already replaced but disable just in case!
+				"TRANSACTIONS_ENABLED": "false" // buy/sell functions are already replaced but disable just in case!
             }
 		},
 		{

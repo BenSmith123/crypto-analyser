@@ -4,7 +4,9 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "start": "AWS_PROFILE=bensmith node src/index.js"
+    "start": "AWS_PROFILE=bensmith node src/index.js",
+    "deploy": "sh scripts/deploy.sh",
+    "configure": "sh scripts/updateEnvVars.sh"
   },
   "dependencies": {
     "aws-sdk": "^2.888.0",
