@@ -63,7 +63,7 @@ function formatPriceLog(name, context, price, value, diff) {
 		? '+'
 		: '';
 
-	return `${name} was last ${context} at ${price} and is now ${value} **(${sym}${diff.toFixed(2)}%)**`;
+	return `${name} was last ${context} at ${price} and is now ${value} (${sym}${diff.toFixed(2)}%)`;
 }
 
 
