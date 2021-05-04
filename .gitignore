@@ -2,6 +2,7 @@
 # custom
 *.private*
 *.zip
+dist
 
 # dependencies
 /node_modules

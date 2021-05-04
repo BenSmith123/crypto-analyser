@@ -9,12 +9,12 @@
     "configure": "sh scripts/updateEnvVars.sh"
   },
   "dependencies": {
-    "aws-sdk": "^2.888.0",
     "axios": "^0.21.1",
     "crypto-js": "^4.0.0",
     "dotenv": "^8.2.0"
   },
   "devDependencies": {
+    "aws-sdk": "^2.900.0",
     "eslint": "^7.24.0",
     "eslint-config-airbnb": "^18.2.1",
     "eslint-config-airbnb-base": "^14.2.1",

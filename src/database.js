@@ -1,5 +1,6 @@
 
-const { DynamoDB } = require('aws-sdk');
+// eslint-disable-next-line import/no-extraneous-dependencies
+const { DynamoDB } = require('aws-sdk'); // lambda runtime has aws-sdk installed
 
 const dynamoClient = new DynamoDB.DocumentClient({ region: 'ap-southeast-2' });
 const DATABASE_TABLE = 'CRYPTO_TRANSACTIONS';

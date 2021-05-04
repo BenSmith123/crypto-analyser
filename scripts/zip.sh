@@ -1,6 +1,16 @@
 
-# zips the src/ folder, node_modules and package/package-lock files
+# creates a /dist folder and copies the package.json and all scr/ files
+# runs a production npm install
+# zips the /dist folder
 
-zip -r ./lambda.zip node_modules package.json package-lock.json src;
+mkdir -p "./dist/src";
+cp package.json "./dist/";
+cp ./src/* ./dist/src; # copy all code in src
+cd dist;
+npm install --production; # prod install - don't include dev deps
 
-echo "Files zipped!";
+cd ..;
+
+zip -r ./dist/lambda.zip ./dist;
+
+echo "Distribution .zip created in ./dist/lambda.zip!";
