@@ -14,7 +14,7 @@ const { log, getLogs } = require('./logging');
  * @param {object} [mockFunctions=null] - optional, used for debugging/analysis in INTERNAL_RUN mode
  * @returns
  */
-exports.main = async function (event, mockFunctions = null) { // eslint-disable-line func-names
+exports.main = async function (event, mockFunctions = null) {
 
 	// Scheduled job (CloudWatch)
 	if (!isScheduledEvent(event)) {
@@ -50,14 +50,14 @@ exports.main = async function (event, mockFunctions = null) { // eslint-disable-
 		if (investmentConfig.isPaused) {
 			// don't send as alert since whatever caused the pause would have done that already
 			await logToDiscord('Paused - no action taken');
-			return ''; // end lambda // TODO - return data
+			return []; // end lambda
 		}
 
 	} catch (err) {
 		// log error and end lambda (without updating to a paused state)
 		// await log to ensure lambda doesn't terminate before log is properly sent
 		await logToDiscord(`An error occurred loading/validating database config: ${err.message}\n\nStack: ${err.stack}`, true);
-		return ''; // end lambda // TODO - return data
+		return []; // end lambda
 	}
 
 
@@ -70,7 +70,7 @@ exports.main = async function (event, mockFunctions = null) { // eslint-disable-
 			await logToDiscord(results.ordersPlaced, true);
 		}
 
-		return results.ordersPlaced || []; // TODO
+		return results.ordersPlaced || [];
 
 	} catch (err) {
 
@@ -80,7 +80,7 @@ exports.main = async function (event, mockFunctions = null) { // eslint-disable-
 		investmentConfig.isPaused = true;
 		await updateInvestmentConfig(investmentConfig);
 
-		return ''; // TODO
+		return err;
 
 	} finally {
 
@@ -182,8 +182,9 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 				ordersPlaced.push(formatOrder('Buy', cryptoName, availableUSDT, cryptoValue.bestAsk));
 
 				canBuy = false;
-				continue;
 			}
+
+			continue;
 		}
 
 		// check for SELL condition
