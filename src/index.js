@@ -3,7 +3,7 @@ const { INTERNAL_RUN } = require('./environment');
 const { validateInvestmentConfig, updateTransactions } = require('./database');
 let { loadInvestmentConfig, updateInvestmentConfig } = require('./database');
 let { getAccountSummary, getAllCryptoValues, checkLatestValueTrend, placeBuyOrder, placeSellOrder } = require('./crypto');
-const { calculatePercDiff, round, formatOrder, logToDiscord } = require('./helpers');
+const { calculatePercDiff, round, formatOrder, formatPriceLog, logToDiscord } = require('./helpers');
 const { log, getLogs } = require('./logging');
 
 
@@ -165,8 +165,7 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 
 			const percentageDiff = calculatePercDiff(cryptoRecord.lastSellPrice, cryptoValue.bestAsk);
 
-			const sym = percentageDiff > 0 ? '+' : '-';
-			log(`${cryptoName} was sold at ${cryptoRecord.lastSellPrice} and is now ${cryptoValue.bestAsk} (${sym}${percentageDiff.toFixed(2)}%)`);
+			log(formatPriceLog(cryptoName, 'sold', cryptoRecord.lastSellPrice, cryptoValue.bestAsk, percentageDiff));
 
 			if (percentageDiff < -config.buyPercentage) { // crypto is down more than x %
 
@@ -190,7 +189,7 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 		// check for SELL condition
 		const percentageDiff = calculatePercDiff(cryptoValue.bestBid, cryptoRecord.lastBuyPrice);
 
-		log(`${cryptoName} was brought at ${cryptoRecord.lastBuyPrice} and is now ${cryptoValue.bestBid} (${percentageDiff.toFixed(2)}%)`);
+		log(formatPriceLog(cryptoName, 'brought', cryptoRecord.lastBuyPrice, cryptoValue.bestBid, percentageDiff));
 
 		if (percentageDiff > config.sellPercentage) { // crypto is up more than x %
 

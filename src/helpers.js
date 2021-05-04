@@ -50,6 +50,24 @@ const saveJsonFile = (data, fileName) => {
 
 
 /**
+ * @param {string} name - crypto currency name
+ * @param {string} context - 'brought' or 'sold'
+ * @param {number} price
+ * @param {number} value
+ * @param {number} diff
+ * @returns {string}
+ */
+function formatPriceLog(name, context, price, value, diff) {
+
+	const sym = diff > 0
+		? '+'
+		: '';
+
+	return `${name} was last ${context} at ${price} and is now ${value} **(${sym}${diff.toFixed(2)}%)**`;
+}
+
+
+/**
  * @param {string} type - buy or sell
  * @param {string} cryptoName
  * @param {number} amount
@@ -62,7 +80,7 @@ function formatOrder(type, cryptoName, amount, value) {
 		name: cryptoName,
 		amount,
 		value,
-		summary: `${type} order placed for ${amount} of ${cryptoName} coins at $${value}USD`,
+		summary: `${type} order placed for ${amount} ${cryptoName} coins at ${value} USD`,
 	};
 }
 
@@ -115,6 +133,7 @@ module.exports = {
 	calculatePercDiff,
 	round,
 	saveJsonFile,
+	formatPriceLog,
 	formatOrder,
 	logToDiscord,
 };
