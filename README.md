@@ -5,11 +5,7 @@
 - ^ Add weights to each crypto (percentages of how much USD to spent)
 - Change option to just buy at market price when there is no record of it - make it only buy in at a certain %
 - Icon or emoji for discord bot
-- Better format for transaction logs
 - Compare transaction logs and actual orders-filled and see if there are any discrepencies (https://crypto.com/exchange/wallets/spot/order-history)
-- Set up in AWS lambda
-    - Need to set up trigger
-    - Need lambda deploy script - don't forget env vars
 
 
 ### Usage

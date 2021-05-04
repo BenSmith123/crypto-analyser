@@ -12,6 +12,7 @@
     },
     "rules": {
         "radix": "off",
+		"func-names": "off",
 		"no-continue": "off",
 		"no-plusplus": "off",
         "padded-blocks": "off",
