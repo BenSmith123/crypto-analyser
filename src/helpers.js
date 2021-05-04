@@ -62,6 +62,7 @@ function formatOrder(type, cryptoName, amount, value) {
 		name: cryptoName,
 		amount,
 		value,
+		summary: `${type} order placed for ${amount} of ${cryptoName} coins at $${value}USD`,
 	};
 }
 
@@ -87,7 +88,7 @@ async function logToDiscord(message, isAlert = false) {
 		content: message,
 	};
 
-	if (typeof message !== 'string') { data.content = JSON.stringify(message); }
+	if (typeof message !== 'string') { data.content = JSON.stringify(message, null, 4); }
 
 	if (isAlert) { console.log(data.content); } // console log any alerts
 
