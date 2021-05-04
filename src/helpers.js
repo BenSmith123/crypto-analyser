@@ -79,6 +79,7 @@ function formatOrder(type, cryptoName, amount, value) {
 		type,
 		name: cryptoName,
 		amount,
+		...type === 'Sell' && { estimateUSD: (amount * value).toFixed(2) }, // for sell orders give estimate USD
 		value,
 		summary: `${type} order placed for ${amount} ${cryptoName} coins at ${value} USD`,
 	};
