@@ -9,8 +9,6 @@ cp ./src/* ./dist/src; # copy all code in src
 cd dist;
 npm install --production; # prod install - don't include dev deps
 
-cd ..;
-
-zip -r ./dist/lambda.zip ./dist;
+zip -r lambda.zip ./*
 
 echo "Distribution .zip created in ./dist/lambda.zip!";
