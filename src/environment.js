@@ -18,6 +18,10 @@ const INTERNAL_RUN = process.env.INTERNAL_RUN === 'true' || false;
 // enable discord logs by default if not specified
 const DISCORD_ENABLED = (!process.env.DISCORD_ENABLED || process.env.DISCORD_ENABLED === 'true');
 
+// default log to my channels
+const DISCORD_URL_ALERTS = process.env.DISCORD_LOGS_URL || '/834201420302647306/3UyU72vcsRwstQmYjiMxb-5d7YSIDNDu1QWz2vMg_Y5nQsP5X05vgMr-PvYqma15MinZ';
+const DISCORD_URL_LOGS = process.env.DISCORD_URL_LOGS || '/834182612419346432/0cvHHmrCE0tXAGmzr_l4RgGvEl7LhVgd4cej0g_rOjSrhcKcEjoyAYkRIh-lJHa0FnPy';
+// TODO ^ should this be moved to database config instead?
 
 module.exports = {
 	API_URL,
@@ -26,4 +30,6 @@ module.exports = {
 	TRANSACTIONS_ENABLED,
 	INTERNAL_RUN,
 	DISCORD_ENABLED,
+	DISCORD_URL_ALERTS,
+	DISCORD_URL_LOGS,
 };

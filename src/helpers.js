@@ -2,7 +2,7 @@
 const axios = require('axios');
 const { writeFileSync } = require('fs');
 
-const { DISCORD_ENABLED } = require('./environment');
+const { DISCORD_ENABLED, DISCORD_URL_ALERTS, DISCORD_URL_LOGS } = require('./environment');
 
 const { version } = require('../package.json');
 
@@ -99,8 +99,8 @@ async function logToDiscord(message, isAlert = false) {
 	if (!message) { throw new Error('No message content'); }
 
 	const url = isAlert
-		? `${discordApi}/834201420302647306/3UyU72vcsRwstQmYjiMxb-5d7YSIDNDu1QWz2vMg_Y5nQsP5X05vgMr-PvYqma15MinZ`
-		: `${discordApi}/834182612419346432/0cvHHmrCE0tXAGmzr_l4RgGvEl7LhVgd4cej0g_rOjSrhcKcEjoyAYkRIh-lJHa0FnPy`;
+		? discordApi + DISCORD_URL_ALERTS
+		: discordApi + DISCORD_URL_LOGS;
 
 	const data = {
 		username: `Analyser v${version}`,
