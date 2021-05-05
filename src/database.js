@@ -31,7 +31,7 @@ async function loadInvestmentConfig() {
 /**
  * Returns true if the database investment state data is valid
  */
-function validateInvestmentConfig(data) {
+function investmentConfigIsValid(data) {
 
 	if (data.id === 'configuration'
 	// && data.isPaused
@@ -92,7 +92,7 @@ async function updateInvestmentConfig(config) {
 		Item: config,
 	};
 
-	validateInvestmentConfig(config);
+	investmentConfigIsValid(config);
 
 	return dynamoClient.put(params).promise(params);
 }
@@ -116,7 +116,7 @@ async function saveTransaction(transaction) {
 
 module.exports = {
 	loadInvestmentConfig,
-	validateInvestmentConfig,
+	investmentConfigIsValid,
 	updateTransactions,
 	updateInvestmentConfig,
 	saveTransaction,

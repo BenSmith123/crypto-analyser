@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "AWS_PROFILE=bensmith node src/index.js",
-    "deploy": "sh scripts/zip.sh && sh scripts/deploy.sh && scripts/cleanup.sh",
+    "deploy": "sh scripts/zip.sh && sh scripts/deploy.sh && sh scripts/cleanup.sh",
     "configure": "sh scripts/updateEnvVars.sh"
   },
   "dependencies": {

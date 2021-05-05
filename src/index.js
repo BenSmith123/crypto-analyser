@@ -1,6 +1,6 @@
 
 const { INTERNAL_RUN } = require('./environment');
-const { validateInvestmentConfig, updateTransactions } = require('./database');
+const { investmentConfigIsValid, updateTransactions } = require('./database');
 let { loadInvestmentConfig, updateInvestmentConfig } = require('./database');
 let { getAccountSummary, getAllCryptoValues, checkLatestValueTrend, placeBuyOrder, placeSellOrder } = require('./crypto');
 const { calculatePercDiff, round, formatOrder, formatPriceLog, logToDiscord } = require('./helpers');
@@ -40,26 +40,19 @@ exports.main = async function (event, mockFunctions = null) {
 		checkLatestValueTrend = () => false;
 	}
 
-	let investmentConfig;
+	const investmentConfig = await loadInvestmentConfig();
 
-	try {
-
-		investmentConfig = await loadInvestmentConfig();
-		validateInvestmentConfig(investmentConfig);
-
-		if (investmentConfig.isPaused) {
-			// don't send as alert since whatever caused the pause would have done that already
-			await logToDiscord('Paused - no action taken');
-			return []; // end lambda
-		}
-
-	} catch (err) {
+	if (!investmentConfigIsValid(investmentConfig)) {
 		// log error and end lambda (without updating to a paused state)
-		// await log to ensure lambda doesn't terminate before log is properly sent
-		await logToDiscord(`An error occurred loading/validating database config: ${err.message}\n\nStack: ${err.stack}`, true);
+		await logToDiscord(`An error occurred validating database config: \n\nConfig: ${JSON.stringify(investmentConfig)}`, true);
 		return []; // end lambda
 	}
 
+	if (investmentConfig.isPaused) {
+		// don't send as alert since whatever caused the pause would have done that already
+		await logToDiscord('Paused - no action taken');
+		return []; // end lambda
+	}
 
 	try {
 		const results = await makeCryptoCurrenciesTrades(investmentConfig);
@@ -75,12 +68,14 @@ exports.main = async function (event, mockFunctions = null) {
 	} catch (err) {
 
 		// generic unexpected error scenario - log, update database config to paused, end lambda
+
+		// await log to ensure lambda doesn't terminate before log is properly sent
 		await logToDiscord(`An unexpected error has occurred: ${err.message}\n\nStack: ${err.stack}`, true);
 
 		investmentConfig.isPaused = true;
 		await updateInvestmentConfig(investmentConfig);
 
-		return err;
+		return err; // end lambda
 
 	} finally {
 
