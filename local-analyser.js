@@ -190,7 +190,7 @@ function updateAccountSummary(orderPlaced, pricePerCoin) {
 
 	const { accounts } = accountSummary;
 
-	if (orderPlaced === 'Buy') {
+	if (orderPlaced === 'buy') {
 
 		// const usdtValue = accountSummary[0].available;
 		const availableCoin = accounts[0].available / pricePerCoin;

@@ -75,13 +75,20 @@ function formatPriceLog(name, context, price, value, diff) {
  * @returns {object}
  */
 function formatOrder(type, cryptoName, amount, value) {
+
+	const isBuy = type === 'buy';
+
 	return {
-		type,
+		type: type.toUpperCase(),
 		name: cryptoName,
 		amount,
-		...type === 'Sell' && { estimateUSD: (amount * value).toFixed(2) }, // for sell orders give estimate USD
 		value,
-		summary: `${type} order placed for ${amount} ${cryptoName} coins at ${value} USD`,
+		estimate: isBuy
+			? (amount * value) + cryptoName
+			: `${(amount * value).toFixed(2)} USD`,
+		summary: isBuy
+			? `Buy order placed for $${amount} USD worth of ${cryptoName} coins at ${value}`
+			: `Sell order placed for ${amount} ${cryptoName} coins at $${value} USD`,
 	};
 }
 

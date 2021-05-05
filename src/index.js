@@ -147,7 +147,7 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 			const order = await placeBuyOrder(cryptoName, availableUSDT);
 
 			config = updateTransactions(config, cryptoName, cryptoValue, true);
-			ordersPlaced.push(formatOrder('Buy', cryptoName, availableUSDT, cryptoValue.bestAsk));
+			ordersPlaced.push(formatOrder('buy', cryptoName, availableUSDT, cryptoValue.bestAsk));
 
 			canBuy = false; // order placed, make no more
 			continue;
@@ -179,7 +179,7 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 				const order = await placeBuyOrder(cryptoName, availableUSDT);
 
 				config = updateTransactions(config, cryptoName, cryptoValue, true);
-				ordersPlaced.push(formatOrder('Buy', cryptoName, availableUSDT, cryptoValue.bestAsk));
+				ordersPlaced.push(formatOrder('buy', cryptoName, availableUSDT, cryptoValue.bestAsk));
 
 				canBuy = false;
 			}
