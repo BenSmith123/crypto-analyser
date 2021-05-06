@@ -2,6 +2,7 @@
 const axios = require('axios');
 const crypto = require('crypto-js');
 
+const { logToDiscord } = require('./helpers');
 const { API_URL, API_KEY, API_SECRET, TRANSACTIONS_ENABLED } = require('./environment');
 
 const API_ENDPOINTS = {
@@ -184,7 +185,7 @@ async function checkLatestValueTrend(cryptoName, checkIncrease = true) {
 	const lookback = 3; // num of array elements to compare
 
 	try {
-		const candlestick = await getCryptoCandlestick(cryptoName, timeframe);
+		const candlestick = await getCryptoCandlestick(`${cryptoName}_USDT`, timeframe);
 
 		if (!candlestick.data || !candlestick.data.length) { throw new Error(`Missing candlestick data for ${cryptoName}`); }
 
@@ -195,7 +196,8 @@ async function checkLatestValueTrend(cryptoName, checkIncrease = true) {
 			: latest.every(isDecreasing);
 
 	} catch (err) {
-		// TODO - log error
+		// TODO - remove if you don't see any of these logs
+		logToDiscord(`checkLatestValueTrend error has occurred: ${err.message}\n\nStack: ${err.stack}`, true);
 		return false;
 	}
 }
