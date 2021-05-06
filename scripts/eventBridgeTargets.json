@@ -1,0 +1,6 @@
+[
+    {
+        "Id": "1",
+        "Arn": "arn:aws:lambda:ap-southeast-2:793861092533:function:crypto-analyser"
+    }
+]

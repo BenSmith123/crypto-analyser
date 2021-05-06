@@ -8,7 +8,8 @@
 			"program": "${workspaceFolder}/local-invoke.js",
 			"internalConsoleOptions": "openOnSessionStart",
 			"env": {
-				"AWS_PROFILE": "bensmith"
+				"AWS_PROFILE": "bensmith",
+				"TRANSACTIONS_ENABLED": "false"
             }
 		},
 		{
