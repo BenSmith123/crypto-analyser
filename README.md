@@ -21,6 +21,18 @@
 - This will buy the crypto at the market price when there is USDT in your account
 - TODO ..
 
+
+### Setting up new users
+- Create new lambda function
+- Add environment variables:
+	- API_KEY
+	- API_SECRET
+	- DATABASE_ID - unique ID for accessing their config in database
+	- DISCORD_URL_ALERTS
+	- DISCORD_URL_LOGS
+- Create a new database record for them in the database
+- Add the event bridge trigger
+
 ### Commands
 - `npm run deploy` 
 	- Copies the package.json and src/ files into a temp `/dist` folder

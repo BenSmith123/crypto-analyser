@@ -1,6 +1,7 @@
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 const { DynamoDB } = require('aws-sdk'); // lambda runtime has aws-sdk installed
+const { DATABASE_ID } = require('./environment');
 
 const dynamoClient = new DynamoDB.DocumentClient({ region: 'ap-southeast-2' });
 const DATABASE_TABLE = 'CRYPTO_TRANSACTIONS';
@@ -33,7 +34,7 @@ async function loadInvestmentConfig() {
  */
 function investmentConfigIsValid(data) {
 
-	if (data.id === 'configuration'
+	if (data.id === DATABASE_ID
 	// && data.isPaused
 	&& data.sellPercentage
 	&& data.buyPercentage
