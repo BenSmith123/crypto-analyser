@@ -5,7 +5,7 @@
 
 mkdir -p "./dist/src";
 cp package.json "./dist/";
-cp ./src/* ./dist/src; # copy all code in src
+cp -r ./src/* ./dist/src; # copy all code in src
 cd dist;
 npm install --production; # prod install - don't include dev deps
 
