@@ -6,9 +6,7 @@ const { DISCORD_ENABLED, DISCORD_URL_ALERTS, DISCORD_URL_LOGS } = require('./env
 
 const { version } = require('../package.json');
 
-const decimalValueMap = require('./decimalValueMap.json');
-
-const discordApi = 'https://discord.com/api/webhooks';
+const decimalValueMap = require('./data/decimalValueMap.json');
 
 
 const calculatePercDiff = (a, b) => 100 * ((a - b) / ((a + b) / 2));
@@ -106,8 +104,8 @@ async function logToDiscord(message, isAlert = false) {
 	if (!message) { throw new Error('No message content'); }
 
 	const url = isAlert
-		? discordApi + DISCORD_URL_ALERTS
-		: discordApi + DISCORD_URL_LOGS;
+		? DISCORD_URL_ALERTS
+		: DISCORD_URL_LOGS;
 
 	const data = {
 		username: `Analyser v${version}`,
