@@ -24,12 +24,7 @@
 
 ### Setting up new users
 - Create new lambda function
-- Add environment variables:
-	- API_KEY
-	- API_SECRET
-	- DATABASE_ID - unique ID for accessing their config in database
-	- DISCORD_URL_ALERTS
-	- DISCORD_URL_LOGS
+- Run `npm run configure <lambda-name>`
 - Create a new database record for them in the database
 - Add the event bridge trigger
 
@@ -40,10 +35,15 @@
 	- Zips the folder and deploys it to AWS lambda
 	- Deletes the temp `/dist` folder
 
+- `npm run configure <lambda-name>`
+	- Configures a lambda function with the default settings (timeout, env vars, handler, role etc.)
+	- NOTE: This clears any existing environment variables
+
 ### Reminders
 - It's safe to make this repo public when you need, keys and temp data aren't committed!
 
 ### Resources
+- Discord announcements channel: https://discord.com/api/webhooks/839816114094866463/UYjXAY_evzfnCKohuFNNFnG7IOQlNhigZKvaCZ0juPz0HZSD7MtCptGcVIj1kOhMl7z2
 - Crypto.com exchange: https://crypto.com/exchange
 - Crypto.com API docs: https://exchange-docs.crypto.com/spot/index.html
 - Big code comment generator: https://ascii.today/

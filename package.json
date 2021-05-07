@@ -6,7 +6,7 @@
   "scripts": {
     "start": "AWS_PROFILE=bensmith node src/index.js",
     "deploy": "sh scripts/zip.sh && sh scripts/deploy.sh && sh scripts/cleanup.sh",
-    "configure": "sh scripts/updateEnvVars.sh"
+    "configure": "sh scripts/configureEnvironment.sh"
   },
   "dependencies": {
     "axios": "^0.21.1",
