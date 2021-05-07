@@ -6,7 +6,7 @@ const { DISCORD_ENABLED, DISCORD_URL_ALERTS, DISCORD_URL_LOGS } = require('./env
 
 const { version } = require('../package.json');
 
-const decimalValueMap = require('./decimalValueMap.json');
+const decimalValueMap = require('./data/decimalValueMap.json');
 
 
 const calculatePercDiff = (a, b) => 100 * ((a - b) / ((a + b) / 2));
