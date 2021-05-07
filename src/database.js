@@ -14,7 +14,9 @@ async function loadInvestmentConfig() {
 
 	const params = {
 		TableName: DATABASE_TABLE,
-		Key: { id: 'configuration' },
+		Key: {
+			id: DATABASE_ID,
+		},
 	};
 
 	return new Promise((resolve, reject) => {
@@ -86,7 +88,7 @@ function updateTransactions(investmentConfig, name, value, isBuyOrder) {
  */
 async function updateInvestmentConfig(config) {
 
-	if (!config.id || config.id !== 'configuration') { throw new Error('Missing config id'); }
+	if (!config.id || config.id !== DATABASE_ID) { throw new Error('Missing config id'); }
 
 	const params = {
 		TableName: DATABASE_TABLE,
