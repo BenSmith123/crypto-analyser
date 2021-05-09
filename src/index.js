@@ -2,7 +2,7 @@
 const { INTERNAL_RUN } = require('./environment');
 const { investmentConfigIsValid, updateTransactions } = require('./database');
 let { loadInvestmentConfig, updateInvestmentConfig } = require('./database');
-let { getAccountSummary, getAllCryptoValues, checkLatestValueTrend, placeBuyOrder, placeSellOrder } = require('./crypto');
+let { getAccountSummary, getOrderDetail, getAllCryptoValues, checkLatestValueTrend, placeBuyOrder, placeSellOrder } = require('./crypto');
 const { calculatePercDiff, round, formatOrder, formatPriceLog, logToDiscord } = require('./helpers');
 const { log, getLogs } = require('./logging');
 
@@ -15,6 +15,9 @@ const { log, getLogs } = require('./logging');
  * @returns
  */
 exports.main = async function (event, mockFunctions = null) {
+
+	const a = await getOrderDetail();
+	console.log(a);
 
 	// Scheduled job (CloudWatch)
 	if (!isScheduledEvent(event)) {
@@ -225,3 +228,5 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 
 
 const isScheduledEvent = event => event['detail-type'] && event['detail-type'] === 'Scheduled Event';
+
+const timeout = ms => new Promise(resolve => setTimeout(resolve, ms));
