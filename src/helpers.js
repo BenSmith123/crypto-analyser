@@ -82,11 +82,12 @@ function formatOrder(type, cryptoName, amount, value) {
 		amount,
 		value,
 		estimate: isBuy
-			? (amount * value) + cryptoName
+			? `${amount * value} ${cryptoName}`
 			: `${(amount * value).toFixed(2)} USD`,
 		summary: isBuy
 			? `Buy order placed for $${amount} USD worth of ${cryptoName} coins at ${value}`
 			: `Sell order placed for ${amount} ${cryptoName} coins at $${value} USD`,
+		date: new Date().toLocaleString(),
 	};
 }
 
