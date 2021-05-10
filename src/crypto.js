@@ -9,8 +9,11 @@ const API_ENDPOINTS = {
 	getTicker: 'public/get-ticker',
 	getInstruments: 'public/get-instruments',
 	getCandlestick: 'public/get-candlestick',
+	// private endpoints (post requests)
 	getAccountSummary: 'private/get-account-summary',
 	createOrder: 'private/create-order',
+	getOrderHistory: 'private/get-order-history',
+	getOrderDetail: 'private/get-order-detail',
 };
 
 
@@ -101,7 +104,7 @@ async function getCryptoValue(instrumentName) {
 async function getAccountSummary(currency) {
 
 	const request = {
-		id: 11,
+		id: 10000,
 		method: API_ENDPOINTS.getAccountSummary,
 		api_key: API_KEY,
 		params: currency
@@ -117,6 +120,58 @@ async function getAccountSummary(currency) {
 		.reduce((acc, curr) => ( // eslint-disable-line no-return-assign
 			acc[curr.currency] = { ...curr }, acc), // eslint-disable-line no-sequences
 		{});
+}
+
+
+/**
+ * Returns the crypto API account summary
+ *
+ * @param {string} currency - optional (default will return all crypto)
+ * @returns {object} - structured object by currency name e.g. { CRO: { balance: 0 } }
+ */
+async function getOrderHistory() {
+
+	const request = {
+		id: 11,
+		method: API_ENDPOINTS.getOrderHistory,
+		api_key: API_KEY,
+		params: {
+			instrument_name: 'DOGE_USDT',
+			// start_ts: 1587846300000,
+			// end_ts: 1587846358253,
+			page_size: 20,
+			page: 0,
+		},
+		nonce: Date.now(),
+	};
+
+	const response = await postToCryptoApi(request);
+
+	return response;
+}
+
+
+/**
+ * Returns the crypto API account summary
+ *
+ * @param {string} currency - optional (default will return all crypto)
+ * @returns {object} - structured object by currency name e.g. { CRO: { balance: 0 } }
+ */
+async function getOrderDetail() {
+
+	const request = {
+		id: 11,
+		method: API_ENDPOINTS.getOrderDetail,
+		api_key: API_KEY,
+		params: {
+			order_id: '1405957663751236930',
+		},
+		nonce: Date.now(),
+	};
+
+	const response = await postToCryptoApi(request);
+
+	return response;
 }
 
 
@@ -261,6 +316,8 @@ async function placeSellOrder(cryptoName, amount) {
 
 module.exports = {
 	getAccountSummary,
+	getOrderHistory,
+	getOrderDetail,
 	// getCryptoValue, - export if needed
 	getAllCryptoValues,
 	// getCryptoCandlestick, - export if needed

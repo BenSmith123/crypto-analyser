@@ -1,0 +1,40 @@
+{
+    "id": 11,
+    "method": "private/get-order-detail",
+    "code": 0,
+    "result": {
+        "trade_list": [
+            {
+                "side": "SELL",
+                "fee": 0.00146752,
+                "trade_id": "1405957663862775558",
+                "instrument_name": "CRO_USDT",
+                "create_time": 1619737603561,
+                "traded_price": 0.18344,
+                "traded_quantity": 5,
+                "fee_currency": "USDT",
+                "order_id": "1405957663751236930",
+                "client_oid": "my_order00234",
+                "liquidity_indicator": "TAKER"
+            }
+        ],
+        "order_info": {
+            "status": "FILLED",
+            "side": "SELL",
+            "price": 0,
+            "quantity": 5,
+            "order_id": "1405957663751236930",
+            "client_oid": "my_order00234",
+            "create_time": 1619737603558,
+            "update_time": 1619737603561,
+            "type": "MARKET",
+            "instrument_name": "CRO_USDT",
+            "avg_price": 0.18344,
+            "cumulative_quantity": 5,
+            "cumulative_value": 0.9172,
+            "fee_currency": "USDT",
+            "exec_inst": "",
+            "time_in_force": "GOOD_TILL_CANCEL"
+        }
+    }
+}
