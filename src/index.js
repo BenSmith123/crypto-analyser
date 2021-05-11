@@ -63,7 +63,12 @@ exports.main = async function (event, mockFunctions = null) {
 		// if any orders were made, update the database config and send transaction logs
 		if (results.ordersPlaced.length) {
 			await updateInvestmentConfig(results.config);
-			await logToDiscord(results.ordersPlaced, true);
+			await logToDiscord(
+				results.ordersPlaced.length === 1
+					? results.ordersPlaced[0]
+					: results.ordersPlaced,
+				true,
+			);
 		}
 
 		return results.ordersPlaced || [];
@@ -73,7 +78,7 @@ exports.main = async function (event, mockFunctions = null) {
 		// generic unexpected error scenario - log, update database config to paused, end lambda
 
 		// await log to ensure lambda doesn't terminate before log is properly sent
-		await logToDiscord(`An unexpected error has occurred: ${err.message}\n\nStack: ${err.stack}`, true);
+		await logToDiscord(`An unexpected error has occurred: ${err.message}\n\nDate: ${new Date().toLocaleString()}\n\nStack: ${err.stack}`, true);
 
 		investmentConfig.isPaused = true;
 		await updateInvestmentConfig(investmentConfig);
