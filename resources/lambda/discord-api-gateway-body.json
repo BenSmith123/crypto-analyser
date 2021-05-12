@@ -1,0 +1,32 @@
+{
+    "application_id": "839044411249655828",
+    "channel_id": "834181611041194002",
+    "data": {
+        "id": "841811603678691358",
+        "name": "blep"
+    },
+    "guild_id": "834181611041193999",
+    "id": "841988318254202880",
+    "member": {
+        "avatar": null,
+        "deaf": false,
+        "is_pending": false,
+        "joined_at": "2021-04-20T21:39:54.478000+00:00",
+        "mute": false,
+        "nick": null,
+        "pending": false,
+        "permissions": "17179869183",
+        "premium_since": null,
+        "roles": [],
+        "user": {
+            "avatar": null,
+            "discriminator": "4581",
+            "id": "409274228794458113",
+            "public_flags": 0,
+            "username": "beninja12"
+        }
+    },
+    "token": "<token>",
+    "type": 2,
+    "version": 1
+}
