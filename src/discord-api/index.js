@@ -1,4 +1,10 @@
 
+/**
+ * Discord slash commands guide: https://discord.com/developers/docs/interactions/slash-commands
+ *
+ * Commands:
+ *
+ */
 
 const nacl = require('tweetnacl');
 require('dotenv').config();
@@ -13,7 +19,7 @@ const API_ENDPOINTS = {
 
 exports.discordController = async function (event) {
 
-	console.log(JSON.stringify(event));
+	console.log('event: ', JSON.stringify(event));
 
 	if (!requestIsValid(event)) {
 		return {
@@ -23,16 +29,17 @@ exports.discordController = async function (event) {
 	}
 
 	// get the requested endpoint
-	const endpoint = event.pathParameters && event.pathParameters.endpoint
-		? event.pathParameters.endpoint
-		: 'root';
+	// const endpoint = event.pathParameters && event.pathParameters.endpoint
+	// 	? event.pathParameters.endpoint
+	// 	: 'root';
 
-	const a = await API_ENDPOINTS[endpoint];
-	console.log(a);
+	const body = JSON.parse(event.body) || null;
+
+	const a = await API_ENDPOINTS[endpoint]();
 
 	const response = {
 		statusCode: 200,
-		body: JSON.stringify(a),
+		body: a,
 	};
 
 	return response;
@@ -41,7 +48,14 @@ exports.discordController = async function (event) {
 
 
 function respondToPing() {
-	return JSON.stringify({ type: 1 });
+	// return JSON.stringify({ type: 1 });
+
+	return JSON.stringify({
+		type: 4,
+		data: {
+			content: 'Congrats on sending your command!',
+		},
+	});
 }
 
 
@@ -49,8 +63,8 @@ function requestIsValid({ headers, body }) {
 
 	const { PUBLIC_KEY } = process.env;
 
-	const signature = headers['X-Signature-Ed25519'];
-	const timestamp = headers['X-Signature-Timestamp'];
+	const signature = headers['x-signature-ed25519'];
+	const timestamp = headers['x-signature-timestamp'];
 
 	if (!signature || !timestamp) { return false; }
 
