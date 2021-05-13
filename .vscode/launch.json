@@ -2,27 +2,39 @@
     "version": "0.2.0",
     "configurations": [
 		{
-			"name": "Local invoke",
+			"name": "Invoke [Scheduled event]",
 			"type": "node",
 			"request": "launch",
-			"program": "${workspaceFolder}/local-invoke.js",
+			"program": "${workspaceFolder}/run/local-invoke-scheduled-event.js",
 			"internalConsoleOptions": "openOnSessionStart",
 			"env": {
 				"AWS_PROFILE": "bensmith",
-				"TRANSACTIONS_ENABLED": "false"
+				"TRANSACTIONS_ENABLED": "false",
+				"DATABASE_ID": "configuration"
+            }
+		},
+		{
+			"name": "Invoke [API Gateway]",
+			"type": "node",
+			"request": "launch",
+			"program": "${workspaceFolder}/run/local-invoke-discord.js",
+			"internalConsoleOptions": "openOnSessionStart",
+			"env": {
+				"AWS_PROFILE": "bensmith",
             }
 		},
 		{
 			"name": "Local analyse",
 			"type": "node",
 			"request": "launch",
-			"program": "${workspaceFolder}/local-analyser.js",
+			"program": "${workspaceFolder}/run/local-analyser.js",
 			"internalConsoleOptions": "openOnSessionStart",
 			"env": {
 				"AWS_PROFILE": "bensmith",
 				"DISCORD_ENABLED": "false",
 				"INTERNAL_RUN": "true", // ensure no external API or database calls are made
-				"TRANSACTIONS_ENABLED": "false" // buy/sell functions are already replaced but disable just in case!
+				"TRANSACTIONS_ENABLED": "false", // buy/sell functions are already replaced but disable just in case!
+				"DATABASE_ID": "configuration"
             }
 		},
 		{

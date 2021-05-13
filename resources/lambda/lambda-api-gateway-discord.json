@@ -80,6 +80,6 @@
         "domainName": "csezryhvsa.execute-api.ap-southeast-2.amazonaws.com",
         "apiId": "csezryhvsa"
     },
-    "body": "{\"application_id\":\"839044411249655828\",\"id\":\"841961544311898113\",\"token\":\"aW50ZXJhY3Rpb246ODQxOTYxNTQ0MzExODk4MTEzOkRieHRLYncwZ0RPQTRpdE1PUmhQTmczRjZxakZXNXU5dVhDOG82cnA5UEYwck5rZTMyQjdqNnNIRkw2ckFYQWViMERqc09nZmUxeVcyTTJOclNIMGpIZlpzeDFtbzR2Z3l0S2RhT3pNbWRNQWMxVVFXUnpxZ29HaG1Gelk5all0\",\"type\":1,\"user\":{\"avatar\":null,\"discriminator\":\"4581\",\"id\":\"409274228794458113\",\"public_flags\":0,\"username\":\"beninja12\"},\"version\":1}",
+    "body": "{\"application_id\":\"839044411249655828\",\"channel_id\":\"834181611041194002\",\"data\":{\"id\":\"841811603678691358\",\"name\":\"blep\"},\"guild_id\":\"834181611041193999\",\"id\":\"841988318254202880\",\"member\":{\"avatar\":null,\"deaf\":false,\"is_pending\":false,\"joined_at\":\"2021-04-20T21:39:54.478000+00:00\",\"mute\":false,\"nick\":null,\"pending\":false,\"permissions\":\"17179869183\",\"premium_since\":null,\"roles\":[],\"user\":{\"avatar\":null,\"discriminator\":\"4581\",\"id\":\"409274228794458113\",\"public_flags\":0,\"username\":\"beninja12\"}},\"token\":\"aW50ZXJhY3Rpb246ODQxOTg4MzE4MjU0MjAyODgwOm4xb1BvY2ZSbFB3U1NXUWNIbWt1eWZFcGlSWHFJRThUMER3a0JBU0hWUkltMzBESVI4ZFA2VVg0TDVrWTNmeEpPTU9vVzBGbk1YTWFIRkxkbjROVnZhMDBoZDBHUEZYdmU5YXEyVzFXV0NMNmQ4Y09oNUhRSFZ1aEJTdVNBUERw\",\"type\":2,\"version\":1}",
     "isBase64Encoded": false
 }

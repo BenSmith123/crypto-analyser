@@ -45,6 +45,7 @@
 
 ### Resources
 - Discord announcements channel: https://discord.com/api/webhooks/839816114094866463/UYjXAY_evzfnCKohuFNNFnG7IOQlNhigZKvaCZ0juPz0HZSD7MtCptGcVIj1kOhMl7z2
+- Discord slash commands guide: https://discord.com/developers/docs/interactions/slash-commands
 - Crypto.com exchange: https://crypto.com/exchange
 - Crypto.com API docs: https://exchange-docs.crypto.com/spot/index.html
 - Big code comment generator: https://ascii.today/
