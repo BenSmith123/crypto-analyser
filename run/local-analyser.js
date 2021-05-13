@@ -13,9 +13,9 @@
 const axios = require('axios');
 const fs = require('fs');
 
-const lambda = require('./src/index');
-const { API_URL } = require('./src/environment');
-const { saveJsonFile } = require('./src/helpers');
+const lambda = require('../src/index');
+const { API_URL } = require('../src/environment');
+const { saveJsonFile } = require('../src/helpers');
 
 const outputDirectory = 'analysis-output.private/';
 const resultsFileName = 'crypto-api-results.json';
