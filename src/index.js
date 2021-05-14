@@ -16,8 +16,8 @@ const { log, getLogs } = require('./logging');
  */
 exports.main = async function (event, mockFunctions = null) {
 
-	const a = await getOrderDetail();
-	console.log(a);
+	// const a = await getOrderDetail();
+	// console.log(a);
 
 	// Scheduled job (CloudWatch)
 	if (!isScheduledEvent(event)) {
