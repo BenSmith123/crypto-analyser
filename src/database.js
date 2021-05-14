@@ -10,12 +10,12 @@ const DATABASE_TABLE = 'CRYPTO_TRANSACTIONS';
 /**
  * Returns the investment configuration data from the database
  */
-async function loadInvestmentConfig() {
+async function loadInvestmentConfig(databaseId) {
 
 	const params = {
 		TableName: DATABASE_TABLE,
 		Key: {
-			id: DATABASE_ID,
+			id: DATABASE_ID || databaseId, // if there is a env var, use it otherwise use param
 		},
 	};
 

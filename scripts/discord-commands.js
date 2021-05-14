@@ -5,16 +5,16 @@ require('dotenv').config();
 const url = 'https://discord.com/api/v8/applications/839044411249655828/commands';
 
 const json = {
-	name: 'list-available-crypto',
-	description: 'Lists the available crypto-currencies on Crypto.com',
-	// options: [
-	// 	{
-	// 		name: 'animal',
-	// 		description: 'The type of animal',
-	// 		type: 3,
-	// 		required: true,
-	// 	},
-	// ],
+	name: 'set-buy-percentage',
+	description: 'Sets the BUY percentage threshold (the decrease that has to meet before buying back to the crypto)',
+	options: [
+		{
+			name: 'percentage',
+			description: '-',
+			type: 4, // 3 = string, 4 = int, 5 = boolean
+			required: true,
+		},
+	],
 };
 
 const headers = {

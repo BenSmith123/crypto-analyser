@@ -97,8 +97,9 @@ function formatOrder(type, cryptoName, amount, value) {
  *
  * @param {string|object} message
  * @param {boolean} [isAlert=false] - optional: log to #alerts instead of #logs channel
+ * @param {boolean} [username] - optional: override the default bot name - used in discord-api
  */
-async function logToDiscord(message, isAlert = false) {
+async function logToDiscord(message, isAlert = false, username) {
 
 	if (!DISCORD_ENABLED) { return null; }
 
@@ -109,7 +110,7 @@ async function logToDiscord(message, isAlert = false) {
 		: DISCORD_URL_LOGS;
 
 	const data = {
-		username: `Analyser v${version}`,
+		username: username || `Analyser v${version}`,
 		content: message,
 	};
 
