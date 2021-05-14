@@ -9,6 +9,13 @@
 	- noBuyBack - after selling coin, don't buy back into it and stop monitoring it
 - Fix USDT selling in only full dollar amounts
 - Log account currencies every x hours
+- Start saving ALL transactions to the database
+- Add user crypto.com data to their database config on every transaction!
+	- Add slash command to get this ^
+- Implement more discord commands!
+	- Allow user to set buy/sell percentages
+	- Allow user to set targetted currency - must be in the available list
+- Trial waiting/confirming transactions?
 - Add a second crypto and test - no logic around ratios to split USDT into different coins - if a coin is sold and is now in USDT, 100% of it will go into the next buy
 - ^ Add weights to each crypto (percentages of how much USD to spent)
 - Change option to just buy at market price when there is no record of it - make it only buy in at a certain %

@@ -88,7 +88,7 @@ function updateTransactions(investmentConfig, name, value, isBuyOrder) {
  */
 async function updateInvestmentConfig(config) {
 
-	if (!config.id || config.id !== DATABASE_ID) { throw new Error('Missing config id'); }
+	if (!config.id) { throw new Error('Missing config ID'); }
 
 	const params = {
 		TableName: DATABASE_TABLE,

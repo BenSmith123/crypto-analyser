@@ -7,6 +7,7 @@
  *
  * Commands:
  *    /get-configuration
+ *    /health-check
  *    /pause
  *    /unpause
  *    /changelog
@@ -43,6 +44,7 @@ const API_ENDPOINTS = {
 	'get-configuration': getConfigurationResponse,
 	'list-available-crypto': listAvailableCrypto,
 	pause: updateUserConfig,
+	unpause: updateUserConfig,
 };
 
 
@@ -72,7 +74,7 @@ exports.discordController = async function (event) {
 		COMMAND = body?.data?.name || 'root';
 
 		USER_NAME = body.member.user.username;
-		ID = body.member.user.username;
+		ID = body.member.user.id;
 
 
 		const content = await API_ENDPOINTS[COMMAND]();
@@ -90,7 +92,7 @@ exports.discordController = async function (event) {
 	} catch (err) {
 
 		// unexpected error scenario - log these
-		await logToDiscord(`An unexpected error has occurred: ${err.message}\n\nDate: ${new Date().toLocaleString()}\n\nStack: ${err.stack}`, true, discordName);
+		await logToDiscord(`An unexpected error has occurred: ${err.message}\n\nStack: ${err.stack}\n\nDate: ${new Date().toLocaleString()}`, true, discordName);
 
 		return {
 			statusCode: 500,
