@@ -1,41 +1,41 @@
 {
     "logs": [
-        {
-            "version": "1.0.4",
-            "changes": [
-                "Fix transaction logs 'estimate' showing incorrect value for BUY orders"
+		{
+            "version": "1.0.1",
+			"devChanges":[
+                "Update build/deploy scripts for faster code-rollouts"
             ],
+            "changes": [
+                "Fix error scenario pausing not working"
+            ]
+        },
+		{
+            "version": "1.0.2",
             "devChanges":[
-                "Minor changes to support the new 'Crypto assistant' bot"
+                "Simplify discord configuration to set up new users faster"
+            ],
+            "changes": [
+                "Fix buying back bug - price difference was showing an increase even on decrease scenarios",
+                "Minor notification improvements for alerts & logging"
             ]
         },
         {
             "version": "1.0.3",
+			"devChanges":[
+                "Configurable database loading/updating based on discord userId"
+            ],
             "changes": [
                 "Added date to all transaction and error messages",
                 "Fix run time to be on the hour"
-            ],
-            "devChanges":[
-                "Configurable database loading/updating based on discord userId"
             ]
         },
-        {
-            "version": "1.0.2",
-            "changes": [
-                "Fix buying back bug - price difference was showing an increase even on decrease scenarios",
-                "Minor notification improvements for alerts & logging"
+		{
+            "version": "1.0.4",
+			"devChanges":[
+                "Minor changes to support the new 'Crypto assistant' bot"
             ],
-            "devChanges":[
-                "Simplify discord configuration to set up new users faster"
-            ]
-        },
-        {
-            "version": "1.0.1",
             "changes": [
-                "Fix error scenario pausing not working"
-            ],
-            "devChanges":[
-                "Update build/deploy scripts for faster code-rollouts"
+                "Fix transaction logs 'estimate' showing incorrect value for BUY orders"
             ]
         }
     ]

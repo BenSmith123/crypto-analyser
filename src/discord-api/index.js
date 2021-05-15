@@ -125,7 +125,7 @@ function getChangelog() {
 	const results = [];
 
 	changelog.logs.forEach(log => {
-		results.push(`v${log.version}`);
+		results.push(`\nv${log.version}`);
 
 		log.changes.forEach(change => {
 			results.push(`   - ${change}`);
