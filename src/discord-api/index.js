@@ -47,6 +47,8 @@ const API_ENDPOINTS = {
 	'list-available-crypto': listAvailableCrypto,
 	pause: updateUserConfig,
 	unpause: updateUserConfig,
+	'set-buy-percentage': updateUserConfig,
+	'set-sell-percentage': updateUserConfig,
 };
 
 
@@ -54,9 +56,12 @@ const API_ENDPOINTS = {
 let COMMAND;
 let USER_NAME;
 let ID;
+let BODY;
 
 
 exports.discordController = async function (event) {
+
+	// await logToDiscord(event.body, true, discordName);
 
 	console.log('event: ', JSON.stringify(event));
 
@@ -71,12 +76,12 @@ exports.discordController = async function (event) {
 		// ? event.pathParameters.endpoint
 		// : 'root';
 
-		const body = JSON.parse(event.body) || null;
+		BODY = JSON.parse(event.body) || null;
 
-		COMMAND = body?.data?.name || 'root';
+		COMMAND = BODY?.data?.name || 'root';
 
-		USER_NAME = body.member.user.username;
-		ID = body.member.user.id;
+		USER_NAME = BODY.member.user.username;
+		ID = BODY.member.user.id;
 
 
 		const content = await API_ENDPOINTS[COMMAND]();
@@ -115,6 +120,22 @@ function errorResponse(err, statusCode = 400) {
 
 function respondToPing() {
 	return JSON.stringify({ type: 1 });
+}
+
+
+/**
+ * Returns the input parameter of the discord slash command if it exists
+ *
+ * @param {string} name - name of the slash command parameter
+ */
+function getInputParam(name) {
+	const options = BODY.data?.options;
+
+	if (!options) return null;
+
+	const param = options.find(option => (option.name === name));
+
+	return param?.value || null;
 }
 
 
@@ -218,7 +239,8 @@ async function listAvailableCrypto() {
 		.map(instrument => (instrument.instrument_name.includes('USDT')
 			? instrument.base_currency
 			: null))
-		.filter(r => r !== null);
+		.filter(r => r !== null)
+		.sort();
 
 	return `${cryptoList.join('\n')}\n${cryptoList.length} total crypto currencies available`;
 }
@@ -231,17 +253,37 @@ async function listAvailableCrypto() {
 async function updateUserConfig() {
 
 	let responseMsg;
+	let percentage;
+
+	// validate commands that require input params before continuing
+	if (COMMAND === 'set-buy-percentage' || COMMAND === 'set-sell-percentage') {
+		percentage = getInputParam('percentage');
+
+		if (!percentage || percentage <= 0) {
+			return `Invalid input (${percentage}) - must be a positive number`;
+		}
+	}
 
 	const config = await getUserConfiguration();
 
 	if (COMMAND === 'pause') {
 		config.isPaused = true;
-		responseMsg = 'Your crypto-bot is now **paused.**';
+		responseMsg = 'Your crypto-bot is now **paused**';
 	}
 
 	if (COMMAND === 'unpause') {
 		config.isPaused = false;
-		responseMsg = 'Your crypto-bot is now **unpaused.**';
+		responseMsg = 'Your crypto-bot is now **unpaused**';
+	}
+
+	if (COMMAND === 'set-buy-percentage') {
+		config.buyPercentage = percentage;
+		responseMsg = `Your buy percentage is now **-${percentage}%** of the last sell price`;
+	}
+
+	if (COMMAND === 'set-sell-percentage') {
+		config.sellPercentage = percentage;
+		responseMsg = `Your sell percentage is now **+${percentage}%** of the last buy price`;
 	}
 
 	await updateInvestmentConfig(config);
