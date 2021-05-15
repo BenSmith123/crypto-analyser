@@ -34,13 +34,14 @@ const discordName = 'Crypto assistant';
 const discordUserConfigMap = {
 	'409274228794458113': 'configuration',
 	'234154409033072650': 'configuration-jett',
-	'604242730268491787': 'configuration-z',
+	'604242730268491787': 'configuration-zlatko',
 };
 
 
 // map discord command paths to their functions
 const API_ENDPOINTS = {
 	root: respondToPing,
+	'health-check': checkCryptoApiStatus,
 	'get-configuration': getConfigurationResponse,
 	'list-available-crypto': listAvailableCrypto,
 	pause: updateUserConfig,
@@ -116,6 +117,29 @@ function respondToPing() {
 }
 
 
+/**
+ * Queries any crypto.com API endpoint and checks the data is valid
+ */
+async function checkCryptoApiStatus() {
+
+	let isHealthy;
+
+	try {
+		const res = await axios(`${API_URL}public/get-instruments`);
+
+		// even in status 200 scenarios the API can still return a 'maintenance page'
+		isHealthy = res.data.result.instruments.length > 0;
+
+	} catch (err) {
+		isHealthy = false;
+	}
+
+	return isHealthy
+		? 'Crypto.com exchange appears to be **healthy**'
+		: 'Crypto.com exchange appears **down**!';
+}
+
+
 function requestIsValid({ headers, body }) {
 
 	const { PUBLIC_KEY } = process.env;
@@ -187,7 +211,7 @@ async function updateUserConfig() {
 	}
 
 	if (COMMAND === 'unpause') {
-		config.isPaused = true;
+		config.isPaused = false;
 		responseMsg = 'Your crypto-bot is now **unpaused.**';
 	}
 
