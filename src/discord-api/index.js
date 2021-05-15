@@ -42,6 +42,7 @@ const discordUserConfigMap = {
 const API_ENDPOINTS = {
 	root: respondToPing,
 	'health-check': checkCryptoApiStatus,
+	changelog: getChangelog,
 	'get-configuration': getConfigurationResponse,
 	'list-available-crypto': listAvailableCrypto,
 	pause: updateUserConfig,
@@ -117,6 +118,29 @@ function respondToPing() {
 }
 
 
+function getChangelog() {
+
+	const changelog = require('../data/changelog.json');
+
+	const results = [];
+
+	changelog.logs.forEach(log => {
+		results.push(`v${log.version}`);
+
+		log.changes.forEach(change => {
+			results.push(`   - ${change}`);
+		});
+
+		log.devChanges.forEach(change => {
+			results.push(`   - [dev] ${change}`);
+		});
+
+	});
+
+	return results.join('\n');
+}
+
+
 /**
  * Queries any crypto.com API endpoint and checks the data is valid
  */
@@ -184,14 +208,19 @@ async function getConfigurationResponse() {
 
 /**
  * Returns a list of the available crypto currencies on the crypto.com API
+ * Available crypto currencies listed and can be traded into USDT
  */
 async function listAvailableCrypto() {
 
 	const res = await axios(`${API_URL}public/get-instruments`);
 
-	return res.data.result.instruments
-		.map(instrument => instrument.base_currency)
-		.join('\n');
+	const cryptoList = res.data.result.instruments
+		.map(instrument => (instrument.instrument_name.includes('USDT')
+			? instrument.base_currency
+			: null))
+		.filter(r => r !== null);
+
+	return `${cryptoList.join('\n')}\n${cryptoList.length} total crypto currencies available`;
 }
 
 
