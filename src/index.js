@@ -58,7 +58,20 @@ exports.main = async function (event, mockFunctions = null) {
 	}
 
 	try {
-		const results = await makeCryptoCurrenciesTrades(investmentConfig);
+
+		const accountSummary = await getAccountSummary();
+
+		if (!accountSummary || !Object.keys(accountSummary).length) {
+			throw new Error('No accounts returned');
+		}
+
+		const results = await makeCryptoCurrenciesTrades(investmentConfig, accountSummary);
+
+		// log account details every 12pm
+		const d = new Date();
+		if (d.getHours() === 12 && d.getMinutes() === 0) {
+			log(`Account summary: \n${JSON.stringify(accountSummary, null, 4)}`);
+		}
 
 		// if any orders were made, update the database config and send transaction logs
 		if (results.ordersPlaced.length) {
@@ -99,26 +112,19 @@ exports.main = async function (event, mockFunctions = null) {
 
 
 // main function for handling the buying/selling of the crypto currencies
-async function makeCryptoCurrenciesTrades(investmentConfig) {
+async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 
 	let config = investmentConfig;
 
-	// TODO - wrap this in a try/catch and retry on error?
-	const accountSummary = await getAccountSummary();
-
-	if (!accountSummary || !Object.keys(accountSummary).length) {
-		throw new Error('No accounts returned');
-	}
-
 	// can try buy if there is USDT funds - $1 or more
-	let canBuy = (accountSummary.USDT && accountSummary.USDT.available >= 1) || false;
+	let canBuy = (account.USDT && account.USDT.available >= 1) || false;
 
 	// can try sell if there are any cryptos that aren't just USDT
-	const canSell = Object.keys(accountSummary).length > 1 || !accountSummary.USDT;
+	const canSell = Object.keys(account).length > 1 || !account.USDT;
 
 	// store amount of USDT available if it exists
 	const availableUSDT = canBuy
-		? Math.floor(accountSummary.USDT.available) // ignore fractions of cents
+		? Math.floor(account.USDT.available) // ignore fractions of cents
 		: 0;
 
 	const ordersPlaced = [];
@@ -212,7 +218,7 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 			}
 
 			// otherwise, crypto value is up but not consistently, sell!
-			const availableCrypto = round(accountSummary[cryptoName].available, cryptoName);
+			const availableCrypto = round(account[cryptoName].available, cryptoName);
 
 			const order = await placeSellOrder(cryptoName, availableCrypto); // TODO - stack promises.all?
 

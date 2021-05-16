@@ -141,7 +141,7 @@ function getInputParam(name) {
 
 function getChangelog() {
 
-	const changelog = require('../data/changelog.json');
+	const changelog = require('../data/changelog.json'); // eslint-disable-line global-require
 
 	const results = [];
 

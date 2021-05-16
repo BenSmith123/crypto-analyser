@@ -35,7 +35,8 @@
                 "Minor changes to support the new 'Crypto assistant' bot"
             ],
             "changes": [
-                "Fix transaction logs 'estimate' showing incorrect value for BUY orders"
+                "Fix transaction logs 'estimate' showing incorrect value for BUY orders",
+				"Log account summary once a day at 12pm"
             ]
         }
     ]
