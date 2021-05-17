@@ -44,11 +44,14 @@ const API_ENDPOINTS = {
 	'health-check': checkCryptoApiStatus,
 	changelog: getChangelog,
 	'get-configuration': getConfigurationResponse,
-	'list-available-crypto': listAvailableCrypto,
+	'list-available-crypto': getAvailableCrypto,
+
 	pause: updateUserConfig,
 	unpause: updateUserConfig,
 	'set-buy-percentage': updateUserConfig,
 	'set-sell-percentage': updateUserConfig,
+	'force-sell': updateUserConfig,
+	'change-crypto': updateUserConfig,
 };
 
 
@@ -230,8 +233,11 @@ async function getConfigurationResponse() {
 /**
  * Returns a list of the available crypto currencies on the crypto.com API
  * Available crypto currencies listed and can be traded into USDT
+ *
+ * @param {boolean} [returnArray] - optional (default false)
+ * @returns {array|string}
  */
-async function listAvailableCrypto() {
+async function getAvailableCrypto(returnArray) {
 
 	const res = await axios(`${API_URL}public/get-instruments`);
 
@@ -242,7 +248,9 @@ async function listAvailableCrypto() {
 		.filter(r => r !== null)
 		.sort();
 
-	return `${cryptoList.join('\n')}\n${cryptoList.length} total crypto currencies available`;
+	return returnArray
+		? cryptoList
+		: `${cryptoList.join('\n')}\n${cryptoList.length} total crypto currencies available`;
 }
 
 
@@ -284,6 +292,31 @@ async function updateUserConfig() {
 	if (COMMAND === 'set-sell-percentage') {
 		config.sellPercentage = percentage;
 		responseMsg = `Your sell percentage is now **+${percentage}%** of the last buy price`;
+	}
+
+	if (COMMAND === 'force-sell') {
+		config.forceSell = true;
+		responseMsg = `All **${config.currenciesTargeted[0]}** will be sold by the crypto-bot shortly!`;
+	}
+
+	if (COMMAND === 'change-crypto') {
+
+		const inputCrypto = getInputParam('currency-code');
+
+		if (!inputCrypto) {
+			return 'No crypto currency provided';
+		}
+
+		const availableCrypto = await getAvailableCrypto(true);
+
+		const newCrypto = inputCrypto.toUpperCase();
+
+		if (availableCrypto.find(c => c === newCrypto)) {
+			config.currenciesTargeted = [newCrypto];
+			responseMsg = `Your crypto-bot will now look at **${newCrypto}**, it will buy in at the market price.`;
+		} else {
+			return `'**${newCrypto}**' is either an invalid name or is not available through the crypto.com exchange`;
+		}
 	}
 
 	await updateInvestmentConfig(config);
