@@ -37,6 +37,7 @@
             "changes": [
                 "Fix transaction logs 'estimate' showing incorrect value for BUY orders",
 				"Log account summary once a day at 12pm",
+				"Log a warning message when the crypto drops below a certain percentage",
 				"Added support for '/force-sell' crypto assistant command",
 				"Added support for '/change-crypto' crypto assistant command"
             ]

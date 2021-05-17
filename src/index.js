@@ -209,6 +209,11 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 
 		log(formatPriceLog(cryptoName, 'brought', cryptoRecord.lastBuyPrice, cryptoValue.bestBid, percentageDiff));
 
+		// log a warning if price has dropped below the specified percentage
+		if (config.alertPercentage && percentageDiff < config.alertPercentage) {
+			log(`[Warning] ${cryptoName} is now ${percentageDiff.toFixed(2)}% since purchasing, consider selling using the /force-sell command`);
+		}
+
 		// crypto is up more than x %
 		if (percentageDiff > config.sellPercentage || config.forceSell) {
 
