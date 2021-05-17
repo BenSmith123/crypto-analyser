@@ -30,13 +30,15 @@
             ]
         },
 		{
-            "version": "1.0.4",
+            "version": "1.1.0",
 			"devChanges":[
                 "Minor changes to support the new 'Crypto assistant' bot"
             ],
             "changes": [
                 "Fix transaction logs 'estimate' showing incorrect value for BUY orders",
-				"Log account summary once a day at 12pm"
+				"Log account summary once a day at 12pm",
+				"Added support for '/force-sell' crypto assistant command",
+				"Added support for '/change-crypto' crypto assistant command"
             ]
         }
     ]

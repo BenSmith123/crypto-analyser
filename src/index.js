@@ -209,7 +209,8 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 
 		log(formatPriceLog(cryptoName, 'brought', cryptoRecord.lastBuyPrice, cryptoValue.bestBid, percentageDiff));
 
-		if (percentageDiff > config.sellPercentage) { // crypto is up more than x %
+		// crypto is up more than x %
+		if (percentageDiff > config.sellPercentage || config.forceSell) {
 
 			if (await checkLatestValueTrend(cryptoName, true)) {
 				// if the crypto value is still increasing, hold the crypto!
@@ -223,6 +224,8 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 			const order = await placeSellOrder(cryptoName, availableCrypto); // TODO - stack promises.all?
 
 			config = updateTransactions(config, cryptoName, cryptoValue, false);
+
+			if (config.forceSell) { config.forceSell = false; }
 
 			const orderDetails = formatOrder('Sell', cryptoName, availableCrypto, cryptoValue.bestBid);
 			log(orderDetails.summary);
