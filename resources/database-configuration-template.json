@@ -5,8 +5,9 @@
 	"currenciesTargeted": [
 		"CRO"
 	],
-	"sellPercentage": 10,
-	"buyPercentage": 10,
+	"sellPercentage": 5,
+	"buyPercentage": 5,
+	"alertPercentage": -15,
 	"transactions": {
 		
 	}

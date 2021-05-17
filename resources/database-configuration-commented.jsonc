@@ -1,19 +1,19 @@
 {
-	"id": "configuration",
+	"id": "configuration", // primary key
 	"inputDate": 0, // TODO
 	"isPaused": false, // don't do processing or buying/selling - set this to true under any error scenarios to avoid making invalid transactions etc.
 	"currenciesTargeted": [ // currencies to get values of and determine whether to buy or sell
 		// don't include USDT since that's the stable coin used to trade in/out of
 		"CRO"
 	],
-	"sellPercentage": 10,
-	"buyPercentage": 10,
-	"latest": {
-		"transactionType": 0,
-		"transactionTime": 0,
-		"buyPrice": 0,
-		"sellPrice": 0,
-		"targetBuyPrice": 0,
-		"targetSellPrice": 0
-	}
+	"transactions": {
+		"BTC": {
+			"lastBuyPrice": 58183.78,
+			"orderPlaced": 1620634504490
+		}
+	},
+	"sellPercentage": 10, // positive percentage to sell at (relative to lastBuyPrice) 
+	"buyPercentage": 10, // negative percentage to buy at (relative to lastSellPrice)
+	"alertPercentage": -20, // percentage to send out warning log (relative to lastBuyPrice)
+	"forceSell": false // optional - flag set to force sell the crypto
 }
