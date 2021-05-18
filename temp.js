@@ -1,6 +1,7 @@
 
-const data = require('./resources/crypto-api-response-examples/get-account-summary-all.json');
+// const bcrypt = require('bcrypt');
 
+const data = require('./resources/crypto-api-response-examples/get-account-summary-all.json');
 
 /* eslint-disable max-len */
 /* eslint-disable no-return-assign */
@@ -17,6 +18,27 @@ const PRICE = {
 
 (async () => {
 
+
+	/// /////////////////////////////////
+	// example on storing passwords using hashing/salt
+	// const saltRounds = 10;
+	// const myPlaintextPassword = 's0/\/\P4$$w0rD';
+
+	// bcrypt.genSalt(saltRounds, (err, salt) => {
+
+	// 	console.log(salt);
+
+	// 	bcrypt.hash(myPlaintextPassword, salt, (err, hash) => {
+	// 		console.log(err, hash);
+
+
+	// 		bcrypt.compare(myPlaintextPassword, hash, (err, result) => {
+	// 			console.log(result);
+	// 		});
+	// 	});
+
+	// });
+	/// ////////////////////////////////
 
 	const b = [
 		{
