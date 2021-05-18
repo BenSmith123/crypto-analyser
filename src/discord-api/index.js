@@ -14,8 +14,9 @@
  *    /health-check
  *    /list-available-crypto
  *    /pause
- *    /set-sell-percentage
  *    /set-buy-percentage
+ *    /set-sell-percentage
+ *    /set-sell-warning
  *    /unpause
  */
 
@@ -45,6 +46,7 @@ const API_ENDPOINTS = {
 	'set-sell-percentage': updateUserConfig,
 	'force-sell': updateUserConfig,
 	'change-crypto': updateUserConfig,
+	'set-sell-warning': updateUserConfig,
 };
 
 
@@ -76,7 +78,7 @@ exports.discordController = async function (event) {
 
 		COMMAND = BODY?.data?.name || 'root';
 
-		USER_NAME = BODY.member.user.username;
+		// USER_NAME = BODY.member.user.username;
 		ID = BODY.member.user.id;
 
 
@@ -146,6 +148,15 @@ async function updateUserConfig() {
 		}
 	}
 
+	if (COMMAND === 'set-sell-warning') {
+		percentage = getInputParam('percentage');
+
+		if (!percentage || percentage >= 0) {
+			return `Invalid input (${percentage}) - must be a negative number`;
+		}
+	}
+
+	// only load config if the above validation was successful
 	const config = await getUserConfiguration(ID);
 
 	if (COMMAND === 'pause') {
@@ -166,6 +177,11 @@ async function updateUserConfig() {
 	if (COMMAND === 'set-sell-percentage') {
 		config.sellPercentage = percentage;
 		responseMsg = `Your sell percentage is now **+${percentage}%** of the last buy price`;
+	}
+
+	if (COMMAND === 'set-sell-warning') {
+		config.alertPercentage = percentage;
+		responseMsg = `Your warning percentage is set to notify you when the value is **${percentage}%** of the last purchase price`;
 	}
 
 	if (COMMAND === 'force-sell') {
