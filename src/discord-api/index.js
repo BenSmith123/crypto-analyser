@@ -6,36 +6,28 @@
  * API endpoint: https://csezryhvsa.execute-api.ap-southeast-2.amazonaws.com/prod
  *
  * Commands:
- *    /get-configuration
- *    /health-check
- *    /pause
- *    /unpause
  *    /changelog
- *    /list-available-crypto
- *    /set-sell-percentage
- *    /set-buy-percentage
+ *    /change-crypto
  *    /force-sell
  *    /force-buy
+ *    /get-configuration
+ *    /health-check
+ *    /list-available-crypto
+ *    /pause
+ *    /set-sell-percentage
+ *    /set-buy-percentage
+ *    /unpause
  */
 
-const nacl = require('tweetnacl');
 require('dotenv').config();
 
-const axios = require('axios');
+const { respondToPing, errorResponse, requestIsValid, getUserConfiguration } = require('./discord-helpers');
+const { getChangelog, checkCryptoApiStatus, getAvailableCrypto } = require('./slash-commands');
+const { updateInvestmentConfig } = require('../database');
 const { logToDiscord } = require('../helpers');
-const { loadInvestmentConfig, updateInvestmentConfig } = require('../database');
-const { API_URL } = require('../environment');
 
 
 const discordName = 'Crypto assistant';
-
-
-// map of discord ID's and their database config ID
-const discordUserConfigMap = {
-	'409274228794458113': 'configuration',
-	'234154409033072650': 'configuration-jett',
-	'604242730268491787': 'configuration-zlatko',
-};
 
 
 // map discord command paths to their functions
@@ -46,6 +38,7 @@ const API_ENDPOINTS = {
 	'get-configuration': getConfigurationResponse,
 	'list-available-crypto': getAvailableCrypto,
 
+	// update config commands
 	pause: updateUserConfig,
 	unpause: updateUserConfig,
 	'set-buy-percentage': updateUserConfig,
@@ -104,25 +97,18 @@ exports.discordController = async function (event) {
 		// unexpected error scenario - log these
 		await logToDiscord(`An unexpected error has occurred: ${err.message}\n\nStack: ${err.stack}\n\nDate: ${new Date().toLocaleString()}`, true, discordName);
 
-		return {
-			statusCode: 500,
-			body: 'invalid request signature',
-		};
+		return errorResponse('Invalid request signature', 500);
 	}
 
 };
 
 
-function errorResponse(err, statusCode = 400) {
-	return {
-		statusCode,
-		body: err.message,
-	};
-}
-
-
-function respondToPing() {
-	return JSON.stringify({ type: 1 });
+/**
+ * Returns the user database configuration as formatted JSON
+ */
+async function getConfigurationResponse() {
+	const config = await getUserConfiguration(ID);
+	return JSON.stringify(config, null, 4);
 }
 
 
@@ -139,118 +125,6 @@ function getInputParam(name) {
 	const param = options.find(option => (option.name === name));
 
 	return param?.value || null;
-}
-
-
-function getChangelog() {
-
-	const changelog = require('../data/changelog.json'); // eslint-disable-line global-require
-
-	const results = [];
-
-	changelog.logs.forEach(log => {
-		results.push(`\nv${log.version}`);
-
-		log.devChanges.forEach(change => {
-			results.push(`   - [dev] ${change}`);
-		});
-
-		log.changes.forEach(change => {
-			results.push(`   - ${change}`);
-		});
-
-	});
-
-	return results.join('\n');
-}
-
-
-/**
- * Queries any crypto.com API endpoint and checks the data is valid
- */
-async function checkCryptoApiStatus() {
-
-	let isHealthy;
-
-	try {
-		const res = await axios(`${API_URL}public/get-instruments`);
-
-		// even in status 200 scenarios the API can still return a 'maintenance page'
-		isHealthy = res.data.result.instruments.length > 0;
-
-	} catch (err) {
-		isHealthy = false;
-	}
-
-	return isHealthy
-		? 'Crypto.com exchange appears to be **healthy**'
-		: 'Crypto.com exchange appears **down**!';
-}
-
-
-function requestIsValid({ headers, body }) {
-
-	const { PUBLIC_KEY } = process.env;
-
-	const signature = headers['x-signature-ed25519'];
-	const timestamp = headers['x-signature-timestamp'];
-
-	if (!signature || !timestamp) { return false; }
-
-	return nacl.sign.detached.verify(
-		Buffer.from(timestamp + body),
-		Buffer.from(signature, 'hex'),
-		Buffer.from(PUBLIC_KEY, 'hex'),
-	);
-
-}
-
-
-/**
- * Returns the user database configuration
- *
- * @returns {object}
- */
-async function getUserConfiguration() {
-
-	const configId = discordUserConfigMap[ID];
-
-	if (!configId) { throw new Error(`User does not exist: ID=${ID}`); }
-
-	return loadInvestmentConfig(configId);
-}
-
-
-/**
- * Returns the user database configuration as formatted JSON
- */
-async function getConfigurationResponse() {
-	const config = await getUserConfiguration();
-	return JSON.stringify(config, null, 4);
-}
-
-
-/**
- * Returns a list of the available crypto currencies on the crypto.com API
- * Available crypto currencies listed and can be traded into USDT
- *
- * @param {boolean} [returnArray] - optional (default false)
- * @returns {array|string}
- */
-async function getAvailableCrypto(returnArray) {
-
-	const res = await axios(`${API_URL}public/get-instruments`);
-
-	const cryptoList = res.data.result.instruments
-		.map(instrument => (instrument.instrument_name.includes('USDT')
-			? instrument.base_currency
-			: null))
-		.filter(r => r !== null)
-		.sort();
-
-	return returnArray
-		? cryptoList
-		: `${cryptoList.join('\n')}\n${cryptoList.length} total crypto currencies available`;
 }
 
 
@@ -272,7 +146,7 @@ async function updateUserConfig() {
 		}
 	}
 
-	const config = await getUserConfiguration();
+	const config = await getUserConfiguration(ID);
 
 	if (COMMAND === 'pause') {
 		config.isPaused = true;
