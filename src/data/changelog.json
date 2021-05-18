@@ -41,6 +41,15 @@
 				"Added support for '/force-sell' crypto assistant command",
 				"Added support for '/change-crypto' crypto assistant command"
             ]
+        },
+		{
+            "version": "1.1.1",
+			"devChanges":[
+                
+            ],
+            "changes": [
+				"Fix transaction message day/month being back-to-front"
+            ]
         }
     ]
 }

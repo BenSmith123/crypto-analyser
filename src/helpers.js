@@ -1,5 +1,7 @@
 
 const axios = require('axios');
+const moment = require('moment-timezone');
+
 const { writeFileSync } = require('fs');
 
 const { DISCORD_ENABLED, DISCORD_URL_ALERTS, DISCORD_URL_LOGS } = require('./environment');
@@ -7,6 +9,8 @@ const { DISCORD_ENABLED, DISCORD_URL_ALERTS, DISCORD_URL_LOGS } = require('./env
 const { version } = require('../package.json');
 
 const decimalValueMap = require('./data/decimalValueMap.json');
+
+moment.tz.setDefault('Pacific/Auckland');
 
 
 const calculatePercDiff = (a, b) => 100 * ((a - b) / ((a + b) / 2));
@@ -87,7 +91,7 @@ function formatOrder(type, cryptoName, amount, value) {
 		summary: isBuy
 			? `Buy order placed for $${amount} USD worth of ${cryptoName} coins at ${value}`
 			: `Sell order placed for ${amount} ${cryptoName} coins at $${value} USD`,
-		date: new Date().toLocaleString(),
+		date: moment(Date.now()).format('DD-MM-YYYY, HH:mma'),
 	};
 }
 

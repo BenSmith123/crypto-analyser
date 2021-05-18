@@ -12,9 +12,11 @@ function getChangelog() {
 	changelog.logs.forEach(log => {
 		results.push(`\nv${log.version}`);
 
-		log.devChanges.forEach(change => {
-			results.push(`   - [dev] ${change}`);
-		});
+		if (log.devChanges) {
+			log.devChanges.forEach(change => {
+				results.push(`   - [dev] ${change}`);
+			});
+		}
 
 		log.changes.forEach(change => {
 			results.push(`   - ${change}`);
