@@ -2,9 +2,11 @@
 const { INTERNAL_RUN } = require('./environment');
 const { investmentConfigIsValid, updateTransactions } = require('./database');
 let { loadInvestmentConfig, updateInvestmentConfig } = require('./database');
-let { getAccountSummary, getOrderDetail, getAllCryptoValues, checkLatestValueTrend, placeBuyOrder, placeSellOrder } = require('./crypto');
+let { getAccountSummary, getAllCryptoValues, checkLatestValueTrend, placeBuyOrder, placeSellOrder, processPlacedOrder } = require('./crypto');
 const { calculatePercDiff, round, formatOrder, formatPriceLog, logToDiscord } = require('./helpers');
 const { log, getLogs } = require('./logging');
+
+/* eslint-disable no-await-in-loop */
 
 
 /**
@@ -15,9 +17,6 @@ const { log, getLogs } = require('./logging');
  * @returns
  */
 exports.main = async function (event, mockFunctions = null) {
-
-	// const a = await getOrderDetail();
-	// console.log(a);
 
 	// Scheduled job (CloudWatch)
 	if (!isScheduledEvent(event)) {
@@ -144,6 +143,8 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 		const cryptoName = cryptoValueNames[i];
 		const cryptoValue = cryptoValues[cryptoName];
 
+		let cryptoPrice = cryptoValue.bestAsk; // bestAsk for any buy orders, bestBid for sell orders
+
 		// database transaction record of the crypto
 		const cryptoRecord = config.transactions[cryptoName];
 
@@ -155,9 +156,11 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 			// TODO - stack to promises.all?
 			const order = await placeBuyOrder(cryptoName, availableUSDT);
 
-			config = updateTransactions(config, cryptoName, cryptoValue, true);
+			const confirmedValue = await processPlacedOrder(order.result?.order_id);
 
-			const orderDetails = formatOrder('buy', cryptoName, availableUSDT, cryptoValue.bestAsk);
+			config = updateTransactions(config, cryptoName, confirmedValue || cryptoPrice, true);
+
+			const orderDetails = formatOrder('buy', cryptoName, availableUSDT, cryptoPrice, confirmedValue);
 			log(orderDetails.summary);
 
 			ordersPlaced.push(orderDetails);
@@ -174,11 +177,11 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 
 		// check for BUY condition
 		if (cryptoRecord.lastSellPrice) {
+
 			// if previously brought, buy back in if price is < x percent less than last sell price
+			const percentageDiff = calculatePercDiff(cryptoPrice, cryptoRecord.lastSellPrice);
 
-			const percentageDiff = calculatePercDiff(cryptoValue.bestAsk, cryptoRecord.lastSellPrice);
-
-			log(formatPriceLog(cryptoName, 'sold', cryptoRecord.lastSellPrice, cryptoValue.bestAsk, percentageDiff));
+			log(formatPriceLog(cryptoName, 'sold', cryptoRecord.lastSellPrice, cryptoPrice, percentageDiff));
 
 			if (percentageDiff < -config.buyPercentage) { // crypto is down more than x %
 
@@ -191,9 +194,11 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 				// TODO - stack promises.all?
 				const order = await placeBuyOrder(cryptoName, availableUSDT);
 
-				config = updateTransactions(config, cryptoName, cryptoValue, true);
+				const confirmedValue = await processPlacedOrder(order.result?.order_id);
 
-				const orderDetails = formatOrder('buy', cryptoName, availableUSDT, cryptoValue.bestAsk);
+				config = updateTransactions(config, cryptoName, confirmedValue || cryptoValue, true);
+
+				const orderDetails = formatOrder('buy', cryptoName, availableUSDT, cryptoPrice, confirmedValue);
 				log(orderDetails.summary);
 
 				ordersPlaced.push(orderDetails);
@@ -205,9 +210,11 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 		}
 
 		// check for SELL condition
-		const percentageDiff = calculatePercDiff(cryptoValue.bestBid, cryptoRecord.lastBuyPrice);
 
-		log(formatPriceLog(cryptoName, 'brought', cryptoRecord.lastBuyPrice, cryptoValue.bestBid, percentageDiff));
+		cryptoPrice = cryptoValue.bestBid;
+		const percentageDiff = calculatePercDiff(cryptoPrice, cryptoRecord.lastBuyPrice);
+
+		log(formatPriceLog(cryptoName, 'brought', cryptoRecord.lastBuyPrice, cryptoPrice, percentageDiff));
 
 		// log a warning if price has dropped below the specified percentage
 		if (config.alertPercentage && percentageDiff < config.alertPercentage) {
@@ -226,13 +233,15 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 			// otherwise, crypto value is up but not consistently, sell!
 			const availableCrypto = round(account[cryptoName].available, cryptoName);
 
-			const order = await placeSellOrder(cryptoName, availableCrypto); // TODO - stack promises.all?
+			const order = await placeSellOrder(cryptoName, availableCrypto);
 
-			config = updateTransactions(config, cryptoName, cryptoValue, false);
+			const confirmedValue = await processPlacedOrder(order.result?.order_id);
+
+			config = updateTransactions(config, cryptoName, confirmedValue || cryptoPrice, false);
 
 			if (config.forceSell) { config.forceSell = false; }
 
-			const orderDetails = formatOrder('Sell', cryptoName, availableCrypto, cryptoValue.bestBid);
+			const orderDetails = formatOrder('Sell', cryptoName, availableCrypto, cryptoPrice, confirmedValue);
 			log(orderDetails.summary);
 
 			ordersPlaced.push(orderDetails);
@@ -247,5 +256,3 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 
 
 const isScheduledEvent = event => event['detail-type'] && event['detail-type'] === 'Scheduled Event';
-
-const timeout = ms => new Promise(resolve => setTimeout(resolve, ms));

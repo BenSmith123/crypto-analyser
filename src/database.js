@@ -65,15 +65,11 @@ function updateTransactions(investmentConfig, name, value, isBuyOrder) {
 		? 'lastBuyPrice'
 		: 'lastSellPrice';
 
-	const buyOrSellValue = isBuyOrder
-		? value.bestAsk
-		: value.bestBid;
-
 	const updatedConfig = investmentConfig;
 
 	// update transaction record of the current
 	updatedConfig.transactions[name] = {
-		[buyOrSellKey]: buyOrSellValue,
+		[buyOrSellKey]: value,
 		orderPlaced: Date.now(), // new Date(),
 		// TODO - add order Id etc. to this
 	};

@@ -2,7 +2,7 @@
 const axios = require('axios');
 const crypto = require('crypto-js');
 
-const { logToDiscord } = require('./helpers');
+const { timeout, logToDiscord } = require('./helpers');
 const { API_URL, API_KEY, API_SECRET, TRANSACTIONS_ENABLED } = require('./environment');
 
 const API_ENDPOINTS = {
@@ -157,14 +157,14 @@ async function getOrderHistory() {
  * @param {string} currency - optional (default will return all crypto)
  * @returns {object} - structured object by currency name e.g. { CRO: { balance: 0 } }
  */
-async function getOrderDetail() {
+async function getOrderDetail(orderId) {
 
 	const request = {
 		id: 11,
 		method: API_ENDPOINTS.getOrderDetail,
 		api_key: API_KEY,
 		params: {
-			order_id: '1405957663751236930',
+			order_id: orderId,
 		},
 		nonce: Date.now(),
 	};
@@ -172,6 +172,46 @@ async function getOrderDetail() {
 	const response = await postToCryptoApi(request);
 
 	return response;
+}
+
+
+/**
+ * Gets the specified order that was placed. If the order placed was filled,
+ *     save the transaction to the database and return the price the order was placed at
+ * Otherwise,
+ *     try again (with another 1sec delay)
+ *     if order is still not filled, store in database anyway,
+ *     return null
+ *
+ * @param {string} orderId
+ * @param {boolean} secondAttempt - don't repeat if on second attempt
+ * @returns {object|null}
+ */
+async function processPlacedOrder(orderId, secondAttempt = false) {
+
+	if (!orderId) {
+		logToDiscord('No order number provided', true);
+		return null;
+	}
+
+	await timeout(1000);
+
+	const order = await getOrderDetail(orderId);
+
+	const orderIsFilled = order.result?.order_info.status === 'FILLED' || false;
+
+	if (orderIsFilled) {
+		// TODO - store transaction in database
+		return order.result.order_info.avg_price;
+	}
+
+	if (secondAttempt) {
+		logToDiscord(`Order was placed but not filled - no confirmed value (orderId=${orderId})`, true);
+		// TODO - store transaction in database
+		return null;
+	}
+
+	return processPlacedOrder(orderId, true);
 }
 
 
@@ -317,7 +357,8 @@ async function placeSellOrder(cryptoName, amount) {
 module.exports = {
 	getAccountSummary,
 	getOrderHistory,
-	getOrderDetail,
+	// getOrderDetail,
+	processPlacedOrder,
 	// getCryptoValue, - export if needed
 	getAllCryptoValues,
 	// getCryptoCandlestick, - export if needed

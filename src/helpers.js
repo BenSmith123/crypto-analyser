@@ -13,6 +13,8 @@ const decimalValueMap = require('./data/decimalValueMap.json');
 moment.tz.setDefault('Pacific/Auckland');
 
 
+const timeout = ms => new Promise(resolve => setTimeout(resolve, ms));
+
 const calculatePercDiff = (a, b) => 100 * ((a - b) / ((a + b) / 2));
 
 
@@ -72,26 +74,39 @@ function formatPriceLog(name, context, price, value, diff) {
 /**
  * @param {string} type - buy or sell
  * @param {string} cryptoName
- * @param {number} amount
- * @param {number} value - value of the crypto
+ * @param {number} amount - crypto that was brought or USDT that was sold for a crypto
+ * @param {number} valuePlaced - crypto value that the order was PLACED at
+ * @param {number} [valueFilled] - optional - crypto value that the order was FILLED at
  * @returns {object}
  */
-function formatOrder(type, cryptoName, amount, value) {
+function formatOrder(type, cryptoName, amount, valuePlaced, valueFilled) {
 
 	const isBuy = type === 'buy';
+
+	// declare/default values as if the order was not filled
+	let value = valuePlaced;
+	let status = 'PLACED';
+	let estimateFlag = 'Estimate';
+
+	if (valueFilled) {
+		value = valueFilled;
+		status = 'FILLED';
+		estimateFlag = '';
+	}
 
 	return {
 		type: type.toUpperCase(),
 		name: cryptoName,
 		amount,
-		value,
-		estimate: isBuy
-			? `${amount / value} ${cryptoName}`
-			: `${(amount * value).toFixed(2)} USD`,
+		valuePlaced,
+		valueFilled,
+		quantity: isBuy
+			? `${estimateFlag} ${amount / value} ${cryptoName}`
+			: `${estimateFlag} ${(amount * value).toFixed(2)} USD`,
 		summary: isBuy
-			? `Buy order placed for $${amount} USD worth of ${cryptoName} coins at ${value}`
-			: `Sell order placed for ${amount} ${cryptoName} coins at $${value} USD`,
-		date: moment(Date.now()).format('DD-MM-YYYY, HH:mma'),
+			? `Buy order ${status} for $${amount} USD worth of ${cryptoName} coins at ${value}`
+			: `Sell order ${status} for ${amount} ${cryptoName} coins at $${value} USD`,
+		date: moment(Date.now()).format('DD/MM/YYYY, HH:mma'),
 	};
 }
 
@@ -142,6 +157,7 @@ async function logToDiscord(message, isAlert = false, username) {
 
 
 module.exports = {
+	timeout,
 	calculatePercDiff,
 	round,
 	saveJsonFile,

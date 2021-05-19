@@ -43,12 +43,14 @@
             ]
         },
 		{
-            "version": "1.1.1",
+            "version": "1.2.0",
 			"devChanges":[
                 
             ],
             "changes": [
-				"Fix transaction message day/month being back-to-front"
+				"Fix transaction message day/month being back-to-front",
+				"Orders are now confirmed and the order-filled price is then used - making all orders 100% accurate!",
+				"Updated transaction logs to use new real values if available (FILLED), not estimates (PLACED)"
             ]
         }
     ]
