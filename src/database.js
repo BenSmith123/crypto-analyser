@@ -128,7 +128,7 @@ function formatTransaction(transaction) {
 		user: transaction.order_info.client_oid,
 		// expose important data at a higher level for easier access
 		status: transaction.order_info.status,
-		...transaction.result,
+		...transaction,
 	};
 }
 
