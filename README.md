@@ -1,6 +1,5 @@
 
 ### TODO
-- AUDITER lambda or function to watch orders placed and update database config?
 - API interface to get data 
 	- account data, stats etc.
 	- how to deal with auth?
@@ -8,15 +7,13 @@
 	- Auto limit sell order or stop loss
 	- noBuyBack - after selling coin, don't buy back into it and stop monitoring it
 - Fix USDT selling in only full dollar amounts
-- Start saving ALL transactions to the database
 - Add user crypto.com data to their database config on every transaction!
 	- Add slash command to get this ^
-- Trial waiting/confirming transactions?
-- Slash command to set the alert percentage
 - Add a second crypto and test - no logic around ratios to split USDT into different coins - if a coin is sold and is now in USDT, 100% of it will go into the next buy
 - ^ Add weights to each crypto (percentages of how much USD to spent)
 - Change option to just buy at market price when there is no record of it - make it only buy in at a certain %
 - Icon or emoji for discord bot
+- Monitor transactions in database and see if any are not filled before storing
 - Compare transaction logs and actual orders-filled and see if there are any discrepencies (https://crypto.com/exchange/wallets/spot/order-history)
 
 
