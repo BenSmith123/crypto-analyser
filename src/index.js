@@ -53,7 +53,7 @@ exports.main = async function (event, mockFunctions = null) {
 
 	if (investmentConfig.isPaused) {
 		// don't send as alert since whatever caused the pause would have done that already
-		await logToDiscord('Paused - no action taken');
+		await logToDiscord('Paused');
 		return []; // end lambda
 	}
 
