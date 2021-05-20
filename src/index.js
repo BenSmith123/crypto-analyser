@@ -39,6 +39,7 @@ exports.main = async function (event, mockFunctions = null) {
 		getAllCryptoValues = mockFunctions.getAllCryptoValues;
 		placeBuyOrder = () => {}; // TODO - replace with mock
 		placeSellOrder = () => {}; // TODO - replace with mock
+		processPlacedOrder = () => {};
 		checkLatestValueTrend = () => false;
 	}
 
@@ -239,10 +240,14 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 
 			config = updateTransactions(config, cryptoName, confirmedValue || cryptoPrice, false);
 
-			if (config.forceSell) { config.forceSell = false; }
-
 			const orderDetails = formatOrder('Sell', cryptoName, availableCrypto, cryptoPrice, confirmedValue);
 			log(orderDetails.summary);
+
+			if (config.forceSell) {
+				config.forceSell = false;
+				config.isPaused = true;
+				log('/force-sell was used, pausing bot. Use /unpause to unpause the bot.');
+			}
 
 			ordersPlaced.push(orderDetails);
 

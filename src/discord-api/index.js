@@ -186,7 +186,7 @@ async function updateUserConfig() {
 
 	if (COMMAND === 'force-sell') {
 		config.forceSell = true;
-		responseMsg = `All **${config.currenciesTargeted[0]}** will be sold by the crypto-bot shortly!`;
+		responseMsg = `All **${config.currenciesTargeted[0]}** will be sold by the crypto-bot shortly!\nOnce sold the bot will be paused.`;
 	}
 
 	if (COMMAND === 'change-crypto') {
