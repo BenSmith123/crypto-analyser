@@ -4,7 +4,11 @@ const { DynamoDB } = require('aws-sdk'); // lambda runtime has aws-sdk installed
 const { DATABASE_ID } = require('./environment');
 
 const dynamoClient = new DynamoDB.DocumentClient({ region: 'ap-southeast-2' });
-const DATABASE_TABLE = 'CRYPTO_TRANSACTIONS';
+
+const DATABASE_TABLES = {
+	users: 'CRYPTO_USERS',
+	transactions: 'CRYPTO_TRANSACTIONS',
+};
 
 
 /**
@@ -13,7 +17,7 @@ const DATABASE_TABLE = 'CRYPTO_TRANSACTIONS';
 async function loadInvestmentConfig(databaseId) {
 
 	const params = {
-		TableName: DATABASE_TABLE,
+		TableName: DATABASE_TABLES.users,
 		Key: {
 			id: DATABASE_ID || databaseId, // if there is a env var, use it otherwise use param
 		},
@@ -87,7 +91,7 @@ async function updateInvestmentConfig(config) {
 	if (!config.id) { throw new Error('Missing config ID'); }
 
 	const params = {
-		TableName: DATABASE_TABLE,
+		TableName: DATABASE_TABLES.users,
 		Item: config,
 	};
 
@@ -100,16 +104,32 @@ async function updateInvestmentConfig(config) {
 /**
  * Saves a transaction to the database
  */
-async function saveTransaction(transaction) {
+async function saveTransaction(rawTransaction) {
 
-	if (!transaction.id) { throw new Error('Missing transaction id'); }
+	const transaction = formatTransaction(rawTransaction);
+
+	if (!transaction.orderId) { throw new Error('Missing transaction orderId'); }
 
 	const params = {
-		TableName: DATABASE_TABLE,
+		TableName: DATABASE_TABLES.transactions,
 		Item: transaction,
 	};
 
 	return dynamoClient.put(params).promise();
+}
+
+
+/**
+ * Returns a formatted object of the raw transaction object so it can be stored in the database
+ */
+function formatTransaction(transaction) {
+	return {
+		orderId: transaction.order_info.order_id,
+		user: transaction.order_info.client_oid,
+		// expose important data at a higher level for easier access
+		status: transaction.order_info.status,
+		...transaction.result,
+	};
 }
 
 

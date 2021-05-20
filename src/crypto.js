@@ -3,7 +3,8 @@ const axios = require('axios');
 const crypto = require('crypto-js');
 
 const { timeout, logToDiscord } = require('./helpers');
-const { API_URL, API_KEY, API_SECRET, TRANSACTIONS_ENABLED } = require('./environment');
+const { API_URL, API_KEY, API_SECRET, TRANSACTIONS_ENABLED, DATABASE_ID } = require('./environment');
+const { saveTransaction } = require('./database');
 
 const API_ENDPOINTS = {
 	getTicker: 'public/get-ticker',
@@ -201,13 +202,14 @@ async function processPlacedOrder(orderId, secondAttempt = false) {
 	const orderIsFilled = order.result?.order_info.status === 'FILLED' || false;
 
 	if (orderIsFilled) {
-		// TODO - store transaction in database
+		// TODO - should this be awaited or can it be done async
+		saveTransaction(order.result);
 		return order.result.order_info.avg_price;
 	}
 
 	if (secondAttempt) {
+		saveTransaction(order.result); // same here ^
 		logToDiscord(`Order was placed but not filled - no confirmed value (orderId=${orderId})`, true);
-		// TODO - store transaction in database
 		return null;
 	}
 
@@ -317,7 +319,7 @@ async function placeBuyOrder(cryptoName, amount) {
 			side: 'BUY',
 			type: 'MARKET',
 			notional: amount, // amount of USDT
-			client_oid: 'my_ordtfg', // optional client order ID
+			client_oid: DATABASE_ID, // optional client order ID
 		},
 		nonce: Date.now(),
 	};
@@ -345,7 +347,7 @@ async function placeSellOrder(cryptoName, amount) {
 			side: 'SELL',
 			type: 'MARKET',
 			quantity: amount, // amount of {crypto}
-			client_oid: 'my_order00234', // optional client order ID
+			client_oid: DATABASE_ID, // optional client order ID
 		},
 		nonce: Date.now(),
 	};
