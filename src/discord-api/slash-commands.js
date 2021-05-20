@@ -10,7 +10,7 @@ function getChangelog() {
 	const results = [];
 
 	changelog.logs.forEach(log => {
-		results.push(`\nv${log.version}`);
+		results.push(`\n**v${log.version}**`);
 
 		if (log.devChanges) {
 			log.devChanges.forEach(change => {
