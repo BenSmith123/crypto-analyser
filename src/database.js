@@ -1,7 +1,8 @@
 
 // eslint-disable-next-line import/no-extraneous-dependencies
 const { DynamoDB } = require('aws-sdk'); // lambda runtime has aws-sdk installed
-const { DATABASE_ID } = require('./environment');
+const moment = require('moment-timezone');
+const { DATABASE_ID, DATETIME_FORMAT } = require('./environment');
 
 const dynamoClient = new DynamoDB.DocumentClient({ region: 'ap-southeast-2' });
 
@@ -74,7 +75,8 @@ function updateTransactions(investmentConfig, name, value, isBuyOrder) {
 	// update transaction record of the current
 	updatedConfig.transactions[name] = {
 		[buyOrSellKey]: value,
-		orderPlaced: Date.now(), // new Date(),
+		timestamp: Date.now(),
+		orderDate: moment(Date.now()).format(DATETIME_FORMAT),
 		// TODO - add order Id etc. to this
 	};
 

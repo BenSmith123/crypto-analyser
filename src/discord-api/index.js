@@ -186,7 +186,7 @@ async function updateUserConfig() {
 
 	if (COMMAND === 'force-sell') {
 		config.forceSell = true;
-		responseMsg = `All **${config.currenciesTargeted[0]}** will be sold by the crypto-bot shortly!\nOnce sold the bot will be paused.`;
+		responseMsg = `All **${config.currenciesTargeted[0]}** will be sold by the crypto-bot shortly!\nOnce sold the bot will be paused`;
 	}
 
 	if (COMMAND === 'change-crypto') {
@@ -203,7 +203,7 @@ async function updateUserConfig() {
 
 		if (availableCrypto.find(c => c === newCrypto)) {
 			config.currenciesTargeted = [newCrypto];
-			responseMsg = `Your crypto-bot will now look at **${newCrypto}**, it will buy in at the market price.`;
+			responseMsg = `Your crypto-bot will now look at **${newCrypto}**, it will buy in at the market price`;
 		} else {
 			return `'**${newCrypto}**' is either an invalid name or is not available through the crypto.com exchange`;
 		}

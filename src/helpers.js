@@ -4,7 +4,7 @@ const moment = require('moment-timezone');
 
 const { writeFileSync } = require('fs');
 
-const { DISCORD_ENABLED, DISCORD_URL_ALERTS, DISCORD_URL_LOGS } = require('./environment');
+const { DISCORD_ENABLED, DISCORD_URL_ALERTS, DISCORD_URL_LOGS, DATETIME_FORMAT } = require('./environment');
 
 const { version } = require('../package.json');
 
@@ -106,7 +106,7 @@ function formatOrder(type, cryptoName, amount, valuePlaced, valueFilled) {
 		summary: isBuy
 			? `Buy order ${status} for $${amount} USD worth of ${cryptoName} coins at ${value}`
 			: `Sell order ${status} for ${amount} ${cryptoName} coins at $${value} USD`,
-		date: moment(Date.now()).format('DD/MM/YYYY, HH:mma'),
+		date: moment(Date.now()).format(DATETIME_FORMAT),
 	};
 }
 
