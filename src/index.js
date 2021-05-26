@@ -222,10 +222,19 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 			log(`[Warning] ${cryptoName} is now ${percentageDiff.toFixed(2)}% since purchasing, consider selling using the /force-sell command`);
 		}
 
-		// crypto is up more than x %
-		if (percentageDiff > config.sellPercentage || config.forceSell) {
+		const hardSellLow = config.hardSellPercentage.low
+		&& percentageDiff < config.hardSellPercentage.low;
 
-			if (await checkLatestValueTrend(cryptoName, true)) {
+		const hardSellHigh = config.hardSellPercentage.high
+		&& percentageDiff > config.hardSellPercentage.high;
+
+		const shouldForceSell = hardSellLow || hardSellHigh || config.forceSell;
+
+		// crypto is up more than x %
+		if (percentageDiff > config.sellPercentage || shouldForceSell) {
+
+			// ignore this step if any of the hard-sell conditions are met
+			if (!shouldForceSell && await checkLatestValueTrend(cryptoName, true)) {
 				// if the crypto value is still increasing, hold the crypto!
 				log(`${cryptoName} is still increasing, holding off selling..`);
 				continue;
@@ -243,10 +252,10 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 			const orderDetails = formatOrder('Sell', cryptoName, availableCrypto, cryptoPrice, confirmedValue);
 			log(orderDetails.summary);
 
-			if (config.forceSell) {
+			if (shouldForceSell) {
 				config.forceSell = false;
 				config.isPaused = true;
-				log('/force-sell was used, pausing bot. Use /unpause to unpause the bot.');
+				log('A hard-sell threshold was met or /force-sell was used, pausing bot. Use /unpause to unpause the bot.');
 			}
 
 			ordersPlaced.push(orderDetails);
