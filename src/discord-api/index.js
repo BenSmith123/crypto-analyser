@@ -140,7 +140,15 @@ async function updateUserConfig() {
 	let percentage;
 
 	// validate commands that require input params before continuing
-	if (COMMAND === 'set-buy-percentage' || COMMAND === 'set-sell-percentage') {
+	if (COMMAND === 'set-buy-percentage') {
+		percentage = getInputParam('percentage');
+
+		if (!percentage || percentage >= 0) {
+			return `Invalid input (${percentage}) - must be a negative number`;
+		}
+	}
+
+	if (COMMAND === 'set-sell-percentage') {
 		percentage = getInputParam('percentage');
 
 		if (!percentage || percentage <= 0) {
@@ -171,7 +179,7 @@ async function updateUserConfig() {
 
 	if (COMMAND === 'set-buy-percentage') {
 		config.buyPercentage = percentage;
-		responseMsg = `Your buy percentage is now **-${percentage}%** of the last sell price`;
+		responseMsg = `Your buy percentage is now **${percentage}%** of the last sell price`;
 	}
 
 	if (COMMAND === 'set-sell-percentage') {
