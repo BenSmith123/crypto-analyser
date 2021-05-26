@@ -184,7 +184,7 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 
 			log(formatPriceLog(cryptoName, 'sold', cryptoRecord.lastSellPrice, cryptoPrice, percentageDiff));
 
-			if (percentageDiff < -config.buyPercentage) { // crypto is down more than x %
+			if (percentageDiff < config.buyPercentage) { // crypto is down more than x %
 
 				if (await checkLatestValueTrend(cryptoName, false)) {
 					// if the crypto value is still decreasing, hold off buying!
