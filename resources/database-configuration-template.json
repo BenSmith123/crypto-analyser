@@ -5,9 +5,13 @@
 		"CRO"
 	],
 	"sellPercentage": 5,
-	"buyPercentage": 5,
+	"buyPercentage": -5,
 	"alertPercentage": -15,
 	"transactions": {
 		
+	},
+	"hardSellPercentage": {
+		"low": null,
+		"high": null
 	}
 }

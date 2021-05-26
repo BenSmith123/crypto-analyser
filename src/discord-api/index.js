@@ -140,7 +140,10 @@ async function updateUserConfig() {
 	let percentage;
 
 	// validate commands that require input params before continuing
-	if (COMMAND === 'set-buy-percentage') {
+	if (COMMAND === 'set-buy-percentage'
+		|| COMMAND === 'set-sell-warning'
+		|| COMMAND === 'set-hard-sell-low') {
+
 		percentage = getInputParam('percentage');
 
 		if (!percentage || percentage >= 0) {
@@ -148,19 +151,11 @@ async function updateUserConfig() {
 		}
 	}
 
-	if (COMMAND === 'set-sell-percentage') {
+	if (COMMAND === 'set-sell-percentage' || COMMAND === 'set-hard-sell-high') {
 		percentage = getInputParam('percentage');
 
 		if (!percentage || percentage <= 0) {
 			return `Invalid input (${percentage}) - must be a positive number`;
-		}
-	}
-
-	if (COMMAND === 'set-sell-warning') {
-		percentage = getInputParam('percentage');
-
-		if (!percentage || percentage >= 0) {
-			return `Invalid input (${percentage}) - must be a negative number`;
 		}
 	}
 
@@ -190,6 +185,16 @@ async function updateUserConfig() {
 	if (COMMAND === 'set-sell-warning') {
 		config.alertPercentage = percentage;
 		responseMsg = `Your warning percentage is set to notify you when the value is **${percentage}%** of the last purchase price`;
+	}
+
+	if (COMMAND === 'set-hard-sell-low') {
+		config.hardSellPercentage.low = percentage;
+		responseMsg = `Your hard-sell LOW percentage is now **${percentage}%** of the last buy price`;
+	}
+
+	if (COMMAND === 'set-hard-sell-high') {
+		config.hardSellPercentage.high = percentage;
+		responseMsg = `Your hard-sell HIGH percentage is now **+${percentage}%** of the last buy price`;
 	}
 
 	if (COMMAND === 'force-sell') {
