@@ -21,9 +21,11 @@
  */
 
 require('dotenv').config();
+const moment = require('moment-timezone');
 
 const { respondToPing, errorResponse, requestIsValid, getUserConfiguration } = require('./discord-helpers');
 const { getChangelog, checkCryptoApiStatus, getAvailableCrypto } = require('./slash-commands');
+const { DATETIME_FORMAT } = require('../environment');
 const { updateInvestmentConfig } = require('../database');
 const { logToDiscord } = require('../helpers');
 
@@ -97,7 +99,7 @@ exports.discordController = async function (event) {
 	} catch (err) {
 
 		// unexpected error scenario - log these
-		await logToDiscord(`An unexpected error has occurred: ${err.message}\n\nStack: ${err.stack}\n\nDate: ${new Date().toLocaleString()}`, true, discordName);
+		await logToDiscord(`An unexpected error has occurred: ${err.message}\n\nStack: ${err.stack}\n\nDate: ${moment(Date.now()).format(DATETIME_FORMAT)}`, true, discordName);
 
 		return errorResponse('Invalid request signature', 500);
 	}

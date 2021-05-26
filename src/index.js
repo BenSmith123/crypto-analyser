@@ -1,5 +1,7 @@
 
-const { INTERNAL_RUN } = require('./environment');
+const moment = require('moment-timezone');
+
+const { INTERNAL_RUN, DATETIME_FORMAT } = require('./environment');
 const { investmentConfigIsValid, updateTransactions } = require('./database');
 let { loadInvestmentConfig, updateInvestmentConfig } = require('./database');
 let { getAccountSummary, getAllCryptoValues, checkLatestValueTrend, placeBuyOrder, placeSellOrder, processPlacedOrder } = require('./crypto');
@@ -91,7 +93,7 @@ exports.main = async function (event, mockFunctions = null) {
 		// generic unexpected error scenario - log, update database config to paused, end lambda
 
 		// await log to ensure lambda doesn't terminate before log is properly sent
-		await logToDiscord(`An unexpected error has occurred: ${err.message}\n\nDate: ${new Date().toLocaleString()}\n\nStack: ${err.stack}`, true);
+		await logToDiscord(`An unexpected error has occurred: ${err.message}\n\nDate: ${moment(Date.now()).format(DATETIME_FORMAT)}\n\nStack: ${err.stack}`, true);
 
 		investmentConfig.isPaused = true;
 		await updateInvestmentConfig(investmentConfig);
