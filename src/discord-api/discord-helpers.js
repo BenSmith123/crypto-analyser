@@ -9,6 +9,8 @@ const discordUserConfigMap = {
 	'409274228794458113': 'configuration',
 	'234154409033072650': 'configuration-jett',
 	'604242730268491787': 'configuration-zlatko',
+	'479206246302482432': 'configuration-vic',
+	'824023199607685201': 'configuration-ayrton',
 };
 
 

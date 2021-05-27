@@ -57,12 +57,19 @@
         },
 		{
             "version": "2.1.0",
-			"devChanges":[
-
-            ],
             "changes": [
 				"Fix 'buy back percentage' being set as a positive number but used as a negative - **/set-buy-percentage**",
 				"Added support for 'hard-sell' - **/set-hard-sell-low** and **/set-hard-sell-high**"
+            ]
+        },
+		{
+            "version": "2.1.1",
+			"devChanges":[
+                "Fix error message date/times being inaccurate",
+				"Added automated script for rolling out code changes to everyone at the same time"
+            ],
+            "changes": [
+				"Remove all quotes from logs"
             ]
         }
     ]

@@ -7,6 +7,8 @@
 	- Auto limit sell order or stop loss
 	- noBuyBack - after selling coin, don't buy back into it and stop monitoring it
 - Fix USDT selling in only full dollar amounts
+- Simplify the confusing mix of discord-IDs, user configuration names & lambda function names
+- Add more user configuration options: Simple logs, disable logs?, 
 - Add user crypto.com data to their database config on every transaction!
 	- Add slash command to get this ^
 - Add a second crypto and test - no logic around ratios to split USDT into different coins - if a coin is sold and is now in USDT, 100% of it will go into the next buy
@@ -31,6 +33,7 @@
 - Add the event bridge trigger
 - Deploy code to their lambda function by changing the name in the `deploy.sh` and running `npm run deploy`
 - Add their lambda function name to the `deploy-all.sh` for their function to be included in code roll-outs
+- Add their discord ID and their lambda function name to the `src/discord-api/discord-helpers discordUserConfigMap` in order for their discord commands to work
 
 ### Commands
 - `npm run deploy` 
