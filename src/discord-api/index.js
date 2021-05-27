@@ -8,15 +8,20 @@
  * Commands:
  *    /changelog
  *    /change-crypto
+ *    /commands
  *    /force-sell
- *    /force-buy
+ *    /force-buy - TODO
  *    /get-configuration
  *    /health-check
+ *    /help - TODO
  *    /list-available-crypto
  *    /pause
  *    /set-buy-percentage
+ *    /set-hard-sell-low
+ *    /set-hard-sell-high
  *    /set-sell-percentage
  *    /set-sell-warning
+ *    /test
  *    /unpause
  */
 
@@ -24,7 +29,7 @@ require('dotenv').config();
 const moment = require('moment-timezone');
 
 const { respondToPing, errorResponse, requestIsValid, getUserConfiguration } = require('./discord-helpers');
-const { getChangelog, checkCryptoApiStatus, getAvailableCrypto } = require('./slash-commands');
+const { getCommands, getChangelog, checkCryptoApiStatus, getAvailableCrypto } = require('./slash-commands');
 const { DATETIME_FORMAT } = require('../environment');
 const { updateInvestmentConfig } = require('../database');
 const { logToDiscord } = require('../helpers');
@@ -36,18 +41,22 @@ const discordName = 'Crypto assistant';
 // map discord command paths to their functions
 const API_ENDPOINTS = {
 	root: respondToPing,
-	'health-check': checkCryptoApiStatus,
 	changelog: getChangelog,
+	commands: getCommands,
+
 	'get-configuration': getConfigurationResponse,
+	'health-check': checkCryptoApiStatus,
 	'list-available-crypto': getAvailableCrypto,
 
 	// update config commands
 	pause: updateUserConfig,
 	unpause: updateUserConfig,
-	'set-buy-percentage': updateUserConfig,
-	'set-sell-percentage': updateUserConfig,
 	'force-sell': updateUserConfig,
 	'change-crypto': updateUserConfig,
+	'set-buy-percentage': updateUserConfig,
+	'set-hard-sell-low': updateUserConfig,
+	'set-hard-sell-high': updateUserConfig,
+	'set-sell-percentage': updateUserConfig,
 	'set-sell-warning': updateUserConfig,
 };
 
