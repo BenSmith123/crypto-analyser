@@ -26,13 +26,14 @@
  */
 
 require('dotenv').config();
+const AWS = require('aws-sdk'); // eslint-disable-line import/no-extraneous-dependencies
 const moment = require('moment-timezone');
 
 const { respondToPing, errorResponse, requestIsValid, getUserConfiguration } = require('./discord-helpers');
 const { getCommands, getChangelog, checkCryptoApiStatus, getAvailableCrypto } = require('./slash-commands');
 const { DATETIME_FORMAT } = require('../environment');
 const { updateInvestmentConfig } = require('../database');
-const { logToDiscord } = require('../helpers');
+const helpers = require('../helpers');
 
 
 const discordName = 'Crypto assistant';
@@ -40,7 +41,11 @@ const discordName = 'Crypto assistant';
 
 // map discord command paths to their functions
 const API_ENDPOINTS = {
+
 	root: respondToPing,
+
+	test,
+
 	changelog: getChangelog,
 	commands: getCommands,
 
@@ -69,10 +74,6 @@ let BODY;
 
 
 exports.discordController = async function (event) {
-
-	// await logToDiscord(event.body, true, discordName);
-
-	console.log('event: ', JSON.stringify(event));
 
 	try {
 
@@ -108,12 +109,22 @@ exports.discordController = async function (event) {
 	} catch (err) {
 
 		// unexpected error scenario - log these
-		await logToDiscord(`An unexpected error has occurred: ${err.message}\n\nStack: ${err.stack}\n\nDate: ${moment(Date.now()).format(DATETIME_FORMAT)}`, true, discordName);
+		await logToDiscord(`An unexpected error has occurred: ${err.message}\n\nStack: ${err.stack}\n\nEvent: ${JSON.stringify(event)} \n\nDate: ${moment(Date.now()).format(DATETIME_FORMAT)}`);
 
 		return errorResponse('Invalid request signature', 500);
 	}
 
 };
+
+
+/**
+ * Interface to ensure all discord logs are always alerts and sent with the discord name
+ *
+ * @param {string} msg
+ */
+async function logToDiscord(msg) {
+	await helpers.logToDiscord(msg, true, discordName);
+}
 
 
 /**
@@ -236,4 +247,27 @@ async function updateUserConfig() {
 	await updateInvestmentConfig(config);
 
 	return responseMsg;
+}
+
+
+async function test() {
+
+	const lambda = new AWS.Lambda({ region: 'ap-southeast-2' });
+
+	const params = {
+		FunctionName: 'crypto-analyser',
+		Payload: JSON.stringify({ hello: 'ben' }),
+	};
+
+	lambda.invoke(params, async (err, data) => {
+		if (err) {
+			console.log(err, err.stack); // an error occurred
+			await logToDiscord(err.message || 'hello');
+
+			return err.message;
+		}
+		console.log(data);
+		await logToDiscord(data || 'hello');
+		return data || 'hello';
+	});
 }
