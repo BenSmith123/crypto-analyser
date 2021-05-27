@@ -2,7 +2,7 @@
     "commands": [
         {
             "name": "changelog",
-            "description": ""
+            "description": "Displays the crypto-bot change log"
         },
         {
             "name": "change-crypto",
@@ -14,7 +14,7 @@
         },
 		{
             "name": "force-buy",
-            "description": ""
+            "description": "TODO"
         },
         {
             "name": "force-sell",
@@ -58,7 +58,7 @@
         },
         {
             "name": "test",
-            "description": ""
+            "description": "Don't fuck with this plz"
         },
         {
             "name": "unpause",

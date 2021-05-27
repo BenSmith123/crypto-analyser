@@ -9,7 +9,7 @@ function getCommands() {
 	const results = [];
 
 	commandsJSON.commands.forEach(command => {
-		results.push(`**/${command.name}**: ${command.description}`);
+		results.push(`_/${command.name}_: ${command.description}`);
 	});
 
 	return results.join('\n');
