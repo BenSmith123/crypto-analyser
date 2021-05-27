@@ -1,0 +1,68 @@
+{
+    "commands": [
+        {
+            "name": "changelog",
+            "description": ""
+        },
+        {
+            "name": "change-crypto",
+            "description": "Changes your watched crypto currency to the currency specified (use /list-available-crypto for all)"
+        },
+        {
+            "name": "commands",
+            "description": "Displays all available commands"
+        },
+		{
+            "name": "force-buy",
+            "description": ""
+        },
+        {
+            "name": "force-sell",
+            "description": "Sells your currently held crypto currency when the crypto-bot is next ran"
+        },
+        {
+            "name": "get-configuration",
+            "description": "Get your current crypto-analyser bot configuration"
+        },
+        {
+            "name": "health-check",
+            "description": "Checks the health of the crypto.com exchange"
+        },
+        {
+            "name": "list-available-crypto",
+            "description": "Lists all of the available crypto-currencies on crypto.com"
+        },
+        {
+            "name": "pause",
+            "description": "Pauses your crypto bot"
+        },
+        {
+            "name": "set-buy-percentage",
+            "description": "Sets the buy percentage threshold (the decrease that has to be met before buying back into the crypto"
+        },
+        {
+            "name": "set-hard-sell-low",
+            "description": "Sets the hard-sell LOW percentage threshold (the decrease before selling and PAUSING)"
+        },
+        {
+            "name": "set-hard-sell-high",
+            "description": "Sets the hard-sell HIGH percentage threshold (the increase before selling and PAUSING)"
+        },
+        {
+            "name": "set-sell-percentage",
+            "description": "Sets the sell percentage threshold (the increase that has to be met before selling back to USDT"
+        },
+        {
+            "name": "set-sell-warning",
+            "description": "Sets the sell warning percentage - the decrease in % relative to the last purchase price"
+        },
+        {
+            "name": "test",
+            "description": ""
+        },
+        {
+            "name": "unpause",
+            "description": "Unpauses your crypto bot"
+        }
+    ]
+}
