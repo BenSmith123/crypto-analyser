@@ -1,6 +1,6 @@
 #!/bin/bash
 
-lambdaFunctions=("crypto-analyser" "crypto-analyser-z" "crypto-analyser-jett")
+lambdaFunctions=("crypto-analyser" "crypto-analyser-z" "crypto-analyser-jett" "crypto-analyser-vic" "crypto-analyser-ayrton")
 
 for lambdaFunc in "${lambdaFunctions[@]}"
 
