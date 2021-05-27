@@ -29,6 +29,8 @@
 - Run `npm run configure <lambda-name>`
 - Create a new database record for them in the database
 - Add the event bridge trigger
+- Deploy code to their lambda function by changing the name in the `deploy.sh` and running `npm run deploy`
+- Add their lambda function name to the `deploy-all.sh` for their function to be included in code roll-outs
 
 ### Commands
 - `npm run deploy` 
@@ -36,6 +38,9 @@
 	- Runs a production install in the temp folder
 	- Zips the folder and deploys it to AWS lambda
 	- Deletes the temp `/dist` folder
+
+- `npm run deploy-all` 
+	- Same as above but deploys to a list of lambda functions
 
 - `npm run configure <lambda-name>`
 	- Configures a lambda function with the default settings (timeout, env vars, handler, role etc.)

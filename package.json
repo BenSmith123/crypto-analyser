@@ -6,6 +6,7 @@
   "scripts": {
     "start": "AWS_PROFILE=bensmith node src/index.js",
     "deploy": "sh scripts/zip.sh && sh scripts/deploy.sh && sh scripts/cleanup.sh",
+    "deploy-all": "sh scripts/zip.sh && sh scripts/deploy-all.sh && sh scripts/cleanup.sh",
     "deploy-discord": "sh scripts/zip.sh && sh scripts/deploy-discord.sh && sh scripts/cleanup.sh",
     "configure": "sh scripts/configureEnvironment.sh"
   },
