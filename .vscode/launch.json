@@ -10,7 +10,7 @@
 			"env": {
 				"AWS_PROFILE": "bensmith",
 				"TRANSACTIONS_ENABLED": "false",
-				"DATABASE_ID": "configuration"
+				"USER_ID": "configuration"
             }
 		},
 		{
@@ -34,7 +34,7 @@
 				"DISCORD_ENABLED": "false",
 				"INTERNAL_RUN": "true", // ensure no external API or database calls are made
 				"TRANSACTIONS_ENABLED": "false", // buy/sell functions are already replaced but disable just in case!
-				"DATABASE_ID": "configuration"
+				"USER_ID": "configuration"
             }
 		},
 		{

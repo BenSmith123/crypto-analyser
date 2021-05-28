@@ -4,16 +4,6 @@ const nacl = require('tweetnacl');
 const { loadInvestmentConfig } = require('../database');
 
 
-// map of discord ID's and their database config ID
-const discordUserConfigMap = {
-	'409274228794458113': 'configuration',
-	'234154409033072650': 'configuration-jett',
-	'604242730268491787': 'configuration-zlatko',
-	'479206246302482432': 'configuration-vic',
-	'824023199607685201': 'configuration-ayrton',
-};
-
-
 function errorResponse(err, statusCode = 400) {
 	return {
 		statusCode,
@@ -52,11 +42,9 @@ function requestIsValid({ headers, body }) {
  */
 async function getUserConfiguration(userId) {
 
-	const configId = discordUserConfigMap[userId];
+	if (!userId) { throw new Error(`User does not exist: ID=${userId}`); }
 
-	if (!configId) { throw new Error(`User does not exist: ID=${userId}`); }
-
-	return loadInvestmentConfig(configId);
+	return loadInvestmentConfig(userId);
 }
 
 

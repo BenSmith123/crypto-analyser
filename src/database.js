@@ -2,7 +2,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 const { DynamoDB } = require('aws-sdk'); // lambda runtime has aws-sdk installed
 const moment = require('moment-timezone');
-const { DATABASE_ID, DATETIME_FORMAT } = require('./environment');
+const { USER_ID, DATETIME_FORMAT } = require('./environment');
 
 const dynamoClient = new DynamoDB.DocumentClient({ region: 'ap-southeast-2' });
 
@@ -20,7 +20,7 @@ async function loadInvestmentConfig(databaseId) {
 	const params = {
 		TableName: DATABASE_TABLES.users,
 		Key: {
-			id: DATABASE_ID || databaseId, // if there is a env var, use it otherwise use param
+			id: USER_ID || databaseId, // if there is a env var, use it otherwise use param
 		},
 	};
 
@@ -41,7 +41,7 @@ async function loadInvestmentConfig(databaseId) {
  */
 function investmentConfigIsValid(data) {
 
-	if (data.id === DATABASE_ID
+	if (data.id === USER_ID
 	// && data.isPaused
 	&& data.sellPercentage
 	&& data.buyPercentage
