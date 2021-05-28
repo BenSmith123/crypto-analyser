@@ -67,7 +67,12 @@ function formatPriceLog(name, context, price, value, diff) {
 		? '+'
 		: '';
 
-	return `${name} was last ${context} at ${price} and is now ${value} (${sym}${diff.toFixed(2)}%)`;
+	// trim to 2dp (avoids large pointless decimal values)
+	const priceFormatted = price > 10
+		? price.toFixed(2)
+		: price;
+
+	return `${name} was last ${context} at ${priceFormatted} and is now ${value} (${sym}${diff.toFixed(2)}%)`;
 }
 
 
