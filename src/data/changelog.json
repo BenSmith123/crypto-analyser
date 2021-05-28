@@ -65,11 +65,12 @@
 		{
             "version": "2.1.1",
 			"devChanges":[
-                "Fix error message date/times being inaccurate",
-				"Added automated script for rolling out code changes to everyone at the same time"
+				"Added automated script for rolling out code changes to everyone at the same time",
+                "User ID's are now ONLY discord ID's - no code mapping the usernames/database ID/server ID (faster user set up)",
+                "Added user data to database"
             ],
             "changes": [
-				"Remove all quotes from logs"
+				"Minor logging changes (error time/dates being wrong, remove all double quotes, typos)"
             ]
         }
     ]
