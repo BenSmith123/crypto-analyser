@@ -72,6 +72,17 @@
             "changes": [
 				"Minor logging changes (error time/dates being wrong, remove all double quotes, typos)"
             ]
+        },
+		{
+            "version": "2.2.0",
+			"devChanges":[
+				"Added script to automatically get the newly added crypto currencies on the crypto.com exchange"
+            ],
+            "changes": [
+				"Shorten the large decimal values to 2dp in logs",
+				"Added support for **/force-buy** command",
+				"Added support for 12 new crypto currencies added to the crypto.com exchange"
+            ]
         }
     ]
 }
