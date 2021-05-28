@@ -14,11 +14,11 @@
         },
 		{
             "name": "force-buy",
-            "description": "TODO"
+            "description": "Buys back into your crypto currency being watched when the crypto-bot is next ran"
         },
         {
             "name": "force-sell",
-            "description": "Sells your currently held crypto currency when the crypto-bot is next ran"
+            "description": "Sells your currently held crypto currency when the crypto-bot is next ran and then pauses the bot"
         },
         {
             "name": "get-configuration",

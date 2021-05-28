@@ -10,7 +10,7 @@
  *    /change-crypto
  *    /commands
  *    /force-sell
- *    /force-buy - TODO
+ *    /force-buy
  *    /get-configuration
  *    /health-check
  *    /help - TODO
@@ -56,6 +56,7 @@ const API_ENDPOINTS = {
 	// update config commands
 	pause: updateUserConfig,
 	unpause: updateUserConfig,
+	'force-buy': updateUserConfig,
 	'force-sell': updateUserConfig,
 	'change-crypto': updateUserConfig,
 	'set-buy-percentage': updateUserConfig,
@@ -217,6 +218,11 @@ async function updateUserConfig() {
 	if (COMMAND === 'set-hard-sell-high') {
 		config.hardSellPercentage.high = percentage;
 		responseMsg = `Your hard-sell HIGH percentage is now **+${percentage}%** of the last buy price`;
+	}
+
+	if (COMMAND === 'force-buy') {
+		config.forceBuy = true;
+		responseMsg = `All **${config.currenciesTargeted[0]}** will be brought by the crypto-bot shortly!`;
 	}
 
 	if (COMMAND === 'force-sell') {
