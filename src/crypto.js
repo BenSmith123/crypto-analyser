@@ -3,7 +3,7 @@ const axios = require('axios');
 const crypto = require('crypto-js');
 
 const { timeout, logToDiscord } = require('./helpers');
-const { API_URL, API_KEY, API_SECRET, TRANSACTIONS_ENABLED, DATABASE_ID } = require('./environment');
+const { API_URL, API_KEY, API_SECRET, TRANSACTIONS_ENABLED, USER_ID } = require('./environment');
 const { saveTransaction } = require('./database');
 
 const API_ENDPOINTS = {
@@ -319,7 +319,7 @@ async function placeBuyOrder(cryptoName, amount) {
 			side: 'BUY',
 			type: 'MARKET',
 			notional: amount, // amount of USDT
-			client_oid: DATABASE_ID, // optional client order ID
+			client_oid: USER_ID, // optional client order ID
 		},
 		nonce: Date.now(),
 	};
@@ -347,7 +347,7 @@ async function placeSellOrder(cryptoName, amount) {
 			side: 'SELL',
 			type: 'MARKET',
 			quantity: amount, // amount of {crypto}
-			client_oid: DATABASE_ID, // optional client order ID
+			client_oid: USER_ID, // optional client order ID
 		},
 		nonce: Date.now(),
 	};

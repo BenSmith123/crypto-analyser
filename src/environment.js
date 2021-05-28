@@ -4,7 +4,9 @@
 
 require('dotenv').config();
 
-const { API_KEY, API_SECRET, DATABASE_ID } = process.env;
+const { API_KEY, API_SECRET, USER_ID } = process.env;
+
+const DATETIME_FORMAT = 'DD/MM/YYYY, HH:mma';
 
 const API_URL = process.env.API_URL || 'https://api.crypto.com/v2/';
 // test API: https://uat-api.3ona.co/v2/
@@ -29,7 +31,8 @@ module.exports = {
 	API_URL,
 	API_KEY,
 	API_SECRET,
-	DATABASE_ID,
+	USER_ID,
+	DATETIME_FORMAT,
 	DISCORD_ENABLED,
 	DISCORD_URL_ALERTS,
 	DISCORD_URL_LOGS,

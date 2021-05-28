@@ -43,7 +43,6 @@ const initialUSDT = 100; // account balance in USD ($100)
 
 let databaseConfiguration = {
 	id: 'configuration',
-	inputDate: 10,
 	isPaused: false,
 	currenciesTargeted: [
 		'CRO',

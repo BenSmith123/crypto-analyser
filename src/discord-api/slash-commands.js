@@ -3,6 +3,19 @@ const axios = require('axios');
 const { API_URL } = require('../environment');
 
 
+function getCommands() {
+	const commandsJSON = require('../data/discordCommands.json'); // eslint-disable-line global-require
+
+	const results = [];
+
+	commandsJSON.commands.forEach(command => {
+		results.push(`/${command.name}: ${command.description}\n`);
+	});
+
+	return results.join('\n');
+}
+
+
 function getChangelog() {
 
 	const changelog = require('../data/changelog.json'); // eslint-disable-line global-require
@@ -12,7 +25,7 @@ function getChangelog() {
 	changelog.logs.forEach(log => {
 		results.push(`\n**v${log.version}**`);
 
-		if (log.devChanges) {
+		if (log.devChanges && log.devChanges.length) {
 			log.devChanges.forEach(change => {
 				results.push(`   - [dev] ${change}`);
 			});
@@ -76,6 +89,7 @@ async function getAvailableCrypto(returnArray) {
 
 
 module.exports = {
+	getCommands,
 	getChangelog,
 	checkCryptoApiStatus,
 	getAvailableCrypto,

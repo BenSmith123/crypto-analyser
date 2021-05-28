@@ -1,14 +1,17 @@
 {
 	"id": "configuration",
-	"inputDate": 0,
 	"isPaused": false,
 	"currenciesTargeted": [
 		"CRO"
 	],
 	"sellPercentage": 5,
-	"buyPercentage": 5,
+	"buyPercentage": -5,
 	"alertPercentage": -15,
 	"transactions": {
 		
+	},
+	"hardSellPercentage": {
+		"low": null,
+		"high": null
 	}
 }

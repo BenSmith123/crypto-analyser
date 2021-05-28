@@ -1,5 +1,7 @@
 
-const { INTERNAL_RUN } = require('./environment');
+const moment = require('moment-timezone');
+
+const { INTERNAL_RUN, DATETIME_FORMAT } = require('./environment');
 const { investmentConfigIsValid, updateTransactions } = require('./database');
 let { loadInvestmentConfig, updateInvestmentConfig } = require('./database');
 let { getAccountSummary, getAllCryptoValues, checkLatestValueTrend, placeBuyOrder, placeSellOrder, processPlacedOrder } = require('./crypto');
@@ -91,7 +93,7 @@ exports.main = async function (event, mockFunctions = null) {
 		// generic unexpected error scenario - log, update database config to paused, end lambda
 
 		// await log to ensure lambda doesn't terminate before log is properly sent
-		await logToDiscord(`An unexpected error has occurred: ${err.message}\n\nDate: ${new Date().toLocaleString()}\n\nStack: ${err.stack}`, true);
+		await logToDiscord(`An unexpected error has occurred: ${err.message}\n\nDate: ${moment(Date.now()).format(DATETIME_FORMAT)}\n\nStack: ${err.stack}`, true);
 
 		investmentConfig.isPaused = true;
 		await updateInvestmentConfig(investmentConfig);
@@ -179,12 +181,12 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 		// check for BUY condition
 		if (cryptoRecord.lastSellPrice) {
 
-			// if previously brought, buy back in if price is < x percent less than last sell price
+			// if previously bought, buy back in if price is < x percent less than last sell price
 			const percentageDiff = calculatePercDiff(cryptoPrice, cryptoRecord.lastSellPrice);
 
 			log(formatPriceLog(cryptoName, 'sold', cryptoRecord.lastSellPrice, cryptoPrice, percentageDiff));
 
-			if (percentageDiff < -config.buyPercentage) { // crypto is down more than x %
+			if (percentageDiff < config.buyPercentage) { // crypto is down more than x %
 
 				if (await checkLatestValueTrend(cryptoName, false)) {
 					// if the crypto value is still decreasing, hold off buying!
@@ -215,17 +217,26 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 		cryptoPrice = cryptoValue.bestBid;
 		const percentageDiff = calculatePercDiff(cryptoPrice, cryptoRecord.lastBuyPrice);
 
-		log(formatPriceLog(cryptoName, 'brought', cryptoRecord.lastBuyPrice, cryptoPrice, percentageDiff));
+		log(formatPriceLog(cryptoName, 'bought', cryptoRecord.lastBuyPrice, cryptoPrice, percentageDiff));
 
 		// log a warning if price has dropped below the specified percentage
 		if (config.alertPercentage && percentageDiff < config.alertPercentage) {
 			log(`[Warning] ${cryptoName} is now ${percentageDiff.toFixed(2)}% since purchasing, consider selling using the /force-sell command`);
 		}
 
-		// crypto is up more than x %
-		if (percentageDiff > config.sellPercentage || config.forceSell) {
+		const hardSellLow = config.hardSellPercentage.low
+		&& percentageDiff < config.hardSellPercentage.low;
 
-			if (await checkLatestValueTrend(cryptoName, true)) {
+		const hardSellHigh = config.hardSellPercentage.high
+		&& percentageDiff > config.hardSellPercentage.high;
+
+		const shouldForceSell = hardSellLow || hardSellHigh || config.forceSell;
+
+		// crypto is up more than x %
+		if (percentageDiff > config.sellPercentage || shouldForceSell) {
+
+			// ignore this step if any of the hard-sell conditions are met
+			if (!shouldForceSell && await checkLatestValueTrend(cryptoName, true)) {
 				// if the crypto value is still increasing, hold the crypto!
 				log(`${cryptoName} is still increasing, holding off selling..`);
 				continue;
@@ -243,10 +254,10 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 			const orderDetails = formatOrder('Sell', cryptoName, availableCrypto, cryptoPrice, confirmedValue);
 			log(orderDetails.summary);
 
-			if (config.forceSell) {
+			if (shouldForceSell) {
 				config.forceSell = false;
 				config.isPaused = true;
-				log('/force-sell was used, pausing bot. Use /unpause to unpause the bot.');
+				log('A hard-sell threshold was met or /force-sell was used, pausing bot. Use /unpause to unpause the bot.');
 			}
 
 			ordersPlaced.push(orderDetails);

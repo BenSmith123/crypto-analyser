@@ -4,7 +4,7 @@ const moment = require('moment-timezone');
 
 const { writeFileSync } = require('fs');
 
-const { DISCORD_ENABLED, DISCORD_URL_ALERTS, DISCORD_URL_LOGS } = require('./environment');
+const { DISCORD_ENABLED, DISCORD_URL_ALERTS, DISCORD_URL_LOGS, DATETIME_FORMAT } = require('./environment');
 
 const { version } = require('../package.json');
 
@@ -55,7 +55,7 @@ const saveJsonFile = (data, fileName) => {
 
 /**
  * @param {string} name - crypto currency name
- * @param {string} context - 'brought' or 'sold'
+ * @param {string} context - 'bought' or 'sold'
  * @param {number} price
  * @param {number} value
  * @param {number} diff
@@ -74,7 +74,7 @@ function formatPriceLog(name, context, price, value, diff) {
 /**
  * @param {string} type - buy or sell
  * @param {string} cryptoName
- * @param {number} amount - crypto that was brought or USDT that was sold for a crypto
+ * @param {number} amount - crypto that was bought or USDT that was sold for a crypto
  * @param {number} valuePlaced - crypto value that the order was PLACED at
  * @param {number} [valueFilled] - optional - crypto value that the order was FILLED at
  * @returns {object}
@@ -106,7 +106,7 @@ function formatOrder(type, cryptoName, amount, valuePlaced, valueFilled) {
 		summary: isBuy
 			? `Buy order ${status} for $${amount} USD worth of ${cryptoName} coins at ${value}`
 			: `Sell order ${status} for ${amount} ${cryptoName} coins at $${value} USD`,
-		date: moment(Date.now()).format('DD/MM/YYYY, HH:mma'),
+		date: moment(Date.now()).format(DATETIME_FORMAT),
 	};
 }
 
@@ -133,7 +133,9 @@ async function logToDiscord(message, isAlert = false, username) {
 		content: message,
 	};
 
-	if (typeof message !== 'string') { data.content = JSON.stringify(message, null, 4); }
+	if (typeof message !== 'string') {
+		data.content = JSON.stringify(message, null, 4).replace(/"/g, '');
+	}
 
 	if (isAlert) { console.log(data.content); } // console log any alerts
 

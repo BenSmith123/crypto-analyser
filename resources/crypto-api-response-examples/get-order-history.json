@@ -1,0 +1,63 @@
+{
+    "id": 11,
+    "method": "private/get-order-history",
+    "code": 0,
+    "result": {
+        "order_list": [
+            {
+                "status": "FILLED",
+                "side": "SELL",
+                "price": 0,
+                "quantity": 85.75,
+                "order_id": "1464771900372030595",
+                "client_oid": "configuration",
+                "create_time": 1621490404399,
+                "update_time": 1621490404432,
+                "type": "MARKET",
+                "instrument_name": "DOGE_USDT",
+                "avg_price": 0.36385,
+                "cumulative_quantity": 85.75,
+                "cumulative_value": 31.2001375,
+                "fee_currency": "USDT",
+                "exec_inst": "",
+                "time_in_force": "GOOD_TILL_CANCEL"
+            },
+            {
+                "status": "FILLED",
+                "side": "BUY",
+                "price": 0,
+                "quantity": 0,
+                "order_id": "1464651083201659235",
+                "client_oid": "configuration",
+                "create_time": 1621486803767,
+                "update_time": 1621486803770,
+                "type": "MARKET",
+                "instrument_name": "DOGE_USDT",
+                "avg_price": 0.35078,
+                "cumulative_quantity": 31.35,
+                "cumulative_value": 10.996953,
+                "fee_currency": "DOGE",
+                "exec_inst": "",
+                "time_in_force": "GOOD_TILL_CANCEL"
+            },
+            {
+                "status": "FILLED",
+                "side": "SELL",
+                "price": 0,
+                "quantity": 0.000291,
+                "order_id": "1464590709016064546",
+                "client_oid": "configuration",
+                "create_time": 1621485004476,
+                "update_time": 1621485004477,
+                "type": "MARKET",
+                "instrument_name": "BTC_USDT",
+                "avg_price": 39628.74,
+                "cumulative_quantity": 0.000291,
+                "cumulative_value": 11.53196334,
+                "fee_currency": "USDT",
+                "exec_inst": "",
+                "time_in_force": "GOOD_TILL_CANCEL"
+            }
+        ]
+    }
+}

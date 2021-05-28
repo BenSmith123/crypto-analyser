@@ -8,24 +8,32 @@
  * Commands:
  *    /changelog
  *    /change-crypto
+ *    /commands
  *    /force-sell
- *    /force-buy
+ *    /force-buy - TODO
  *    /get-configuration
  *    /health-check
+ *    /help - TODO
  *    /list-available-crypto
  *    /pause
  *    /set-buy-percentage
+ *    /set-hard-sell-low
+ *    /set-hard-sell-high
  *    /set-sell-percentage
  *    /set-sell-warning
+ *    /test
  *    /unpause
  */
 
 require('dotenv').config();
+const AWS = require('aws-sdk'); // eslint-disable-line import/no-extraneous-dependencies
+const moment = require('moment-timezone');
 
 const { respondToPing, errorResponse, requestIsValid, getUserConfiguration } = require('./discord-helpers');
-const { getChangelog, checkCryptoApiStatus, getAvailableCrypto } = require('./slash-commands');
+const { getCommands, getChangelog, checkCryptoApiStatus, getAvailableCrypto } = require('./slash-commands');
+const { DATETIME_FORMAT } = require('../environment');
 const { updateInvestmentConfig } = require('../database');
-const { logToDiscord } = require('../helpers');
+const helpers = require('../helpers');
 
 
 const discordName = 'Crypto assistant';
@@ -33,19 +41,27 @@ const discordName = 'Crypto assistant';
 
 // map discord command paths to their functions
 const API_ENDPOINTS = {
+
 	root: respondToPing,
-	'health-check': checkCryptoApiStatus,
+
+	test,
+
 	changelog: getChangelog,
+	commands: getCommands,
+
 	'get-configuration': getConfigurationResponse,
+	'health-check': checkCryptoApiStatus,
 	'list-available-crypto': getAvailableCrypto,
 
 	// update config commands
 	pause: updateUserConfig,
 	unpause: updateUserConfig,
-	'set-buy-percentage': updateUserConfig,
-	'set-sell-percentage': updateUserConfig,
 	'force-sell': updateUserConfig,
 	'change-crypto': updateUserConfig,
+	'set-buy-percentage': updateUserConfig,
+	'set-hard-sell-low': updateUserConfig,
+	'set-hard-sell-high': updateUserConfig,
+	'set-sell-percentage': updateUserConfig,
 	'set-sell-warning': updateUserConfig,
 };
 
@@ -58,10 +74,6 @@ let BODY;
 
 
 exports.discordController = async function (event) {
-
-	// await logToDiscord(event.body, true, discordName);
-
-	console.log('event: ', JSON.stringify(event));
 
 	try {
 
@@ -97,12 +109,22 @@ exports.discordController = async function (event) {
 	} catch (err) {
 
 		// unexpected error scenario - log these
-		await logToDiscord(`An unexpected error has occurred: ${err.message}\n\nStack: ${err.stack}\n\nDate: ${new Date().toLocaleString()}`, true, discordName);
+		await logToDiscord(`An unexpected error has occurred: ${err.message}\n\nStack: ${err.stack}\n\nEvent: ${JSON.stringify(event)} \n\nDate: ${moment(Date.now()).format(DATETIME_FORMAT)}`);
 
 		return errorResponse('Invalid request signature', 500);
 	}
 
 };
+
+
+/**
+ * Interface to ensure all discord logs are always alerts and sent with the discord name
+ *
+ * @param {string} msg
+ */
+async function logToDiscord(msg) {
+	await helpers.logToDiscord(msg, true, discordName);
+}
 
 
 /**
@@ -140,19 +162,22 @@ async function updateUserConfig() {
 	let percentage;
 
 	// validate commands that require input params before continuing
-	if (COMMAND === 'set-buy-percentage' || COMMAND === 'set-sell-percentage') {
-		percentage = getInputParam('percentage');
+	if (COMMAND === 'set-buy-percentage'
+		|| COMMAND === 'set-sell-warning'
+		|| COMMAND === 'set-hard-sell-low') {
 
-		if (!percentage || percentage <= 0) {
-			return `Invalid input (${percentage}) - must be a positive number`;
-		}
-	}
-
-	if (COMMAND === 'set-sell-warning') {
 		percentage = getInputParam('percentage');
 
 		if (!percentage || percentage >= 0) {
 			return `Invalid input (${percentage}) - must be a negative number`;
+		}
+	}
+
+	if (COMMAND === 'set-sell-percentage' || COMMAND === 'set-hard-sell-high') {
+		percentage = getInputParam('percentage');
+
+		if (!percentage || percentage <= 0) {
+			return `Invalid input (${percentage}) - must be a positive number`;
 		}
 	}
 
@@ -171,7 +196,7 @@ async function updateUserConfig() {
 
 	if (COMMAND === 'set-buy-percentage') {
 		config.buyPercentage = percentage;
-		responseMsg = `Your buy percentage is now **-${percentage}%** of the last sell price`;
+		responseMsg = `Your buy percentage is now **${percentage}%** of the last sell price`;
 	}
 
 	if (COMMAND === 'set-sell-percentage') {
@@ -184,9 +209,19 @@ async function updateUserConfig() {
 		responseMsg = `Your warning percentage is set to notify you when the value is **${percentage}%** of the last purchase price`;
 	}
 
+	if (COMMAND === 'set-hard-sell-low') {
+		config.hardSellPercentage.low = percentage;
+		responseMsg = `Your hard-sell LOW percentage is now **${percentage}%** of the last buy price`;
+	}
+
+	if (COMMAND === 'set-hard-sell-high') {
+		config.hardSellPercentage.high = percentage;
+		responseMsg = `Your hard-sell HIGH percentage is now **+${percentage}%** of the last buy price`;
+	}
+
 	if (COMMAND === 'force-sell') {
 		config.forceSell = true;
-		responseMsg = `All **${config.currenciesTargeted[0]}** will be sold by the crypto-bot shortly!\nOnce sold the bot will be paused.`;
+		responseMsg = `All **${config.currenciesTargeted[0]}** will be sold by the crypto-bot shortly!\nOnce sold the bot will be paused`;
 	}
 
 	if (COMMAND === 'change-crypto') {
@@ -203,7 +238,7 @@ async function updateUserConfig() {
 
 		if (availableCrypto.find(c => c === newCrypto)) {
 			config.currenciesTargeted = [newCrypto];
-			responseMsg = `Your crypto-bot will now look at **${newCrypto}**, it will buy in at the market price.`;
+			responseMsg = `Your crypto-bot will now look at **${newCrypto}**, it will buy in at the market price`;
 		} else {
 			return `'**${newCrypto}**' is either an invalid name or is not available through the crypto.com exchange`;
 		}
@@ -212,4 +247,27 @@ async function updateUserConfig() {
 	await updateInvestmentConfig(config);
 
 	return responseMsg;
+}
+
+
+async function test() {
+
+	const lambda = new AWS.Lambda({ region: 'ap-southeast-2' });
+
+	const params = {
+		FunctionName: 'crypto-analyser',
+		Payload: JSON.stringify({ hello: 'ben' }),
+	};
+
+	lambda.invoke(params, async (err, data) => {
+		if (err) {
+			console.log(err, err.stack); // an error occurred
+			await logToDiscord(err.message || 'hello');
+
+			return err.message;
+		}
+		console.log(data);
+		await logToDiscord(data || 'hello');
+		return data || 'hello';
+	});
 }

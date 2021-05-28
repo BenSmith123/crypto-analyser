@@ -7,8 +7,16 @@
 	- Auto limit sell order or stop loss
 	- noBuyBack - after selling coin, don't buy back into it and stop monitoring it
 - Fix USDT selling in only full dollar amounts
+- Simplify the confusing mix of discord-IDs, user configuration names & lambda function names
+- Add more user configuration options: Simple logs, disable logs?, 
 - Add user crypto.com data to their database config on every transaction!
 	- Add slash command to get this ^
+- Change logic to not just buy in at market price?
+- Make the crypto bot invoke lambda functions based on the user to get crypto-api details
+- ^ this avoids having auth or storing their crypto-api keys
+- Implement /force-buy
+- Fix buyPercentage being positive number
+- Update command to only accept negative number ^
 - Add a second crypto and test - no logic around ratios to split USDT into different coins - if a coin is sold and is now in USDT, 100% of it will go into the next buy
 - ^ Add weights to each crypto (percentages of how much USD to spent)
 - Change option to just buy at market price when there is no record of it - make it only buy in at a certain %
@@ -27,8 +35,11 @@
 ### Setting up new users
 - Create new lambda function
 - Run `npm run configure <lambda-name>`
-- Create a new database record for them in the database
+- Create a new database record for them in the database (with their `id` being the discord ID)
+- Manually enter env vars (discord urls, user_id etc.)
 - Add the event bridge trigger
+- Deploy code to their lambda function by changing the name in the `deploy.sh` and running `npm run deploy`
+- Add their lambda function name to the `deploy-all.sh` for their function to be included in code roll-outs
 
 ### Commands
 - `npm run deploy` 
@@ -36,6 +47,9 @@
 	- Runs a production install in the temp folder
 	- Zips the folder and deploys it to AWS lambda
 	- Deletes the temp `/dist` folder
+
+- `npm run deploy-all` 
+	- Same as above but deploys to a list of lambda functions
 
 - `npm run configure <lambda-name>`
 	- Configures a lambda function with the default settings (timeout, env vars, handler, role etc.)

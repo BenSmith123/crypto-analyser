@@ -54,6 +54,24 @@
 				"Updated transaction logs to use new real values if available (FILLED), not estimates (PLACED)",
                 "All transactions and transaction details are now stored in a database"
             ]
+        },
+		{
+            "version": "2.1.0",
+            "changes": [
+				"Fix 'buy back percentage' being set as a positive number but used as a negative - **/set-buy-percentage**",
+				"Added support for 'hard-sell' - **/set-hard-sell-low** and **/set-hard-sell-high**"
+            ]
+        },
+		{
+            "version": "2.1.1",
+			"devChanges":[
+				"Added automated script for rolling out code changes to everyone at the same time",
+                "User ID's are now ONLY discord ID's - no code mapping the usernames/database ID/server ID (faster user set up)",
+                "Added user data to database"
+            ],
+            "changes": [
+				"Minor logging changes (error time/dates being wrong, remove all double quotes, typos)"
+            ]
         }
     ]
 }
