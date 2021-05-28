@@ -55,7 +55,7 @@ const saveJsonFile = (data, fileName) => {
 
 /**
  * @param {string} name - crypto currency name
- * @param {string} context - 'brought' or 'sold'
+ * @param {string} context - 'bought' or 'sold'
  * @param {number} price
  * @param {number} value
  * @param {number} diff
@@ -74,7 +74,7 @@ function formatPriceLog(name, context, price, value, diff) {
 /**
  * @param {string} type - buy or sell
  * @param {string} cryptoName
- * @param {number} amount - crypto that was brought or USDT that was sold for a crypto
+ * @param {number} amount - crypto that was bought or USDT that was sold for a crypto
  * @param {number} valuePlaced - crypto value that the order was PLACED at
  * @param {number} [valueFilled] - optional - crypto value that the order was FILLED at
  * @returns {object}

@@ -181,7 +181,7 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 		// check for BUY condition
 		if (cryptoRecord.lastSellPrice) {
 
-			// if previously brought, buy back in if price is < x percent less than last sell price
+			// if previously bought, buy back in if price is < x percent less than last sell price
 			const percentageDiff = calculatePercDiff(cryptoPrice, cryptoRecord.lastSellPrice);
 
 			log(formatPriceLog(cryptoName, 'sold', cryptoRecord.lastSellPrice, cryptoPrice, percentageDiff));
@@ -217,7 +217,7 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 		cryptoPrice = cryptoValue.bestBid;
 		const percentageDiff = calculatePercDiff(cryptoPrice, cryptoRecord.lastBuyPrice);
 
-		log(formatPriceLog(cryptoName, 'brought', cryptoRecord.lastBuyPrice, cryptoPrice, percentageDiff));
+		log(formatPriceLog(cryptoName, 'bought', cryptoRecord.lastBuyPrice, cryptoPrice, percentageDiff));
 
 		// log a warning if price has dropped below the specified percentage
 		if (config.alertPercentage && percentageDiff < config.alertPercentage) {
