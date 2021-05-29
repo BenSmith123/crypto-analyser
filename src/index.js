@@ -178,17 +178,20 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 			continue;
 		}
 
+		const { simpleLogs } = config.options;
+
 		// check for BUY condition
 		if (cryptoRecord.lastSellPrice) {
 
 			// if previously bought, buy back in if price is < x percent less than last sell price
 			const percentageDiff = calculatePercDiff(cryptoPrice, cryptoRecord.lastSellPrice);
 
-			log(formatPriceLog(cryptoName, 'sold', cryptoRecord.lastSellPrice, cryptoPrice, percentageDiff));
+			log(formatPriceLog(cryptoName, 'sold', cryptoRecord.lastSellPrice, cryptoPrice, percentageDiff, simpleLogs));
 
-			if (percentageDiff < config.buyPercentage) { // crypto is down more than x %
+			// crypto is down more than x %
+			if (percentageDiff < config.buyPercentage || config.forceBuy) {
 
-				if (await checkLatestValueTrend(cryptoName, false)) {
+				if (!config.forceBuy && await checkLatestValueTrend(cryptoName, false)) {
 					// if the crypto value is still decreasing, hold off buying!
 					log(`${cryptoName} is still decreasing, holding off buying..`);
 					continue;
@@ -204,6 +207,11 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 				const orderDetails = formatOrder('buy', cryptoName, availableUSDT, cryptoPrice, confirmedValue);
 				log(orderDetails.summary);
 
+				if (config.forceBuy) {
+					config.forceBuy = false;
+					log('Force buy was used.');
+				}
+
 				ordersPlaced.push(orderDetails);
 
 				canBuy = false;
@@ -217,7 +225,7 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 		cryptoPrice = cryptoValue.bestBid;
 		const percentageDiff = calculatePercDiff(cryptoPrice, cryptoRecord.lastBuyPrice);
 
-		log(formatPriceLog(cryptoName, 'bought', cryptoRecord.lastBuyPrice, cryptoPrice, percentageDiff));
+		log(formatPriceLog(cryptoName, 'bought', cryptoRecord.lastBuyPrice, cryptoPrice, percentageDiff, simpleLogs));
 
 		// log a warning if price has dropped below the specified percentage
 		if (config.alertPercentage && percentageDiff < config.alertPercentage) {
