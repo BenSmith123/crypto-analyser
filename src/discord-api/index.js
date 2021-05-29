@@ -22,6 +22,7 @@
  *    /set-sell-percentage
  *    /set-sell-warning
  *    /test
+ *    /toggle-log-format
  *    /unpause
  */
 
@@ -64,6 +65,7 @@ const API_ENDPOINTS = {
 	'set-hard-sell-high': updateUserConfig,
 	'set-sell-percentage': updateUserConfig,
 	'set-sell-warning': updateUserConfig,
+	'toggle-log-format': updateUserConfig,
 };
 
 
@@ -193,6 +195,13 @@ async function updateUserConfig() {
 	if (COMMAND === 'unpause') {
 		config.isPaused = false;
 		responseMsg = 'Your crypto-bot is now **unpaused**';
+	}
+
+	if (COMMAND === 'toggle-log-format') {
+		config.options.simpleLogs = !config.options.simpleLogs;
+		responseMsg = config.options.simpleLogs
+			? 'Short logs enabled'
+			: 'Short logs disabled';
 	}
 
 	if (COMMAND === 'set-buy-percentage') {

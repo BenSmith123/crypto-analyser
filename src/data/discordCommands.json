@@ -57,6 +57,10 @@
             "description": "Sets the sell warning percentage - the decrease in % relative to the last purchase price"
         },
         {
+            "name": "toggle-log-format",
+            "description": "Toggles the logging format (normal/short)"
+        },
+        {
             "name": "test",
             "description": "Don't fuck with this plz"
         },

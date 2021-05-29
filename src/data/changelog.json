@@ -80,6 +80,7 @@
             ],
             "changes": [
 				"Shorten the large decimal values to 2dp in logs",
+                "Added support for simplified logs (**/toggle-log-format**)",
 				"Added support for **/force-buy** command",
 				"Added support for 12 new crypto currencies added to the crypto.com exchange"
             ]
