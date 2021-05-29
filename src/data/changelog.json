@@ -84,6 +84,12 @@
                 "Added option for simplified logs (**/toggle-log-format**)",
                 "Support for **/force-buy** command"
             ]
+        },
+        {
+            "version": "2.2.1",
+            "changes": [
+                "Fix logic around **/force-buy** - you can now use this command even if you're already holding the crypto currency"
+            ]
         }
     ]
 }
