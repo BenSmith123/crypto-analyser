@@ -59,9 +59,10 @@ const saveJsonFile = (data, fileName) => {
  * @param {number} price
  * @param {number} value
  * @param {number} diff
+ * @param {boolean} simpleLogs - optional (default false)
  * @returns {string}
  */
-function formatPriceLog(name, context, price, value, diff) {
+function formatPriceLog(name, context, price, value, diff, simpleLogs) {
 
 	const sym = diff > 0
 		? '+'
@@ -72,7 +73,16 @@ function formatPriceLog(name, context, price, value, diff) {
 		? price.toFixed(2)
 		: price;
 
-	return `${name} was last ${context} at ${priceFormatted} and is now ${value} (${sym}${diff.toFixed(2)}%)`;
+	const shortDiff = diff.toFixed(2);
+
+	if (simpleLogs) {
+		return context === 'bought'
+			? `Holding ${name} (${sym}${shortDiff}%)`
+			: `Waiting to buy ${name} (${sym}${shortDiff}%)`;
+	}
+
+	return `${name} was last ${context} at ${priceFormatted} and is now ${value} (${sym}${shortDiff}%)`;
+
 }
 
 

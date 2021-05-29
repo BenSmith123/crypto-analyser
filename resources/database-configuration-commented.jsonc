@@ -11,6 +11,9 @@
 			"orderPlaced": 1620634504490
 		}
 	},
+	"options": {
+		"simpleLogs": false	
+	},
 	"hardSellPercentage": {
 		"low": null, // optional (negative num)
 		"high": null // optional (positive num)
