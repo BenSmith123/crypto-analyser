@@ -178,10 +178,11 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 			continue;
 		}
 
+		const { forceBuy } = config;
 		const { simpleLogs } = config.options;
 
 		// check for BUY condition
-		if (cryptoRecord.lastSellPrice) {
+		if (cryptoRecord.lastSellPrice || forceBuy) {
 
 			// if previously bought, buy back in if price is < x percent less than last sell price
 			const percentageDiff = calculatePercDiff(cryptoPrice, cryptoRecord.lastSellPrice);
@@ -189,9 +190,9 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 			log(formatPriceLog(cryptoName, 'sold', cryptoRecord.lastSellPrice, cryptoPrice, percentageDiff, simpleLogs));
 
 			// crypto is down more than x %
-			if (percentageDiff < config.buyPercentage || config.forceBuy) {
+			if (percentageDiff < config.buyPercentage || forceBuy) {
 
-				if (!config.forceBuy && await checkLatestValueTrend(cryptoName, false)) {
+				if (!forceBuy && await checkLatestValueTrend(cryptoName, false)) {
 					// if the crypto value is still decreasing, hold off buying!
 					log(`${cryptoName} is still decreasing, holding off buying..`);
 					continue;
@@ -207,9 +208,9 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 				const orderDetails = formatOrder('buy', cryptoName, availableUSDT, cryptoPrice, confirmedValue);
 				log(orderDetails.summary);
 
-				if (config.forceBuy) {
+				if (forceBuy) {
 					config.forceBuy = false;
-					log('Force buy was used.');
+					log(`Force buy was used - if you already had ${cryptoName}, the last buy price will be overridden by this buy price.`);
 				}
 
 				ordersPlaced.push(orderDetails);
