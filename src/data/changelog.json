@@ -1,17 +1,17 @@
 {
     "logs": [
-		{
+        {
             "version": "1.0.1",
-			"devChanges":[
+            "devChanges": [
                 "Update build/deploy scripts for faster code-rollouts"
             ],
             "changes": [
                 "Fix error scenario pausing not working"
             ]
         },
-		{
+        {
             "version": "1.0.2",
-            "devChanges":[
+            "devChanges": [
                 "Simplify discord configuration to set up new users faster"
             ],
             "changes": [
@@ -21,7 +21,7 @@
         },
         {
             "version": "1.0.3",
-			"devChanges":[
+            "devChanges": [
                 "Configurable database loading/updating based on discord userId"
             ],
             "changes": [
@@ -29,60 +29,60 @@
                 "Fix run time to be on the hour"
             ]
         },
-		{
+        {
             "version": "1.1.0",
-			"devChanges":[
+            "devChanges": [
                 "Minor changes to support the new 'Crypto assistant' bot"
             ],
             "changes": [
                 "Fix transaction logs 'estimate' showing incorrect value for BUY orders",
-				"Log account summary once a day at 12pm",
-				"Log a warning message when the crypto drops below a certain percentage",
-				"Added support for '/force-sell' crypto assistant command",
-				"Added support for '/change-crypto' crypto assistant command"
+                "Log account summary once a day at 12pm",
+                "Log a warning message when the crypto drops below a certain percentage",
+                "Added support for '/force-sell' crypto assistant command",
+                "Added support for '/change-crypto' crypto assistant command"
             ]
         },
-		{
+        {
             "version": "2.0.0",
-			"devChanges":[
+            "devChanges": [
                 "Package dependency update"
             ],
             "changes": [
-				"Fix transaction message day/month being back-to-front",
+                "Fix transaction message day/month being back-to-front",
                 "Using /force-sell will now pause the bot after the transaction is made",
-				"Orders are now confirmed and the order-filled price is then used - making all orders 100% accurate!",
-				"Updated transaction logs to use new real values if available (FILLED), not estimates (PLACED)",
+                "Orders are now confirmed and the order-filled price is then used - making all orders 100% accurate!",
+                "Updated transaction logs to use new real values if available (FILLED), not estimates (PLACED)",
                 "All transactions and transaction details are now stored in a database"
             ]
         },
-		{
+        {
             "version": "2.1.0",
             "changes": [
-				"Fix 'buy back percentage' being set as a positive number but used as a negative - **/set-buy-percentage**",
-				"Added support for 'hard-sell' - **/set-hard-sell-low** and **/set-hard-sell-high**"
+                "Fix 'buy back percentage' being set as a positive number but used as a negative - **/set-buy-percentage**",
+                "Added support for 'hard-sell' - **/set-hard-sell-low** and **/set-hard-sell-high**"
             ]
         },
-		{
+        {
             "version": "2.1.1",
-			"devChanges":[
-				"Added automated script for rolling out code changes to everyone at the same time",
+            "devChanges": [
+                "Added automated script for rolling out code changes to everyone at the same time",
                 "User ID's are now ONLY discord ID's - no code mapping the usernames/database ID/server ID (faster user set up)",
                 "Added user data to database"
             ],
             "changes": [
-				"Minor logging changes (error time/dates being wrong, remove all double quotes, typos)"
+                "Minor logging changes (error time/dates being wrong, remove all double quotes, typos)"
             ]
         },
-		{
+        {
             "version": "2.2.0",
-			"devChanges":[
-				"Added script to automatically get the newly added crypto currencies on the crypto.com exchange"
+            "devChanges": [
+                "Added script to automatically get the newly added crypto currencies on the crypto.com exchange"
             ],
             "changes": [
-				"Shorten the large decimal values to 2dp in logs",
+                "Shorten the large decimal values to 2dp in logs",
                 "Support for 12 new crypto currencies added to the crypto.com exchange",
                 "Added option for simplified logs (**/toggle-log-format**)",
-				"Support for **/force-buy** command"
+                "Support for **/force-buy** command"
             ]
         }
     ]
