@@ -152,45 +152,32 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 		const cryptoRecord = config.transactions[cryptoName];
 
 		// if there is no buy or sell record of the crypto
-		if (!cryptoRecord) {
+		const initialBuy = !cryptoRecord && canBuy;
 
-			if (!canBuy) { continue; }
-
-			// TODO - stack to promises.all?
-			const order = await placeBuyOrder(cryptoName, availableUSDT);
-
-			const confirmedValue = await processPlacedOrder(order.result?.order_id);
-
-			config = updateTransactions(config, cryptoName, confirmedValue || cryptoPrice, true);
-
-			const orderDetails = formatOrder('buy', cryptoName, availableUSDT, cryptoPrice, confirmedValue);
-			log(orderDetails.summary);
-
-			ordersPlaced.push(orderDetails);
-
-			canBuy = false; // order placed, make no more
-			continue;
-		}
-
-		if (!cryptoRecord.lastSellPrice && !cryptoRecord.lastBuyPrice) {
+		if (!initialBuy && !cryptoRecord.lastSellPrice && !cryptoRecord.lastBuyPrice) {
 			// if price then log and skip to the next crypto
 			logToDiscord(`${cryptoName} database record has no last sell or last buy price`, true);
 			continue;
 		}
 
-		const { forceBuy } = config;
+		// set forceBuy to true if it's the first buy, otherwise use config
+		const { forceBuy } = initialBuy === true || config;
 		const { simpleLogs } = config.options;
 
 		// check for BUY condition
 		if (cryptoRecord.lastSellPrice || forceBuy) {
 
-			// if previously bought, buy back in if price is < x percent less than last sell price
-			const percentageDiff = calculatePercDiff(cryptoPrice, cryptoRecord.lastSellPrice);
+			let percentageDiff;
 
-			log(formatPriceLog(cryptoName, 'sold', cryptoRecord.lastSellPrice, cryptoPrice, percentageDiff, simpleLogs));
+			if (!forceBuy) {
+				// if previously bought, buy back in if price is < x percent less than last sell price
+				percentageDiff = calculatePercDiff(cryptoPrice, cryptoRecord.lastSellPrice);
+
+				log(formatPriceLog(cryptoName, 'sold', cryptoRecord.lastSellPrice, cryptoPrice, percentageDiff, simpleLogs));
+			}
 
 			// crypto is down more than x %
-			if (percentageDiff < config.buyPercentage || forceBuy) {
+			if (forceBuy || percentageDiff < config.buyPercentage) {
 
 				if (!forceBuy && await checkLatestValueTrend(cryptoName, false)) {
 					// if the crypto value is still decreasing, hold off buying!
@@ -208,7 +195,7 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 				const orderDetails = formatOrder('buy', cryptoName, availableUSDT, cryptoPrice, confirmedValue);
 				log(orderDetails.summary);
 
-				if (forceBuy) {
+				if (forceBuy && !initialBuy) {
 					config.forceBuy = false;
 					log(`Force buy was used - if you already had ${cryptoName}, the last buy price will be overridden by this buy price.`);
 				}
