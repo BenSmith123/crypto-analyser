@@ -186,9 +186,10 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 
 			log(formatPriceLog(cryptoName, 'sold', cryptoRecord.lastSellPrice, cryptoPrice, percentageDiff));
 
-			if (percentageDiff < config.buyPercentage) { // crypto is down more than x %
+			// crypto is down more than x %
+			if (percentageDiff < config.buyPercentage || config.forceBuy) {
 
-				if (await checkLatestValueTrend(cryptoName, false)) {
+				if (!config.forceBuy && await checkLatestValueTrend(cryptoName, false)) {
 					// if the crypto value is still decreasing, hold off buying!
 					log(`${cryptoName} is still decreasing, holding off buying..`);
 					continue;
@@ -203,6 +204,11 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 
 				const orderDetails = formatOrder('buy', cryptoName, availableUSDT, cryptoPrice, confirmedValue);
 				log(orderDetails.summary);
+
+				if (config.forceBuy) {
+					config.forceBuy = false;
+					log('Force buy was used.');
+				}
 
 				ordersPlaced.push(orderDetails);
 
