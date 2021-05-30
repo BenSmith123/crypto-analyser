@@ -2,7 +2,7 @@
 const moment = require('moment-timezone');
 
 const { INTERNAL_RUN, CONSOLE_LOG, DATETIME_FORMAT } = require('./environment');
-const { investmentConfigIsValid, updateTransactions } = require('./database');
+const { investmentConfigIsValid, updateConfigRecord } = require('./database');
 let { loadInvestmentConfig, updateInvestmentConfig } = require('./database');
 let { getAccountSummary, getAllCryptoValues, checkLatestValueTrend, placeBuyOrder, placeSellOrder, processPlacedOrder } = require('./crypto');
 const { calculatePercDiff, round, formatOrder, formatPriceLog, logToDiscord } = require('./helpers');
@@ -149,7 +149,7 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 		let cryptoPrice = cryptoValue.bestAsk; // bestAsk for any buy orders, bestBid for sell orders
 
 		// database transaction record of the crypto
-		const cryptoRecord = config.transactions[cryptoName];
+		const cryptoRecord = config.records[cryptoName];
 
 		const limitUSDT = cryptoRecord.limitUSDT || 0;
 
@@ -188,7 +188,7 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 			}
 
 			// crypto is down more than x %
-			if (forceBuy || percentageDiff < config.buyPercentage) {
+			if (forceBuy || percentageDiff < cryptoRecord.buyPercentage) {
 
 				if (!forceBuy && await checkLatestValueTrend(cryptoName, false)) {
 					// if the crypto value is still decreasing, hold off buying!
@@ -202,7 +202,7 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 				const orderValue = await processPlacedOrder(order?.result?.order_id);
 
 				// use the confirmed value if the order was filled immediately
-				config = updateTransactions(config, cryptoName, orderValue || cryptoValue, true, limitUSDT);
+				config = updateConfigRecord(config, cryptoName, orderValue || cryptoValue, true, limitUSDT);
 
 				const orderDetails = formatOrder('buy', cryptoName, amountUSDT, cryptoPrice, orderValue);
 				log(orderDetails.summary);
@@ -227,20 +227,20 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 		log(formatPriceLog(cryptoName, 'bought', cryptoRecord.lastBuyPrice, cryptoPrice, percentageDiff, simpleLogs));
 
 		// log a warning if price has dropped below the specified percentage
-		if (config.alertPercentage && percentageDiff < config.alertPercentage) {
+		if (cryptoRecord.alertPercentage && percentageDiff < cryptoRecord.alertPercentage) {
 			log(`[Warning] ${cryptoName} is now ${percentageDiff.toFixed(2)}% since purchasing, consider selling using the /force-sell command`);
 		}
 
-		const hardSellLow = config.hardSellPercentage.low
-		&& percentageDiff < config.hardSellPercentage.low;
+		const hardSellLow = cryptoRecord.hardSellPercentage.low
+		&& percentageDiff < cryptoRecord.hardSellPercentage.low;
 
-		const hardSellHigh = config.hardSellPercentage.high
-		&& percentageDiff > config.hardSellPercentage.high;
+		const hardSellHigh = cryptoRecord.hardSellPercentage.high
+		&& percentageDiff > cryptoRecord.hardSellPercentage.high;
 
 		const shouldForceSell = hardSellLow || hardSellHigh || config.forceSell;
 
 		// crypto is up more than x %
-		if (percentageDiff > config.sellPercentage || shouldForceSell) {
+		if (percentageDiff > cryptoRecord.sellPercentage || shouldForceSell) {
 
 			// ignore this step if any of the hard-sell conditions are met
 			if (!shouldForceSell && await checkLatestValueTrend(cryptoName, true)) {
@@ -265,7 +265,7 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 				// ^ might not matter since the next buy scenario the price of the coin should have dropped
 			}
 
-			config = updateTransactions(config, cryptoName, orderValue || cryptoPrice, false, valueUSDT);
+			config = updateConfigRecord(config, cryptoName, orderValue || cryptoPrice, false, valueUSDT);
 
 			const orderDetails = formatOrder('Sell', cryptoName, availableCrypto, cryptoPrice, orderValue);
 			log(orderDetails.summary);

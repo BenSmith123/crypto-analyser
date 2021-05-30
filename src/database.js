@@ -41,14 +41,33 @@ async function loadInvestmentConfig(databaseId) {
  */
 function investmentConfigIsValid(data) {
 
+	const cryptoTransactionKeys = Object.keys(data.records);
+
 	if (data.id === USER_ID
-	// && data.isPaused
-	&& data.sellPercentage
-	&& data.buyPercentage
-	&& data.transactions
-	&& Object.keys(data.currenciesTargeted).length) {
-		// TODO - loop over the transactions list and validate each one
-		return true;
+	&& data.currenciesTargeted.length
+	&& data.records
+	&& cryptoTransactionKeys.length) {
+
+		// currently optional config data:
+		// && typeof data.isPaused !== 'undefined'
+		// && data.user
+		// && data.options)
+
+		const validRecords = cryptoTransactionKeys.filter(cryptoName => {
+			const record = data.records[cryptoName];
+
+			return (record.thresholds
+				&& record.thresholds.buyPercentage
+				&& record.thresholds.sellPercentage
+				&& record.thresholds.hardSelPercentage
+				// && (record.lastSellPrice || record.lastBuyPrice) // valid to not have either on first buy
+				// currently optional:
+				// record.limitUSDT
+				// record.alertPercentage
+			);
+		});
+
+		return validRecords.length === cryptoTransactionKeys.length;
 	}
 
 	return false;
@@ -56,7 +75,7 @@ function investmentConfigIsValid(data) {
 
 
 /**
- * Returns the database investment configuration with the updated transactions data
+ * Returns the database investment configuration with the updated record data
  *
  * @param {object} investmentConfig
  * @param {string} name - currency name
@@ -65,7 +84,7 @@ function investmentConfigIsValid(data) {
  * @param {boolean} limitUSDT - optional
  * @returns
  */
-function updateTransactions(investmentConfig, name, value, isBuyOrder, limitUSDT) {
+function updateConfigRecord(investmentConfig, name, value, isBuyOrder, limitUSDT) {
 
 	const buyOrSellKey = isBuyOrder
 		? 'lastBuyPrice'
@@ -73,8 +92,8 @@ function updateTransactions(investmentConfig, name, value, isBuyOrder, limitUSDT
 
 	const updatedConfig = investmentConfig;
 
-	// update transaction record of the current
-	updatedConfig.transactions[name] = {
+	// update transaction record
+	updatedConfig.records[name] = {
 		[buyOrSellKey]: value,
 		timestamp: Date.now(),
 		orderDate: moment(Date.now()).format(DATETIME_FORMAT),
@@ -143,7 +162,7 @@ function formatTransaction(transaction) {
 module.exports = {
 	loadInvestmentConfig,
 	investmentConfigIsValid,
-	updateTransactions,
+	updateConfigRecord,
 	updateInvestmentConfig,
 	saveTransaction,
 };
