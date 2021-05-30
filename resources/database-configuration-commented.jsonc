@@ -8,7 +8,9 @@
 	"transactions": {
 		"BTC": {
 			"lastBuyPrice": 58183.78,
-			"orderPlaced": 1620634504490
+			"timestamp": 1622267105449,
+			"orderDate": "29/05/2021, 17:45pm",
+			"limitUSDT": 200 // optional - amount of USDT to use when buying (if not set, all available USDT will be used)
 		}
 	},
 	"options": {

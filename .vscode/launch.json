@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
 		{
-			"name": "Invoke [Scheduled event]",
+			"name": "Invoke analyser bot [Scheduled event]",
 			"type": "node",
 			"request": "launch",
 			"program": "${workspaceFolder}/run/local-invoke-scheduled-event.js",
@@ -10,11 +10,13 @@
 			"env": {
 				"AWS_PROFILE": "bensmith",
 				"TRANSACTIONS_ENABLED": "false",
-				"USER_ID": "409274228794458113"
+				"USER_ID": "409274228794458113",
+				"DISCORD_ENABLED": "false",
+				"CONSOLE_LOG": "true"
             }
 		},
 		{
-			"name": "Invoke [API Gateway]",
+			"name": "Invoke discord bot [API Gateway]",
 			"type": "node",
 			"request": "launch",
 			"program": "${workspaceFolder}/run/local-invoke-discord.js",
