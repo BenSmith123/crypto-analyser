@@ -62,9 +62,10 @@ function investmentConfigIsValid(data) {
  * @param {string} name - currency name
  * @param {object} value
  * @param {boolean} isBuyOrder
+ * @param {boolean} limitUSDT - optional
  * @returns
  */
-function updateTransactions(investmentConfig, name, value, isBuyOrder) {
+function updateTransactions(investmentConfig, name, value, isBuyOrder, limitUSDT) {
 
 	const buyOrSellKey = isBuyOrder
 		? 'lastBuyPrice'
@@ -77,6 +78,10 @@ function updateTransactions(investmentConfig, name, value, isBuyOrder) {
 		[buyOrSellKey]: value,
 		timestamp: Date.now(),
 		orderDate: moment(Date.now()).format(DATETIME_FORMAT),
+		// if there was a limit, update it when selling or store to be used when buying back in
+		...limitUSDT && {
+			limitUSDT,
+		},
 		// TODO - add order Id etc. to this
 	};
 
