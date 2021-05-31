@@ -1,6 +1,24 @@
 
 ### TODO
 - Incorporate RSI, volume etc.
+- V3 rollout - manually update everyones database configuration
+	- move each crypto must have the 'thresholds' object and its percentages
+	- Add the 'isHolding' flag too - true if they have a 'lastBuyPrice'
+- Make sure the crypto currencies in 'records' buy/sell percentages aren't being deleted
+- Buy/sell thresholds etc all need to be per crypto-currency, not globally
+- New commands needed for multiple currencies:
+	- /set-crypto: Sets your crypto currencies to trade in/out of name(s) - comma separated 
+	- /remove-crypto
+- Clean up the records - data still hangs around even if the currency is no longer targetted
+- Fix logic around force-sell/hard-sell-low!
+	- buy back in at where the losses were (e.g. -10%) but if it goes down again, sell at -11% to avoid it bouncing around, 
+	  just take the 1% loss instead of -0.4% every transaction
+	- Don't pause bot anymore
+	- If it hard sells, automatically set your sell percent to whatever the hard-sell % was plus the sell % you set - i.e. what % you'll still make money at
+	- But also send a warning message saying 'set sell % to X in order to break even' (hard-sell-high to sell and not buy back in?)
+- Add user details to transactions? Not just their IDs
+- Pause crypto currencies individually?
+- Implement paused 'reason' - Error, manually, bot update etc.
 - More coin options:
 	- Auto limit sell order or stop loss
 	- noBuyBack - after selling coin, don't buy back into it and stop monitoring it
