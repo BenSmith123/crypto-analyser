@@ -56,11 +56,16 @@ function investmentConfigIsValid(data) {
 		const validRecords = cryptoTransactionKeys.filter(cryptoName => {
 			const record = data.records[cryptoName];
 
+			// if isBuyOrder is defined, record must have: true=lastBuyPrice false=lastSellPrice
+			if (typeof record.isHolding !== 'undefined') {
+				if (record.isHolding && !record.lastBuyPrice) { return false; }
+				if (!record.isHolding && !record.lastSellPrice) { return false; }
+			}
+
 			return (record.thresholds
 				&& record.thresholds.buyPercentage
 				&& record.thresholds.sellPercentage
-				&& record.thresholds.hardSelPercentage
-				// && (record.lastSellPrice || record.lastBuyPrice) // valid to not have either on first buy
+				&& record.thresholds.hardSellPercentage
 				// currently optional:
 				// record.limitUSDT
 				// record.alertPercentage
@@ -86,6 +91,8 @@ function investmentConfigIsValid(data) {
  */
 function updateConfigRecord(investmentConfig, name, value, isBuyOrder, limitUSDT) {
 
+	const { thresholds } = investmentConfig.records[name]; // keep the existing record thresholds
+
 	const buyOrSellKey = isBuyOrder
 		? 'lastBuyPrice'
 		: 'lastSellPrice';
@@ -95,8 +102,10 @@ function updateConfigRecord(investmentConfig, name, value, isBuyOrder, limitUSDT
 	// update transaction record
 	updatedConfig.records[name] = {
 		[buyOrSellKey]: value,
+		isHolding: isBuyOrder, // if it was a buy order, we are holding the coin
 		timestamp: Date.now(),
 		orderDate: moment(Date.now()).format(DATETIME_FORMAT),
+		thresholds,
 		// if there was a limit, update it when selling or store to be used when buying back in
 		...limitUSDT && {
 			limitUSDT,
