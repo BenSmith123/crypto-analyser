@@ -4,18 +4,15 @@ require('dotenv').config();
 
 const url = 'https://discord.com/api/v8/applications/839044411249655828/commands';
 
-const json = {
-	name: 'set-buy-percentage',
-	description: 'Sets the BUY percentage threshold (the decrease that has to meet before buying back to the crypto)',
-	options: [
-		{
-			name: 'percentage',
-			description: '-',
-			type: 4, // 3 = string, 4 = int, 5 = boolean
-			required: true,
-		},
-	],
-};
+const source = require('../src/data/discordCommands-v2.json');
+
+const commandToUpdate = 'add-crypto'; // UPDATE ME
+
+const json = source.commands.find(c => c.name === commandToUpdate);
+
+if (!json) {
+	throw new Error('No command found');
+}
 
 const headers = {
 	Authorization: `Bot ${process.env.BOT_TOKEN}`,
@@ -23,8 +20,9 @@ const headers = {
 
 (async () => {
 
-	// const a = await deleteCommand('841811603678691358');
-	// await getCommands();
+	// const a = await deleteCommand('849150535475265537');
+	// const a = await getCommands();
+	// console.log(a);
 
 	const req = {
 		url,
@@ -34,10 +32,10 @@ const headers = {
 	};
 
 	try {
-		const a = await axios(req);
-		console.log(a);
+		const result = await axios(req);
+		console.log('Success!', result);
 	} catch (err) {
-		console.log(err);
+		console.log('Error:', err.messages);
 	}
 
 })();
