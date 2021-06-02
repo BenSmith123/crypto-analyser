@@ -18,6 +18,8 @@ const helpers = require('../helpers');
 
 const discordName = 'Crypto assistant';
 
+const multipleCurrencyLimit = 4;
+
 
 // map discord command paths to their functions
 // if function is not defined, use updateConfiguration
@@ -52,11 +54,13 @@ exports.discordController = async function (event) {
 		const requestData = {
 			userId: body.member.user.id,
 			command,
-			body,
+			body: body.data,
 		};
 
 		// if command is mapped to a function, run it - otherwise its a user config update
-		const content = await API_ENDPOINTS[command](requestData) || await updateUserConfig(requestData); // eslint-disable-line
+		const content = API_ENDPOINTS[command]
+			? await API_ENDPOINTS[command](requestData)
+			: await updateUserConfig(requestData);
 
 		return {
 			statusCode: 200,
@@ -71,7 +75,10 @@ exports.discordController = async function (event) {
 	} catch (err) {
 
 		// unexpected error scenario - log these
-		await logToDiscord(`An unexpected error has occurred: ${err.message}\n\nStack: ${err.stack}\n\nEvent: ${JSON.stringify(event)} \n\nDate: ${moment(Date.now()).format(DATETIME_FORMAT)}`);
+		await logToDiscord(`An unexpected error has occurred: ${err.message}
+		\nStack: ${err.stack}
+		\nEvent: ${JSON.stringify(event)}
+		\nDate: ${moment(Date.now()).format(DATETIME_FORMAT)}`);
 
 		return errorResponse('Invalid request signature', 500);
 	}
@@ -104,6 +111,8 @@ async function getConfigurationResponse({ userId }) {
 /**
  * Get the users database configuration, update field(s) based on the input command
  * Update configuration in the database and respond with a message
+ *
+ * @returns {string}
  */
 async function updateUserConfig({ command, userId, body }) {
 
@@ -123,78 +132,133 @@ async function updateUserConfig({ command, userId, body }) {
 		return paramErrors.join('\n');
 	}
 
+	const options = {};
+
+	// get simplified object of the params & values e.g. { name: 'ben' }
+	body?.options.forEach(option => {
+		options[option.name] = option.value;
+	});
+
 	const config = await getUserConfiguration(userId);
 
-	if (command === 'pause') {
+	const currencyCode = options.code;
+	const currentRecord = config.records[currencyCode];
+
+	switch (command) {
+
+	case 'pause': {
 		config.isPaused = true;
 		responseMsg = 'Your crypto-bot is now **paused**';
+		break;
 	}
 
-	if (command === 'unpause') {
+	case 'unpause': {
 		config.isPaused = false;
 		responseMsg = 'Your crypto-bot is now **unpaused**';
+		break;
 	}
 
-	if (command === 'toggle-log-format') {
+	case 'toggle-log-format': {
 		config.options.simpleLogs = !config.options.simpleLogs;
 		responseMsg = config.options.simpleLogs
 			? 'Short logs enabled'
 			: 'Short logs disabled';
+		break;
 	}
 
-	if (command === 'set-buy-percentage') {
-		config.buyPercentage = percentage;
-		responseMsg = `Your buy percentage is now **${percentage}%** of the last sell price`;
-	}
+	case 'add-crypto': {
 
-	if (command === 'set-sell-percentage') {
-		config.sellPercentage = percentage;
-		responseMsg = `Your sell percentage is now **+${percentage}%** of the last buy price`;
-	}
-
-	if (command === 'set-sell-warning') {
-		config.alertPercentage = percentage;
-		responseMsg = `Your warning percentage is set to notify you when the value is **${percentage}%** of the last purchase price`;
-	}
-
-	if (command === 'set-hard-sell-low') {
-		config.hardSellPercentage.low = percentage;
-		responseMsg = `Your hard-sell LOW percentage is now **${percentage}%** of the last buy price`;
-	}
-
-	if (command === 'set-hard-sell-high') {
-		config.hardSellPercentage.high = percentage;
-		responseMsg = `Your hard-sell HIGH percentage is now **+${percentage}%** of the last buy price`;
-	}
-
-	if (command === 'force-buy') {
-		config.forceBuy = true;
-		responseMsg = `All **${config.currenciesTargeted[0]}** will be brought by the crypto-bot shortly!`;
-	}
-
-	if (command === 'force-sell') {
-		config.forceSell = true;
-		responseMsg = `All **${config.currenciesTargeted[0]}** will be sold by the crypto-bot shortly!\nOnce sold the bot will be paused`;
-	}
-
-	if (command === 'change-crypto') {
-
-		const inputCrypto = getInputValue('currency-code');
-
-		if (!inputCrypto) {
-			return 'No crypto currency provided';
+		if (Object.keys(config.records).length === multipleCurrencyLimit) {
+			responseMsg = 'Max number of currencies reached';
+			break;
 		}
 
-		const availableCrypto = await getAvailableCrypto(true);
+		if (currentRecord) { return `'${currencyCode}' already exists in your configuration`; }
 
-		const newCrypto = inputCrypto.toUpperCase();
+		config.records[currencyCode] = {
+			...options['limit-amount'] && {
+				limitUSDT: options['limit-amount'],
+			},
+			thresholds: {
+				sellPercentage: options['sell-percentage'],
+				buyPercentage: options['sell-percentage'],
+				alertPercentage: options['warning-percentage'], // TODO - rename 'alertPercentage'
+				hardSellPercentage: {
+					high: null,
+					low: options['stop-loss-percentage'], // TODO - remove/fix data
+				},
+			},
+		};
 
-		if (availableCrypto.find(c => c === newCrypto)) {
-			config.currenciesTargeted = [newCrypto];
-			responseMsg = `Your crypto-bot will now look at **${newCrypto}**, it will buy in at the market price`;
-		} else {
-			return `'**${newCrypto}**' is either an invalid name or is not available through the crypto.com exchange`;
-		}
+		responseMsg = `Your crypto-bot will now look at **${currencyCode}**, it will buy shortly at the market price`;
+		break;
+	}
+
+	case 'remove-crypto': {
+
+		if (!currentRecord) { return `Your crypto-bot isn't using **${currencyCode}**`; }
+
+		delete config.records[currencyCode];
+		responseMsg = `Your crypto-bot will no longer monitor **${currencyCode}**`;
+		break;
+	}
+
+	case 'force-buy': {
+
+		if (!currentRecord) { return `Your crypto-bot isn't using **${currencyCode}**`; }
+
+		currentRecord.forceBuy = true;
+		responseMsg = `**${currencyCode}** will be bought by the crypto-bot shortly!`;
+		break;
+	}
+
+	case 'force-sell': {
+
+		if (!currentRecord) { return `Your crypto-bot isn't using **${currencyCode}**`; }
+
+		currentRecord.forceSell = true;
+		responseMsg = `**${currencyCode}** will be sold by the crypto-bot shortly!\nOnce sold the bot will be paused`;
+		break;
+	}
+
+	case 'set-buy-threshold': {
+
+		if (!currentRecord) { return `Your crypto-bot isn't using **${currencyCode}**`; }
+
+		currentRecord.thresholds.buyPercentage = options['buy-percentage'];
+		responseMsg = `Your buy threshold is now **${percentage}%** of the last sell price`;
+		break;
+	}
+
+	case 'set-sell-threshold': {
+
+		if (!currentRecord) { return `Your crypto-bot isn't using **${currencyCode}**`; }
+
+		currentRecord.thresholds.sellPercentage = options['sell-percentage'];
+		responseMsg = `Your sell percentage is now **+${percentage}%** of the last purchase price`;
+		break;
+	}
+
+	case 'set-sell-warning': {
+
+		if (!currentRecord) { return `Your crypto-bot isn't using **${currencyCode}**`; }
+
+		currentRecord.thresholds.alertPercentage = options['warning-percentage'];
+		responseMsg = `Your crypto-bot is set to notify you when the value is **${percentage}%** of the last purchase price`;
+		break;
+	}
+
+	case 'set-stop-loss': {
+
+		if (!currentRecord) { return `Your crypto-bot isn't using **${currencyCode}**`; }
+
+		currentRecord.thresholds.hardSellPercentage.low = options['sell-percentage'];
+		responseMsg = `Your stop loss percentage is now **${percentage}%** of the last buy price`;
+		break;
+	}
+
+	default:
+		return `/${command} not found`;
 	}
 
 	await updateInvestmentConfig(config);
