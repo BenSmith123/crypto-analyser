@@ -173,8 +173,11 @@ async function updateUserConfig({ command, userId, body }) {
 			break;
 		}
 
-		if (currentRecord) { return `'${currencyCode}' already exists in your configuration`; }
+		const currencyExists = config.currenciesTargeted.find(c => c === currencyCode);
 
+		if (currencyExists) { return `'${currencyCode}' already exists in your configuration`; }
+
+		config.currenciesTargeted.push(currencyCode);
 		config.records[currencyCode] = {
 			...options['limit-amount'] && {
 				limitUSDT: options['limit-amount'],
@@ -196,8 +199,12 @@ async function updateUserConfig({ command, userId, body }) {
 
 	case 'remove-crypto': {
 
+		const currencyExists = config.currenciesTargeted.find(c => c === currencyCode);
+
+		if (!currencyExists) { return `'${currencyCode}' does not exist in your configuration`; }
 		if (!currentRecord) { return `Your crypto-bot isn't using **${currencyCode}**`; }
 
+		config.currenciesTargeted = config.currenciesTargeted.filter(c => c !== currencyCode);
 		delete config.records[currencyCode];
 		responseMsg = `Your crypto-bot will no longer monitor **${currencyCode}**`;
 		break;
