@@ -116,6 +116,24 @@
 				}
 			]
         },
+		{
+            "name": "set-limit",
+            "description": "The about of USDT to use when trading the given crypto",
+			"options": [
+				{
+					"name": "code",
+					"description": "e.g. 'BTC'",
+					"type": 3,
+					"required": true
+				},
+				{
+					"name": "limit-amount",
+					"description": "Amount in USDT - updated automatically after sell transactions",
+					"type": 4,
+					"required": true
+				}
+			]
+        },
         {
             "name": "set-stop-loss",
             "description": "TODO - clarify logic",

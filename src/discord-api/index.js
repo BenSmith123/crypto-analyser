@@ -257,6 +257,15 @@ async function updateUserConfig({ command, userId, body }) {
 		break;
 	}
 
+	case 'set-limit': {
+
+		if (!currentRecord) { return `Your crypto-bot isn't using **${currencyCode}**`; }
+
+		currentRecord.limitUSDT = options['limit-amount'];
+		responseMsg = `**${currencyCode}** will now trade with a maximum of $${currentRecord.limitUSDT} USDT\nThis limit will be updated automatically after sell transactions to include any gains/losses when trading`;
+		break;
+	}
+
 	default:
 		return `/${command} not found`;
 	}
