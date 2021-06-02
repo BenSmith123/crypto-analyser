@@ -118,7 +118,7 @@
         },
 		{
             "name": "set-limit",
-            "description": "The about of USDT to use when trading the given crypto",
+            "description": "The amount of USDT to use when trading the given crypto",
 			"options": [
 				{
 					"name": "code",
