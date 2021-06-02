@@ -95,7 +95,7 @@
             "version": "3.0.0",
             "changes": [
                 "Implemented multiple currencies!",
-                "All new discord slash commands for handling multiple currencies: "
+                "All new discord slash commands for handling multiple currencies"
             ]
         }
     ]
