@@ -1,25 +1,32 @@
 {
     "application_id": "839044411249655828",
-    "channel_id": "834181611041194002",
+    "channel_id": "9729174198549541561",
     "data": {
-        "id": "841811603678691358",
-        "name": "blep"
+        "id": "842573489608589333",
+        "name": "force-buy",
+        "options": [
+            {
+                "name": "code",
+                "type": 4,
+                "value": "BTC"
+            }
+        ]
     },
     "guild_id": "834181611041193999",
-    "id": "841988318254202880",
+    "id": "74192792458217925175",
     "member": {
         "avatar": null,
         "deaf": false,
         "is_pending": false,
         "joined_at": "2021-04-20T21:39:54.478000+00:00",
         "mute": false,
-        "nick": null,
+        "nick": "Ben",
         "pending": false,
-        "permissions": "17179869183",
+        "permissions": "137438953471",
         "premium_since": null,
         "roles": [],
         "user": {
-            "avatar": null,
+            "avatar": "c60ee13409b89ef8aae71ff41fde14f1",
             "discriminator": "4581",
             "id": "409274228794458113",
             "public_flags": 0,
