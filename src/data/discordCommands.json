@@ -50,6 +50,10 @@
             "name": "commands",
             "description": "Displays all available commands"
         },
+		{
+            "name": "configuration",
+            "description": "Displays your current crypto-analyser bot configuration"
+        },
         {
             "name": "force-buy",
             "description": "Buys back into the specified crypto currency when the crypto-bot is next ran",

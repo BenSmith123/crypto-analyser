@@ -27,7 +27,7 @@ const API_ENDPOINTS = {
 	test,
 	changelog: getChangelog,
 	commands: getCommands,
-	'get-configuration': getConfigurationResponse,
+	configuration: getConfigurationResponse,
 	'health-check': checkCryptoApiStatus,
 	'list-available-crypto': getAvailableCrypto,
 };
@@ -102,9 +102,15 @@ async function logToDiscord(msg) {
 async function getConfigurationResponse({ userId }) {
 	const config = await getUserConfiguration(userId);
 
-	// TODO - filter out data - format too?
+	const filteredConfig = {
+		ID: config.id,
+		currencies: config.currenciesTargeted,
+		isPaused: config.isPaused,
+		records: config.records,
+		options: config.options,
+	};
 
-	return JSON.stringify(config, null, 4);
+	return JSON.stringify(filteredConfig, null, 4).replace(/"/g, '');
 }
 
 
@@ -141,7 +147,7 @@ async function updateUserConfig({ command, userId, body }) {
 
 	const config = await getUserConfiguration(userId);
 
-	const currencyCode = options.code;
+	const currencyCode = options.code.toUpperCase();
 	const currentRecord = config.records[currencyCode];
 
 	switch (command) {

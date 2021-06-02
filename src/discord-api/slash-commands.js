@@ -69,25 +69,22 @@ async function checkCryptoApiStatus() {
 
 /**
  * Returns a list of the available crypto currencies on the crypto.com API
- * Available crypto currencies listed and can be traded into USDT
+ * that can be traded into USDT
  *
- * @param {boolean} [returnArray] - optional (default false)
- * @returns {array|string}
+ * @returns {array}
  */
-async function getAvailableCrypto(returnArray) {
+async function getAvailableCrypto() {
 
-	const res = await axios(`${API_URL}public/get-instruments`);
+	const supportedCurrencies = require('../data/decimalValueMap.json'); // eslint-disable-line global-require
 
-	const cryptoList = res.data.result.instruments
+	const cryptoList = supportedCurrencies
 		.map(instrument => (instrument.instrument_name.includes('USDT')
 			? instrument.base_currency
 			: null))
 		.filter(r => r !== null)
 		.sort();
 
-	return returnArray
-		? cryptoList
-		: `${cryptoList.join('\n')}\n${cryptoList.length} total crypto currencies available`;
+	return `${cryptoList.join('\n')}\n${cryptoList.length} total crypto currencies available`;
 }
 
 
