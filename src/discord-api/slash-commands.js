@@ -24,7 +24,7 @@ function getChangelog() {
 
 	changelog.logs.forEach(log => {
 
-		if (!log.version.startsWith('2')) { return; } // trim logs to only v2 onwards (avoid discord text limit)
+		if (log.version.startsWith('1')) { return; } // trim logs to only v2 onwards (avoid discord text limit)
 
 		results.push(`\n**v${log.version}**`);
 
