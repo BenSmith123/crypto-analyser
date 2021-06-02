@@ -1,14 +1,14 @@
 
 ### TODO
 - Incorporate RSI, volume etc.
-- V3 rollout - manually update everyones database configuration
-	- move each crypto must have the 'thresholds' object and its percentages
-	- Add the 'isHolding' flag too - true if they have a 'lastBuyPrice'
+- V3 rollout 
+	- manually update everyones database configuration
+		- move each crypto must have the 'thresholds' object and its percentages
+		- Add the 'isHolding' flag too - true if they have a 'lastBuyPrice'
+	- delete all discord commands!
+	- create all new discord commands
 - Make sure the crypto currencies in 'records' buy/sell percentages aren't being deleted
 - Buy/sell thresholds etc all need to be per crypto-currency, not globally
-- New commands needed for multiple currencies:
-	- /set-crypto: Sets your crypto currencies to trade in/out of name(s) - comma separated 
-	- /remove-crypto
 - Clean up the records - data still hangs around even if the currency is no longer targetted
 - Fix logic around force-sell/hard-sell-low!
 	- buy back in at where the losses were (e.g. -10%) but if it goes down again, sell at -11% to avoid it bouncing around, 
