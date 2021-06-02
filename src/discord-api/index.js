@@ -184,7 +184,7 @@ async function updateUserConfig({ command, userId, body }) {
 			},
 			thresholds: {
 				sellPercentage: options['sell-percentage'],
-				buyPercentage: options['sell-percentage'],
+				buyPercentage: options['buy-percentage'],
 				alertPercentage: options['warning-percentage'], // TODO - rename 'alertPercentage'
 				hardSellPercentage: {
 					high: null,
