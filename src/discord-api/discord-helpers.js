@@ -3,7 +3,7 @@ const nacl = require('tweetnacl');
 
 const { loadInvestmentConfig } = require('../database');
 
-const discordCommands = require('../data/discordCommands.json');
+const discordCommandsData = require('../data/discordCommands.json');
 const decimalValueMap = require('../data/decimalValueMap.json');
 
 
@@ -66,13 +66,15 @@ function getInputValue(paramName, inputOptions) {
  * @returns
  */
 function getCommandDetails(commandName) {
-	return discordCommands.find(c => c.name === commandName);
+	return discordCommandsData.commands.find(c => c.name === commandName);
 }
 
 
 /**
  * Returns an array of errors based on the given parameter options and the
  * command parameter details specified in the discordCommands.json
+ *
+ * NOTE - this does NOT validate the logic of the command, just the params/values
  *
  * @param {object} body - body of the incoming request
  * @param {object} commandDetails
@@ -84,7 +86,7 @@ function validateCommandParams(body, commandDetails) {
 		return []; // no options specified in the commands to validate
 	}
 
-	const inputOptions = body.data?.options;
+	const inputOptions = body?.options;
 
 	if (!inputOptions) {
 		return ['Internal error - options were specified in commands list but don\'t exist on the request'];
@@ -92,10 +94,12 @@ function validateCommandParams(body, commandDetails) {
 
 	const validationErrors = inputOptions.map(option => {
 
+		const isRequired = commandDetails.options.find(opt => (opt.name === option.name)).required;
+
 		const optionValue = getInputValue(option.name, inputOptions);
 
 		// skip validation if it isn't required and wasn't provided
-		if (!option.required && !optionValue) {
+		if (isRequired === false || !optionValue) {
 			return null;
 		}
 
@@ -106,7 +110,7 @@ function validateCommandParams(body, commandDetails) {
 
 			return foundCurrency
 				? null
-				: `Currency '${optionValue}' is invalid or does not exist in crypto.com exchange - use /list-available-crypto for the full list`;
+				: `'**${optionValue}**' is invalid or is not available through the crypto.com exchange - use /list-available-crypto for the full list`;
 		}
 
 		case 'sell-percentage': {
@@ -134,7 +138,7 @@ function validateCommandParams(body, commandDetails) {
 		}
 	});
 
-	return validationErrors;
+	return validationErrors.filter(Boolean);
 }
 
 
