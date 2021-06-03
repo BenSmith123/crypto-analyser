@@ -146,7 +146,7 @@ async function updateUserConfig({ command, userId, body }) {
 
 	const config = await getUserConfiguration(userId);
 
-	const currencyCode = options.code.toUpperCase();
+	const currencyCode = options.code?.toUpperCase();
 	const currentRecord = config.records[currencyCode];
 
 	switch (command) {
