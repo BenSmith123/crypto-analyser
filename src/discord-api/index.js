@@ -27,8 +27,8 @@ const API_ENDPOINTS = {
 	test,
 	changelog: getChangelog,
 	commands: getCommands,
+	health: checkCryptoApiStatus,
 	'get-configuration': getConfigurationResponse,
-	'health-check': checkCryptoApiStatus,
 	'list-available-crypto': getAvailableCrypto,
 };
 
@@ -77,7 +77,7 @@ exports.discordController = async function (event) {
 		// unexpected error scenario - log these
 		await logToDiscord(`An unexpected error has occurred: ${err.message}
 		\nStack: ${err.stack}
-		\nEvent: ${JSON.stringify(event)}
+		\nEvent: ${event.body}
 		\nDate: ${moment(Date.now()).format(DATETIME_FORMAT)}`);
 
 		return errorResponse('Invalid request signature', 500);
@@ -135,7 +135,7 @@ async function updateUserConfig({ command, userId, body }) {
 	const options = {};
 
 	// get simplified object of the params & values e.g. { name: 'ben' }
-	body?.options.forEach(option => {
+	body.options?.forEach(option => {
 		options[option.name] = option.value;
 	});
 
