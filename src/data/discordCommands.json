@@ -50,6 +50,10 @@
             "name": "commands",
             "description": "Displays all available commands"
         },
+		{
+            "name": "configuration",
+            "description": "Displays your current crypto-analyser bot configuration"
+        },
         {
             "name": "force-buy",
             "description": "Buys back into the specified crypto currency when the crypto-bot is next ran",
@@ -111,6 +115,24 @@
 				{
 					"name": "buy-percentage",
 					"description": "negative",
+					"type": 4,
+					"required": true
+				}
+			]
+        },
+		{
+            "name": "set-limit",
+            "description": "The amount of USDT to use when trading the given crypto",
+			"options": [
+				{
+					"name": "code",
+					"description": "e.g. 'BTC'",
+					"type": 3,
+					"required": true
+				},
+				{
+					"name": "limit-amount",
+					"description": "Amount in USDT - updated automatically after sell transactions",
 					"type": 4,
 					"required": true
 				}

@@ -28,7 +28,7 @@ const API_ENDPOINTS = {
 	changelog: getChangelog,
 	commands: getCommands,
 	health: checkCryptoApiStatus,
-	'get-configuration': getConfigurationResponse,
+	configuration: getConfigurationResponse,
 	'list-available-crypto': getAvailableCrypto,
 };
 
@@ -102,9 +102,15 @@ async function logToDiscord(msg) {
 async function getConfigurationResponse({ userId }) {
 	const config = await getUserConfiguration(userId);
 
-	// TODO - filter out data - format too?
+	const filteredConfig = {
+		ID: config.id,
+		currencies: config.currenciesTargeted,
+		isPaused: config.isPaused,
+		records: config.records,
+		options: config.options,
+	};
 
-	return JSON.stringify(config, null, 4);
+	return JSON.stringify(filteredConfig, null, 4).replace(/"/g, '');
 }
 
 
@@ -141,7 +147,7 @@ async function updateUserConfig({ command, userId, body }) {
 
 	const config = await getUserConfiguration(userId);
 
-	const currencyCode = options.code;
+	const currencyCode = options.code.toUpperCase();
 	const currentRecord = config.records[currencyCode];
 
 	switch (command) {
@@ -173,15 +179,18 @@ async function updateUserConfig({ command, userId, body }) {
 			break;
 		}
 
-		if (currentRecord) { return `'${currencyCode}' already exists in your configuration`; }
+		const currencyExists = config.currenciesTargeted.find(c => c === currencyCode);
 
+		if (currencyExists) { return `'${currencyCode}' already exists in your configuration`; }
+
+		config.currenciesTargeted.push(currencyCode);
 		config.records[currencyCode] = {
 			...options['limit-amount'] && {
 				limitUSDT: options['limit-amount'],
 			},
 			thresholds: {
 				sellPercentage: options['sell-percentage'],
-				buyPercentage: options['sell-percentage'],
+				buyPercentage: options['buy-percentage'],
 				alertPercentage: options['warning-percentage'], // TODO - rename 'alertPercentage'
 				hardSellPercentage: {
 					high: null,
@@ -196,8 +205,12 @@ async function updateUserConfig({ command, userId, body }) {
 
 	case 'remove-crypto': {
 
+		const currencyExists = config.currenciesTargeted.find(c => c === currencyCode);
+
+		if (!currencyExists) { return `'${currencyCode}' does not exist in your configuration`; }
 		if (!currentRecord) { return `Your crypto-bot isn't using **${currencyCode}**`; }
 
+		config.currenciesTargeted = config.currenciesTargeted.filter(c => c !== currencyCode);
 		delete config.records[currencyCode];
 		responseMsg = `Your crypto-bot will no longer monitor **${currencyCode}**`;
 		break;
@@ -254,6 +267,15 @@ async function updateUserConfig({ command, userId, body }) {
 
 		currentRecord.thresholds.hardSellPercentage.low = options['sell-percentage'];
 		responseMsg = `Your stop loss percentage is now **${percentage}%** of the last buy price`;
+		break;
+	}
+
+	case 'set-limit': {
+
+		if (!currentRecord) { return `Your crypto-bot isn't using **${currencyCode}**`; }
+
+		currentRecord.limitUSDT = options['limit-amount'];
+		responseMsg = `**${currencyCode}** will now trade with a maximum of $${currentRecord.limitUSDT} USDT\nThis limit will be updated automatically after sell transactions to include any gains/losses when trading`;
 		break;
 	}
 

@@ -61,9 +61,7 @@ function getInputValue(paramName, inputOptions) {
 
 
 /**
- *
  * @param {string} commandName
- * @returns
  */
 function getCommandDetails(commandName) {
 	return discordCommandsData.commands.find(c => c.name === commandName);

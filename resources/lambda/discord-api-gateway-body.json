@@ -3,12 +3,17 @@
     "channel_id": "9729174198549541561",
     "data": {
         "id": "842573489608589333",
-        "name": "force-buy",
+        "name": "set-buy-threshold",
         "options": [
             {
                 "name": "code",
                 "type": 4,
                 "value": "BTC"
+            },
+            {
+                "name": "buy-percentage",
+                "type": 3,
+                "value": 5
             }
         ]
     },

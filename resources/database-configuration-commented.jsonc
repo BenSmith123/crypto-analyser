@@ -10,6 +10,7 @@
             "lastSellPrice": 0.29153, // optional - if no lastSellPrice or lastBuyPrice exists its the first time buy
             "orderDate": "30/05/2021, 03:00am",
             "timestamp": 1622300405158,
+			"isHolding": false,
             "forceSell": false, // optional - flag set to force sell the crypto
 			"forceBuy": false, // optional
             "thresholds": {
