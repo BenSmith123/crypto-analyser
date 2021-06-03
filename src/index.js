@@ -167,7 +167,7 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 		}
 
 		// set forceBuy to true if it's the first buy, otherwise use config
-		const forceBuy = initialBuy === true || config.forceBuy;
+		const forceBuy = initialBuy === true || cryptoRecord.forceBuy;
 		const { simpleLogs } = config.options;
 
 		// check for BUY condition
