@@ -207,7 +207,7 @@ async function processPlacedOrder(orderId, secondAttempt = false) {
 
 	const order = await getOrderDetail(orderId);
 
-	const orderIsFilled = order.result?.order_info.status === 'FILLED' || false;
+	const orderIsFilled = order.result?.order_info?.status === 'FILLED' || false;
 
 	if (orderIsFilled) {
 		// TODO - should this be awaited or can it be done async
