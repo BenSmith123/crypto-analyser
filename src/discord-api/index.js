@@ -123,7 +123,6 @@ async function getConfigurationResponse({ userId }) {
 async function updateUserConfig({ command, userId, body }) {
 
 	let responseMsg;
-	let percentage;
 
 	const commandDetails = getCommandDetails(command);
 
@@ -239,7 +238,7 @@ async function updateUserConfig({ command, userId, body }) {
 		if (!currentRecord) { return `Your crypto-bot isn't using **${currencyCode}**`; }
 
 		currentRecord.thresholds.buyPercentage = options['buy-percentage'];
-		responseMsg = `Your buy threshold is now **${percentage}%** of the last sell price`;
+		responseMsg = `Your buy threshold is now **${options['buy-percentage']}%** of the last sell price`;
 		break;
 	}
 
@@ -248,7 +247,7 @@ async function updateUserConfig({ command, userId, body }) {
 		if (!currentRecord) { return `Your crypto-bot isn't using **${currencyCode}**`; }
 
 		currentRecord.thresholds.sellPercentage = options['sell-percentage'];
-		responseMsg = `Your sell percentage is now **+${percentage}%** of the last purchase price`;
+		responseMsg = `Your sell percentage is now **+${options['sell-percentage']}%** of the last purchase price`;
 		break;
 	}
 
@@ -257,7 +256,7 @@ async function updateUserConfig({ command, userId, body }) {
 		if (!currentRecord) { return `Your crypto-bot isn't using **${currencyCode}**`; }
 
 		currentRecord.thresholds.alertPercentage = options['warning-percentage'];
-		responseMsg = `Your crypto-bot is set to notify you when the value is **${percentage}%** of the last purchase price`;
+		responseMsg = `Your crypto-bot is set to notify you when the value is **${options['warning-percentage']}%** of the last purchase price`;
 		break;
 	}
 
@@ -266,7 +265,7 @@ async function updateUserConfig({ command, userId, body }) {
 		if (!currentRecord) { return `Your crypto-bot isn't using **${currencyCode}**`; }
 
 		currentRecord.thresholds.hardSellPercentage.low = options['sell-percentage'];
-		responseMsg = `Your stop loss percentage is now **${percentage}%** of the last buy price`;
+		responseMsg = `Your stop loss percentage is now **${options['sell-percentage']}%** of the last buy price`;
 		break;
 	}
 
@@ -275,7 +274,8 @@ async function updateUserConfig({ command, userId, body }) {
 		if (!currentRecord) { return `Your crypto-bot isn't using **${currencyCode}**`; }
 
 		currentRecord.limitUSDT = options['limit-amount'];
-		responseMsg = `**${currencyCode}** will now trade with a maximum of $${currentRecord.limitUSDT} USDT\nThis limit will be updated automatically after sell transactions to include any gains/losses when trading`;
+		responseMsg = `**${currencyCode}** will now trade with a maximum of $${currentRecord.limitUSDT} USDT
+		This limit will be updated automatically after sell transactions to include any gains/losses when trading`;
 		break;
 	}
 
