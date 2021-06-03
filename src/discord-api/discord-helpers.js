@@ -104,7 +104,8 @@ function validateCommandParams(body, commandDetails) {
 		switch (option.name) {
 
 		case 'code': {
-			const foundCurrency = decimalValueMap.find(crypto => crypto.base_currency === optionValue);
+			const foundCurrency = decimalValueMap
+				.find(crypto => crypto.base_currency === optionValue.toUpperCase());
 
 			return foundCurrency
 				? null
