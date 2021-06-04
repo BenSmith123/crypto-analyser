@@ -174,7 +174,7 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 		if (cryptoRecord.lastSellPrice || forceBuy) {
 
 			if (limitUSDT > availableUSDT) {
-				log(`[Warning] You do not have enough USDT funds ($${availableUSDT}) to meet the specified limit ($${limitUSDT}), all available funds will be used in a buy scenario`);
+				log(`[Warning] You do not have enough USDT funds ($${availableUSDT}) to meet the specified limit for ${cryptoName} ($${limitUSDT}), all available funds will be used in a buy scenario`);
 			}
 
 			let percentageDiff;
@@ -207,7 +207,6 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 				log(orderDetails.summary);
 
 				if (forceBuy && !initialBuy) {
-					delete config.forceBuy;
 					log(`Force buy was used - if you already had ${cryptoName}, the last buy price will be overridden by this buy price.`);
 				}
 
@@ -230,16 +229,16 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 			log(`[Warning] ${cryptoName} is now ${percentageDiff.toFixed(2)}% since purchasing, consider selling`);
 		}
 
-		const hardSellLow = thresholds.stopLossPercentage
+		const sellAtLoss = thresholds.stopLossPercentage
 		&& percentageDiff < thresholds.stopLossPercentage;
 
-		const shouldForceSell = hardSellLow || config.forceSell;
+		const forceSell = sellAtLoss || cryptoRecord.forceSell;
 
 		// crypto is up more than x %
-		if (percentageDiff > thresholds.sellPercentage || shouldForceSell) {
+		if (percentageDiff > thresholds.sellPercentage || forceSell) {
 
 			// ignore this step if any of the hard-sell conditions are met
-			if (!shouldForceSell && await checkLatestValueTrend(cryptoName, true)) {
+			if (!forceSell && await checkLatestValueTrend(cryptoName, true)) {
 				// if the crypto value is still increasing, hold the crypto!
 				log(`${cryptoName} is still increasing, holding off selling..`);
 				continue;
@@ -266,10 +265,9 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 			const orderDetails = formatOrder('Sell', cryptoName, availableCrypto, cryptoPrice, orderValue);
 			log(orderDetails.summary);
 
-			if (shouldForceSell) {
-				delete config.forceSell;
-				config.isPaused = true;
-				log('A hard-sell threshold was met or /force-sell was used, pausing bot. Use /unpause to unpause the bot.');
+			// if crypto was sold because of the stopLossPercentage
+			if (sellAtLoss) {
+				log(`${cryptoName} stop-loss threshold was met`);
 			}
 
 			ordersPlaced.push(orderDetails);
