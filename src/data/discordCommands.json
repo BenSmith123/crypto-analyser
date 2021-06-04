@@ -157,10 +157,6 @@
 			]
         },
         {
-            "name": "set-hard-sell-high",
-            "description": "Sets the hard-sell HIGH percentage threshold (the increase before selling and PAUSING)"
-        },
-        {
             "name": "set-sell-threshold",
             "description": "The increase that has to be met before selling back into USDT",
 			"options": [

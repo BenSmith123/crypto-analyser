@@ -75,10 +75,7 @@ exports.discordController = async function (event) {
 	} catch (err) {
 
 		// unexpected error scenario - log these
-		await logToDiscord(`An unexpected error has occurred: ${err.message}
-		\nStack: ${err.stack}
-		\nEvent: ${event.body}
-		\nDate: ${moment(Date.now()).format(DATETIME_FORMAT)}`);
+		await logToDiscord(`An unexpected error has occurred: ${err.message}\nStack: ${err.stack}\nEvent: ${event.body}\nDate: ${moment(Date.now()).format(DATETIME_FORMAT)}`);
 
 		return errorResponse('Invalid request signature', 500);
 	}
@@ -274,8 +271,7 @@ async function updateUserConfig({ command, userId, body }) {
 		if (!currentRecord) { return `Your crypto-bot isn't using **${currencyCode}**`; }
 
 		currentRecord.limitUSDT = options['limit-amount'];
-		responseMsg = `**${currencyCode}** will now trade with a maximum of $${currentRecord.limitUSDT} USDT
-		This limit will be updated automatically after sell transactions to include any gains/losses when trading`;
+		responseMsg = `**${currencyCode}** will now trade with a maximum of $${currentRecord.limitUSDT} USDT\nThis limit will be updated automatically after sell transactions to include any gains/losses when trading`;
 		break;
 	}
 
