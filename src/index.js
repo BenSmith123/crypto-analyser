@@ -207,7 +207,7 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 				log(orderDetails.summary);
 
 				if (forceBuy && !initialBuy) {
-					config.forceBuy = false;
+					delete config.forceBuy;
 					log(`Force buy was used - if you already had ${cryptoName}, the last buy price will be overridden by this buy price.`);
 				}
 
@@ -230,13 +230,10 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 			log(`[Warning] ${cryptoName} is now ${percentageDiff.toFixed(2)}% since purchasing, consider selling using the /force-sell command`);
 		}
 
-		const hardSellLow = thresholds.hardSellPercentage?.low
-		&& percentageDiff < thresholds.hardSellPercentage.low;
+		const hardSellLow = thresholds.stopLossPercentage
+		&& percentageDiff < thresholds.stopLossPercentage;
 
-		const hardSellHigh = thresholds.hardSellPercentage?.high
-		&& percentageDiff > thresholds.hardSellPercentage.high;
-
-		const shouldForceSell = hardSellLow || hardSellHigh || config.forceSell;
+		const shouldForceSell = hardSellLow || config.forceSell;
 
 		// crypto is up more than x %
 		if (percentageDiff > thresholds.sellPercentage || shouldForceSell) {
@@ -270,7 +267,7 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 			log(orderDetails.summary);
 
 			if (shouldForceSell) {
-				config.forceSell = false;
+				delete config.forceSell;
 				config.isPaused = true;
 				log('A hard-sell threshold was met or /force-sell was used, pausing bot. Use /unpause to unpause the bot.');
 			}

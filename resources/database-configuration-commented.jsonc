@@ -17,20 +17,14 @@
                 "buyPercentage": -5, // negative percentage to buy at (relative to lastSellPrice)
                 "sellPercentage": 3, // positive percentage to sell at (relative to lastBuyPrice) 
                 "alertPercentage": -10, // optional - percentage to send out warning log (relative to lastBuyPrice)
-                "hardSellPercentage": {
-                    "high": null, // optional
-                    "low": -10 // optional
-                }
+                "stopLossPercentage": -10 // optional
             }
         },
 		"BTC": {
 			"limitUSDT": 100, // optional - amount of USDT to use when buying (if not set, all available USDT will be used)
 			"thresholds": {
                 "buyPercentage": -2,
-                "sellPercentage": 2,
-                "hardSellPercentage": {
-					
-                }
+                "sellPercentage": 2
             }
 		}
 	},

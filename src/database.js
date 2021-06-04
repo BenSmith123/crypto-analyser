@@ -65,9 +65,9 @@ function investmentConfigIsValid(data) {
 			return (record.thresholds
 				&& record.thresholds.buyPercentage
 				&& record.thresholds.sellPercentage
-				&& record.thresholds.hardSellPercentage
 				// currently optional:
 				// record.limitUSDT
+				// record.stopLossPercentage
 				// record.alertPercentage
 			);
 		});
