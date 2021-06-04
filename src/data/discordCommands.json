@@ -140,7 +140,7 @@
         },
         {
             "name": "set-stop-loss",
-            "description": "TODO - clarify logic",
+            "description": "TODO - WIP",
 			"options": [
 				{
 					"name": "code",
@@ -149,7 +149,7 @@
 					"required": true
 				},
 				{
-					"name": "sell-percentage",
+					"name": "stop-loss-percentage",
 					"description": "negative",
 					"type": 4,
 					"required": true

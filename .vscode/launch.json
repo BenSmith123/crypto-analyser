@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
 		{
-			"name": "Invoke analyser bot [Scheduled event]",
+			"name": "Run analyser bot",
 			"type": "node",
 			"request": "launch",
 			"program": "${workspaceFolder}/run/local-invoke-scheduled-event.js",
@@ -16,13 +16,14 @@
             }
 		},
 		{
-			"name": "Invoke discord bot [API Gateway]",
+			"name": "Run discord bot",
 			"type": "node",
 			"request": "launch",
 			"program": "${workspaceFolder}/run/local-invoke-discord.js",
 			"internalConsoleOptions": "openOnSessionStart",
 			"env": {
 				"AWS_PROFILE": "bensmith",
+				"BYPASS_VALIDATION": "true"
             }
 		},
 		{
@@ -40,7 +41,7 @@
             }
 		},
 		{
-			"name": "Node selected file",
+			"name": "Node selected",
 			"type": "node",
 			"request": "launch",
 			"program": "${file}",

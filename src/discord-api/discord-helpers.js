@@ -92,7 +92,7 @@ function validateCommandParams(body, commandDetails) {
 
 	const validationErrors = inputOptions.map(option => {
 
-		const isRequired = commandDetails.options.find(opt => (opt.name === option.name)).required;
+		const isRequired = commandDetails.options.find(opt => (opt.name === option.name))?.required;
 
 		const optionValue = getInputValue(option.name, inputOptions);
 
