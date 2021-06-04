@@ -8,7 +8,7 @@
 		"CRO": {
 			"sellPercentage": 5,
 			"buyPercentage": -5,
-			"alertPercentage": null,
+			"warningPercentage": null,
 			"stopLossPercentage": null
 		}
 	},

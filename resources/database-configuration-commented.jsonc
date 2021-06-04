@@ -16,7 +16,7 @@
             "thresholds": {
                 "buyPercentage": -5, // negative percentage to buy at (relative to lastSellPrice)
                 "sellPercentage": 3, // positive percentage to sell at (relative to lastBuyPrice) 
-                "alertPercentage": -10, // optional - percentage to send out warning log (relative to lastBuyPrice)
+                "warningPercentage": -10, // optional - percentage to send out warning log (relative to lastBuyPrice)
                 "stopLossPercentage": -10 // optional
             }
         },

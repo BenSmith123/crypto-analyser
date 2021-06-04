@@ -226,8 +226,8 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 		log(formatPriceLog(cryptoName, 'bought', cryptoRecord.lastBuyPrice, cryptoPrice, percentageDiff, simpleLogs));
 
 		// log a warning if price has dropped below the specified percentage
-		if (thresholds.alertPercentage && percentageDiff < thresholds.alertPercentage) {
-			log(`[Warning] ${cryptoName} is now ${percentageDiff.toFixed(2)}% since purchasing, consider selling using the /force-sell command`);
+		if (thresholds.warningPercentage && percentageDiff < thresholds.warningPercentage) {
+			log(`[Warning] ${cryptoName} is now ${percentageDiff.toFixed(2)}% since purchasing, consider selling`);
 		}
 
 		const hardSellLow = thresholds.stopLossPercentage

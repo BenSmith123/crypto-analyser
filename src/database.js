@@ -68,7 +68,7 @@ function investmentConfigIsValid(data) {
 				// currently optional:
 				// record.limitUSDT
 				// record.stopLossPercentage
-				// record.alertPercentage
+				// record.warningPercentage
 			);
 		});
 

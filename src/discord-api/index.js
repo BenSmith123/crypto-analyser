@@ -189,7 +189,7 @@ async function updateUserConfig({ command, userId, body }) {
 			thresholds: {
 				sellPercentage: options['sell-percentage'],
 				buyPercentage: options['buy-percentage'],
-				alertPercentage: options['warning-percentage'], // TODO - rename 'alertPercentage'
+				warningPercentage: options['warning-percentage'],
 				stopLossPercentage: options['stop-loss-percentage'],
 			},
 		};
@@ -251,7 +251,7 @@ async function updateUserConfig({ command, userId, body }) {
 
 		if (!currentRecord) { return `Your crypto-bot isn't using **${currencyCode}**`; }
 
-		currentRecord.thresholds.alertPercentage = options['warning-percentage'];
+		currentRecord.thresholds.warningPercentage = options['warning-percentage'];
 		responseMsg = `Your crypto-bot is set to notify you when the value is **${options['warning-percentage']}%** of the last purchase price`;
 		break;
 	}
