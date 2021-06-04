@@ -1,15 +1,35 @@
 
 ### TODO
+- If stable, increase the number of cryptos
+- Check out the lambda function metrics - CPU, run duration (if unable to get, set up code to track)
+- Update crypto-assistant to log to new channel: https://discord.com/api/webhooks/849967012062691328/qDd3tsk0-DSD4_FmcZGByWC0XT5w3fMqBD-8ezflXQqpF8Yj38ZAMCH_8pGk3_vL8aEj
+- Fix hardSellPercentage data structure & remove hardSellPercentage.high
+- Don't pause the bot on every error - if crypto.com is down, let bot keep running rather than everyone having to unpause manually
+- AUTOMATION TEST! 
+	- Heaps of errors on the v3 release on the crypto-assistant, lots could've been caught my
+- Fix logic around force-sell/hard-sell-low!
+	- buy back in at where the losses were (e.g. -10%) but if it goes down again, sell at -11% to avoid it bouncing around, 
+	  just take the 1% loss instead of -0.4% every transaction
+	- Don't pause bot anymore
+	- If it hard sells, automatically set your sell percent to whatever the hard-sell % was plus the sell % you set - i.e. what % you'll still make money at
+	- But also send a warning message saying 'set sell % to X in order to break even' (hard-sell-high to sell and not buy back in?)
+- Add user details to transactions? Not just their IDs
+- Website to show of the bot!
+	- Purpose, details, features
+	- Lists the commands/has screenshots
+	- Has all logic documented
+	- Includes changelog
 - Incorporate RSI, volume etc.
+- Convert all outputs from USDT to NZD estimates
+- Crypto assistant audit logs - daily/weekly updates on no. of transactions, all filled, money moved etc.
 - More coin options:
-	- Auto limit sell order or stop loss
 	- noBuyBack - after selling coin, don't buy back into it and stop monitoring it
 - Fix USDT selling in only full dollar amounts
 - Make the crypto bot invoke lambda functions based on the user to get crypto-api details (this avoids having auth or storing their crypto-api keys)
 - ^ might not be useful if everyone can already see it in their wallet
-- Add a second crypto and test - no logic around ratios to split USDT into different coins - if a coin is sold and is now in USDT, 100% of it will go into the next buy
-- ^ Add weights to each crypto (percentages of how much USD to spent)
-- Change option to just buy at market price when there is no record of it - make it only buy in at a certain %
+- Auto limit sell order or stop loss?
+- Implement paused 'reason' - Error, manually, bot update etc.
+- Pause crypto currencies individually?
 - Icon or emoji for discord bot
 
 

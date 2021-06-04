@@ -1,8 +1,8 @@
 
 const moment = require('moment-timezone');
 
-const { INTERNAL_RUN, DATETIME_FORMAT } = require('./environment');
-const { investmentConfigIsValid, updateTransactions } = require('./database');
+const { INTERNAL_RUN, CONSOLE_LOG, DATETIME_FORMAT } = require('./environment');
+const { investmentConfigIsValid, updateConfigRecord } = require('./database');
 let { loadInvestmentConfig, updateInvestmentConfig } = require('./database');
 let { getAccountSummary, getAllCryptoValues, checkLatestValueTrend, placeBuyOrder, placeSellOrder, processPlacedOrder } = require('./crypto');
 const { calculatePercDiff, round, formatOrder, formatPriceLog, logToDiscord } = require('./helpers');
@@ -49,7 +49,7 @@ exports.main = async function (event, mockFunctions = null) {
 
 	if (!investmentConfigIsValid(investmentConfig)) {
 		// log error and end lambda (without updating to a paused state)
-		await logToDiscord(`An error occurred validating database config: \n\nConfig: ${JSON.stringify(investmentConfig)}`, true);
+		await logToDiscord(`An error occurred validating database config: \n\nConfig: ${JSON.stringify(investmentConfig, null, 4)}`, true);
 		return []; // end lambda
 	}
 
@@ -61,19 +61,7 @@ exports.main = async function (event, mockFunctions = null) {
 
 	try {
 
-		const accountSummary = await getAccountSummary();
-
-		if (!accountSummary || !Object.keys(accountSummary).length) {
-			throw new Error('No accounts returned');
-		}
-
-		const results = await makeCryptoCurrenciesTrades(investmentConfig, accountSummary);
-
-		// log account details every 12pm
-		const d = new Date();
-		if (d.getHours() === 12 && d.getMinutes() === 0) {
-			log(`Account summary: \n${JSON.stringify(accountSummary, null, 4)}`);
-		}
+		const results = await makeCryptoCurrenciesTrades(investmentConfig);
 
 		// if any orders were made, update the database config and send transaction logs
 		if (results.ordersPlaced.length) {
@@ -106,7 +94,11 @@ exports.main = async function (event, mockFunctions = null) {
 		const runtimeLogs = getLogs();
 
 		if (runtimeLogs.length) {
-			await logToDiscord(runtimeLogs.join('\n'));
+			if (CONSOLE_LOG) {
+				console.log(runtimeLogs);
+			} else {
+				await logToDiscord(runtimeLogs.join('\n'));
+			}
 		}
 	}
 
@@ -114,20 +106,11 @@ exports.main = async function (event, mockFunctions = null) {
 
 
 // main function for handling the buying/selling of the crypto currencies
-async function makeCryptoCurrenciesTrades(investmentConfig, account) {
+async function makeCryptoCurrenciesTrades(investmentConfig) {
 
+	let account;
+	let refreshAccount = true;
 	let config = investmentConfig;
-
-	// can try buy if there is USDT funds - $1 or more
-	let canBuy = (account.USDT && account.USDT.available >= 1) || false;
-
-	// can try sell if there are any cryptos that aren't just USDT
-	const canSell = Object.keys(account).length > 1 || !account.USDT;
-
-	// store amount of USDT available if it exists
-	const availableUSDT = canBuy
-		? Math.floor(account.USDT.available) // ignore fractions of cents
-		: 0;
 
 	const ordersPlaced = [];
 
@@ -136,6 +119,23 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 	const cryptoValueNames = Object.keys(cryptoValues);
 
 	for (let i = 0; i < cryptoValueNames.length; i++) {
+
+		if (refreshAccount) {
+			// initial check or after every transaction - get new account data
+			account = await getAccountSummary();
+			refreshAccount = false;
+		}
+
+		// can try buy if there is USDT funds - $1 or more
+		const canBuy = (account.USDT && account.USDT.available >= 1) || false;
+
+		// can try sell if there are any cryptos that aren't just USDT
+		const canSell = Object.keys(account).length > 1 || !account.USDT;
+
+		// store amount of USDT available if it exists
+		const availableUSDT = canBuy
+			? Math.floor(account.USDT.available) // ignore fractions of cents
+			: 0;
 
 		if (!canBuy && !canSell) {
 			// no more actions to take, log to discord and return
@@ -149,10 +149,16 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 		let cryptoPrice = cryptoValue.bestAsk; // bestAsk for any buy orders, bestBid for sell orders
 
 		// database transaction record of the crypto
-		const cryptoRecord = config.transactions[cryptoName];
+		const cryptoRecord = config.records[cryptoName];
+		const { thresholds, limitUSDT } = cryptoRecord;
+
+		// if no limit set, or there isn't enough available USDT use all available USDT
+		const amountUSDT = !limitUSDT || limitUSDT > availableUSDT
+			? availableUSDT
+			: limitUSDT;
 
 		// if there is no buy or sell record of the crypto
-		const initialBuy = !cryptoRecord && canBuy;
+		const initialBuy = canBuy && !cryptoRecord.lastSellPrice && !cryptoRecord.lastBuyPrice;
 
 		if (!initialBuy && !cryptoRecord.lastSellPrice && !cryptoRecord.lastBuyPrice) {
 			// if price then log and skip to the next crypto
@@ -161,11 +167,15 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 		}
 
 		// set forceBuy to true if it's the first buy, otherwise use config
-		const { forceBuy } = initialBuy === true || config;
+		const forceBuy = initialBuy === true || cryptoRecord.forceBuy;
 		const { simpleLogs } = config.options;
 
 		// check for BUY condition
 		if (cryptoRecord.lastSellPrice || forceBuy) {
+
+			if (limitUSDT > availableUSDT) {
+				log(`[Warning] You do not have enough USDT funds ($${availableUSDT}) to meet the specified limit ($${limitUSDT}), all available funds will be used in a buy scenario`);
+			}
 
 			let percentageDiff;
 
@@ -177,7 +187,7 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 			}
 
 			// crypto is down more than x %
-			if (forceBuy || percentageDiff < config.buyPercentage) {
+			if (forceBuy || percentageDiff < thresholds.buyPercentage) {
 
 				if (!forceBuy && await checkLatestValueTrend(cryptoName, false)) {
 					// if the crypto value is still decreasing, hold off buying!
@@ -186,13 +196,14 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 				}
 
 				// TODO - stack promises.all?
-				const order = await placeBuyOrder(cryptoName, availableUSDT);
+				const order = await placeBuyOrder(cryptoName, amountUSDT);
 
-				const confirmedValue = await processPlacedOrder(order.result?.order_id);
+				const orderValue = await processPlacedOrder(order?.result?.order_id);
 
-				config = updateTransactions(config, cryptoName, confirmedValue || cryptoValue, true);
+				// use the confirmed value if the order was filled immediately
+				config = updateConfigRecord(config, cryptoName, orderValue || cryptoValue, true, limitUSDT);
 
-				const orderDetails = formatOrder('buy', cryptoName, availableUSDT, cryptoPrice, confirmedValue);
+				const orderDetails = formatOrder('buy', cryptoName, amountUSDT, cryptoPrice, orderValue);
 				log(orderDetails.summary);
 
 				if (forceBuy && !initialBuy) {
@@ -201,8 +212,7 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 				}
 
 				ordersPlaced.push(orderDetails);
-
-				canBuy = false;
+				refreshAccount = true;
 			}
 
 			continue;
@@ -216,20 +226,20 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 		log(formatPriceLog(cryptoName, 'bought', cryptoRecord.lastBuyPrice, cryptoPrice, percentageDiff, simpleLogs));
 
 		// log a warning if price has dropped below the specified percentage
-		if (config.alertPercentage && percentageDiff < config.alertPercentage) {
+		if (thresholds.alertPercentage && percentageDiff < thresholds.alertPercentage) {
 			log(`[Warning] ${cryptoName} is now ${percentageDiff.toFixed(2)}% since purchasing, consider selling using the /force-sell command`);
 		}
 
-		const hardSellLow = config.hardSellPercentage.low
-		&& percentageDiff < config.hardSellPercentage.low;
+		const hardSellLow = thresholds.hardSellPercentage?.low
+		&& percentageDiff < thresholds.hardSellPercentage.low;
 
-		const hardSellHigh = config.hardSellPercentage.high
-		&& percentageDiff > config.hardSellPercentage.high;
+		const hardSellHigh = thresholds.hardSellPercentage?.high
+		&& percentageDiff > thresholds.hardSellPercentage.high;
 
 		const shouldForceSell = hardSellLow || hardSellHigh || config.forceSell;
 
 		// crypto is up more than x %
-		if (percentageDiff > config.sellPercentage || shouldForceSell) {
+		if (percentageDiff > thresholds.sellPercentage || shouldForceSell) {
 
 			// ignore this step if any of the hard-sell conditions are met
 			if (!shouldForceSell && await checkLatestValueTrend(cryptoName, true)) {
@@ -243,11 +253,20 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 
 			const order = await placeSellOrder(cryptoName, availableCrypto);
 
-			const confirmedValue = await processPlacedOrder(order.result?.order_id);
+			const orderValue = await processPlacedOrder(order.result?.order_id);
 
-			config = updateTransactions(config, cryptoName, confirmedValue || cryptoPrice, false);
+			let valueUSDT;
 
-			const orderDetails = formatOrder('Sell', cryptoName, availableCrypto, cryptoPrice, confirmedValue);
+			if (limitUSDT) {
+				// get the USDT value of the sell to store
+				valueUSDT = Math.floor((orderValue || cryptoPrice) * availableCrypto);
+				// TODO - use the price when the order was filled otherwise this might be slightly off
+				// ^ might not matter since the next buy scenario the price of the coin should have dropped
+			}
+
+			config = updateConfigRecord(config, cryptoName, orderValue || cryptoPrice, false, valueUSDT);
+
+			const orderDetails = formatOrder('Sell', cryptoName, availableCrypto, cryptoPrice, orderValue);
 			log(orderDetails.summary);
 
 			if (shouldForceSell) {
@@ -257,8 +276,7 @@ async function makeCryptoCurrenciesTrades(investmentConfig, account) {
 			}
 
 			ordersPlaced.push(orderDetails);
-
-			continue;
+			refreshAccount = true;
 		}
 
 	}

@@ -119,8 +119,8 @@ function formatOrder(type, cryptoName, amount, valuePlaced, valueFilled) {
 			? `${estimateFlag} ${amount / value} ${cryptoName}`
 			: `${estimateFlag} ${(amount * value).toFixed(2)} USD`,
 		summary: isBuy
-			? `Buy order ${status} for $${amount} USD worth of ${cryptoName} coins at ${value}`
-			: `Sell order ${status} for ${amount} ${cryptoName} coins at $${value} USD`,
+			? `Buy order ${status} for $${amount} USD worth of ${cryptoName} at ${value}`
+			: `Sell order ${status} for ${amount} ${cryptoName} at $${value} USD`,
 		date: moment(Date.now()).format(DATETIME_FORMAT),
 	};
 }

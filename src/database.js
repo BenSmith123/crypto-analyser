@@ -41,14 +41,38 @@ async function loadInvestmentConfig(databaseId) {
  */
 function investmentConfigIsValid(data) {
 
+	const cryptoTransactionKeys = Object.keys(data.records);
+
 	if (data.id === USER_ID
-	// && data.isPaused
-	&& data.sellPercentage
-	&& data.buyPercentage
-	&& data.transactions
-	&& Object.keys(data.currenciesTargeted).length) {
-		// TODO - loop over the transactions list and validate each one
-		return true;
+	&& data.currenciesTargeted.length
+	&& data.records
+	&& cryptoTransactionKeys.length) {
+
+		// currently optional config data:
+		// && typeof data.isPaused !== 'undefined'
+		// && data.user
+		// && data.options)
+
+		const validRecords = cryptoTransactionKeys.filter(cryptoName => {
+			const record = data.records[cryptoName];
+
+			// if isBuyOrder is defined, record must have: true=lastBuyPrice false=lastSellPrice
+			if (typeof record.isHolding !== 'undefined') {
+				if (record.isHolding && !record.lastBuyPrice) { return false; }
+				if (!record.isHolding && !record.lastSellPrice) { return false; }
+			}
+
+			return (record.thresholds
+				&& record.thresholds.buyPercentage
+				&& record.thresholds.sellPercentage
+				&& record.thresholds.hardSellPercentage
+				// currently optional:
+				// record.limitUSDT
+				// record.alertPercentage
+			);
+		});
+
+		return validRecords.length === cryptoTransactionKeys.length;
 	}
 
 	return false;
@@ -56,15 +80,18 @@ function investmentConfigIsValid(data) {
 
 
 /**
- * Returns the database investment configuration with the updated transactions data
+ * Returns the database investment configuration with the updated record data
  *
  * @param {object} investmentConfig
  * @param {string} name - currency name
  * @param {object} value
  * @param {boolean} isBuyOrder
+ * @param {boolean} limitUSDT - optional
  * @returns
  */
-function updateTransactions(investmentConfig, name, value, isBuyOrder) {
+function updateConfigRecord(investmentConfig, name, value, isBuyOrder, limitUSDT) {
+
+	const { thresholds } = investmentConfig.records[name]; // keep the existing record thresholds
 
 	const buyOrSellKey = isBuyOrder
 		? 'lastBuyPrice'
@@ -72,11 +99,17 @@ function updateTransactions(investmentConfig, name, value, isBuyOrder) {
 
 	const updatedConfig = investmentConfig;
 
-	// update transaction record of the current
-	updatedConfig.transactions[name] = {
+	// update transaction record
+	updatedConfig.records[name] = {
 		[buyOrSellKey]: value,
+		isHolding: isBuyOrder, // if it was a buy order, we are holding the coin
 		timestamp: Date.now(),
 		orderDate: moment(Date.now()).format(DATETIME_FORMAT),
+		thresholds,
+		// if there was a limit, update it when selling or store to be used when buying back in
+		...limitUSDT && {
+			limitUSDT,
+		},
 		// TODO - add order Id etc. to this
 	};
 
@@ -138,7 +171,7 @@ function formatTransaction(transaction) {
 module.exports = {
 	loadInvestmentConfig,
 	investmentConfigIsValid,
-	updateTransactions,
+	updateConfigRecord,
 	updateInvestmentConfig,
 	saveTransaction,
 };

@@ -116,11 +116,17 @@ async function getAccountSummary(currency) {
 
 	const response = await postToCryptoApi(request);
 
-	return response.result.accounts
+	const accountSummary = response.result.accounts
 		.filter(account => account.available > 0) // filter out accounts that have no crypto balance
 		.reduce((acc, curr) => ( // eslint-disable-line no-return-assign
 			acc[curr.currency] = { ...curr }, acc), // eslint-disable-line no-sequences
 		{});
+
+	if (!accountSummary || !Object.keys(accountSummary).length) {
+		throw new Error('No accounts returned');
+	}
+
+	return accountSummary;
 }
 
 
@@ -190,6 +196,8 @@ async function getOrderDetail(orderId) {
  */
 async function processPlacedOrder(orderId, secondAttempt = false) {
 
+	if (!TRANSACTIONS_ENABLED) { return null; }
+
 	if (!orderId) {
 		logToDiscord('No order number provided', true);
 		return null;
@@ -199,7 +207,7 @@ async function processPlacedOrder(orderId, secondAttempt = false) {
 
 	const order = await getOrderDetail(orderId);
 
-	const orderIsFilled = order.result?.order_info.status === 'FILLED' || false;
+	const orderIsFilled = order.result?.order_info?.status === 'FILLED' || false;
 
 	if (orderIsFilled) {
 		// TODO - should this be awaited or can it be done async

@@ -5,27 +5,81 @@
             "description": "Displays the crypto-bot change log"
         },
         {
-            "name": "change-crypto",
-            "description": "Changes your watched crypto currency to the currency specified (use /list-available-crypto for all)"
+            "name": "add-crypto",
+            "description": "Adds another crypto to trade in/out of - the crypto will be purchased immediately after being added",
+			"options": [
+				{
+					"name": "code",
+					"description": "e.g. 'BTC'",
+					"type": 3,
+					"required": true
+				},
+				{
+					"name": "sell-percentage",
+					"description": "postitive",
+					"type": 4,
+					"required": true
+				},
+				{
+					"name": "buy-percentage",
+					"description": "negative",
+					"type": 4,
+					"required": true
+				},
+				{
+					"name": "limit-amount",
+					"description": "Initial limit amount in USDT (will be updated on every sell transaction)",
+					"type": 4,
+					"required": false
+				},
+				{
+					"name": "stop-loss-percentage",
+					"description": "negative",
+					"type": 4,
+					"required": false
+				},
+				{
+					"name": "warning-percentage",
+					"description": "negative",
+					"type": 4,
+					"required": false
+				}
+			]
         },
         {
             "name": "commands",
             "description": "Displays all available commands"
         },
 		{
+            "name": "configuration",
+            "description": "Displays your current crypto-analyser bot configuration"
+        },
+        {
             "name": "force-buy",
-            "description": "Buys back into your crypto currency being watched when the crypto-bot is next ran"
+            "description": "Buys back into the specified crypto currency when the crypto-bot is next ran",
+			"options": [
+				{
+					"name": "code",
+					"description": "e.g. 'BTC'",
+					"type": 3,
+					"required": true
+				}
+			]
         },
         {
             "name": "force-sell",
-            "description": "Sells your currently held crypto currency when the crypto-bot is next ran and then pauses the bot"
+            "description": "Sells the specified crypto currency when the crypto-bot is next ran and then pauses the bot",
+			"options": [
+				{
+					"name": "code",
+					"description": "e.g. 'BTC'",
+					"type": 3,
+					"required": true
+				}
+			]
         },
         {
-            "name": "get-configuration",
-            "description": "Get your current crypto-analyser bot configuration"
-        },
-        {
-            "name": "health-check",
+            "name": "health",
             "description": "Checks the health of the crypto.com exchange"
         },
         {
@@ -37,24 +91,106 @@
             "description": "Pauses your crypto bot"
         },
         {
-            "name": "set-buy-percentage",
-            "description": "Sets the buy percentage threshold (the decrease that has to be met before buying back into the crypto"
+            "name": "remove-crypto",
+            "description": "Removes a crypto currency from your crypto-bot",
+			"options": [
+				{
+					"name": "code",
+					"description": "e.g. 'BTC'",
+					"type": 3,
+					"required": true
+				}
+			]
         },
         {
-            "name": "set-hard-sell-low",
-            "description": "Sets the hard-sell LOW percentage threshold (the decrease before selling and PAUSING)"
+            "name": "set-buy-threshold",
+            "description": "The decrease that has to be met before buying back into the crypto",
+			"options": [
+				{
+					"name": "code",
+					"description": "e.g. 'BTC'",
+					"type": 3,
+					"required": true
+				},
+				{
+					"name": "buy-percentage",
+					"description": "negative",
+					"type": 4,
+					"required": true
+				}
+			]
+        },
+		{
+            "name": "set-limit",
+            "description": "The amount of USDT to use when trading the given crypto",
+			"options": [
+				{
+					"name": "code",
+					"description": "e.g. 'BTC'",
+					"type": 3,
+					"required": true
+				},
+				{
+					"name": "limit-amount",
+					"description": "Amount in USDT - updated automatically after sell transactions",
+					"type": 4,
+					"required": true
+				}
+			]
         },
         {
-            "name": "set-hard-sell-high",
-            "description": "Sets the hard-sell HIGH percentage threshold (the increase before selling and PAUSING)"
+            "name": "set-stop-loss",
+            "description": "TODO - clarify logic",
+			"options": [
+				{
+					"name": "code",
+					"description": "e.g. 'BTC'",
+					"type": 3,
+					"required": true
+				},
+				{
+					"name": "sell-percentage",
+					"description": "negative",
+					"type": 4,
+					"required": true
+				}
+			]
         },
         {
-            "name": "set-sell-percentage",
-            "description": "Sets the sell percentage threshold (the increase that has to be met before selling back to USDT"
+            "name": "set-sell-threshold",
+            "description": "The increase that has to be met before selling back into USDT",
+			"options": [
+				{
+					"name": "code",
+					"description": "e.g. 'BTC'",
+					"type": 3,
+					"required": true
+				},
+				{
+					"name": "sell-percentage",
+					"description": "positive",
+					"type": 4,
+					"required": true
+				}
+			]
         },
         {
             "name": "set-sell-warning",
-            "description": "Sets the sell warning percentage - the decrease in % relative to the last purchase price"
+            "description": "the decrease in % relative to the last purchase price",
+			"options": [
+				{
+					"name": "code",
+					"description": "e.g. 'BTC'",
+					"type": 3,
+					"required": true
+				},
+				{
+					"name": "warning-percentage",
+					"description": "negative",
+					"type": 4,
+					"required": true
+				}
+			]
         },
         {
             "name": "toggle-log-format",

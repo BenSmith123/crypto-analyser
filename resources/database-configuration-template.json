@@ -1,17 +1,25 @@
 {
-	"id": "configuration",
+	"id": "11111",
 	"isPaused": false,
 	"currenciesTargeted": [
 		"CRO"
 	],
-	"sellPercentage": 5,
-	"buyPercentage": -5,
-	"alertPercentage": -15,
-	"transactions": {
-		
+	"records": {
+		"CRO": {
+			"sellPercentage": 5,
+			"buyPercentage": -5,
+			"alertPercentage": null,
+			"hardSellPercentage": {
+				"high": null,
+				"low": null
+			}
+		}
 	},
-	"hardSellPercentage": {
-		"low": null,
-		"high": null
+	"options": {
+		"simpleLogs": false
+	},
+	"user": {
+		"displayName": "",
+		"firstName": ""
 	}
 }

@@ -1,26 +1,44 @@
 {
-	"id": "configuration", // primary key
+	"id": "13723035304572939", // primary key
 	"isPaused": false, // don't do processing or buying/selling - set this to true under any error scenarios to avoid making invalid transactions etc.
 	"currenciesTargeted": [ // currencies to get values of and determine whether to buy or sell
 		// don't include USDT since that's the stable coin used to trade in/out of
 		"CRO"
 	],
-	"transactions": {
+	"records": {
+		"DOGE": {
+            "lastSellPrice": 0.29153, // optional - if no lastSellPrice or lastBuyPrice exists its the first time buy
+            "orderDate": "30/05/2021, 03:00am",
+            "timestamp": 1622300405158,
+			"isHolding": false,
+            "forceSell": false, // optional - flag set to force sell the crypto
+			"forceBuy": false, // optional
+            "thresholds": {
+                "buyPercentage": -5, // negative percentage to buy at (relative to lastSellPrice)
+                "sellPercentage": 3, // positive percentage to sell at (relative to lastBuyPrice) 
+                "alertPercentage": -10, // optional - percentage to send out warning log (relative to lastBuyPrice)
+                "hardSellPercentage": {
+                    "high": null, // optional
+                    "low": -10 // optional
+                }
+            }
+        },
 		"BTC": {
-			"lastBuyPrice": 58183.78,
-			"orderPlaced": 1620634504490
+			"limitUSDT": 100, // optional - amount of USDT to use when buying (if not set, all available USDT will be used)
+			"thresholds": {
+                "buyPercentage": -2,
+                "sellPercentage": 2,
+                "hardSellPercentage": {
+					
+                }
+            }
 		}
 	},
 	"options": {
-		"simpleLogs": false	
+		"simpleLogs": false
 	},
-	"hardSellPercentage": {
-		"low": null, // optional (negative num)
-		"high": null // optional (positive num)
-	},
-	"sellPercentage": 10, // positive percentage to sell at (relative to lastBuyPrice) 
-	"buyPercentage": -10, // negative percentage to buy at (relative to lastSellPrice)
-	"alertPercentage": -20, // percentage to send out warning log (relative to lastBuyPrice)
-	"forceSell": false, // optional - flag set to force sell the crypto
-	"forceBuy": false // optional
+	"user": { // currently unused
+		"displayName": "Ben",
+		"firstName": "Ben"
+	}
 }

@@ -24,6 +24,8 @@ const DISCORD_URL_LOGS = process.env.DISCORD_URL_LOGS || `${discordApi}/83418261
 // transactions enabled if not specified
 const TRANSACTIONS_ENABLED = (!process.env.TRANSACTIONS_ENABLED || process.env.TRANSACTIONS_ENABLED === 'true');
 
+const CONSOLE_LOG = process.env.CONSOLE_LOG === 'true' || false;
+
 // in internal run mode no external calls are made (to the database or crypto API)
 const INTERNAL_RUN = process.env.INTERNAL_RUN === 'true' || false;
 
@@ -38,5 +40,6 @@ module.exports = {
 	DISCORD_URL_LOGS,
 	// debug stuff
 	TRANSACTIONS_ENABLED,
+	CONSOLE_LOG,
 	INTERNAL_RUN,
 };

@@ -90,6 +90,20 @@
             "changes": [
                 "Fix logic around **/force-buy** - you can now use this command even if you're already holding the crypto currency"
             ]
+        },
+        {
+            "version": "3.0.0",
+            "changes": [
+                "Implemented multiple currencies!",
+                "All new discord slash commands for handling multiple currencies"
+            ]
+        },
+        {
+            "version": "3.0.1",
+            "changes": [
+                "Fix error message/no transaction details coming through if the order was not filled",
+                "Fix /force-buy command"
+            ]
         }
     ]
 }
