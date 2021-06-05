@@ -1,15 +1,15 @@
 
 ### TODO
-- If stable, increase the number of cryptos
-- Check out the lambda function metrics - CPU, run duration (if unable to get, set up code to track)
-- Update crypto-assistant to log to new channel: https://discord.com/api/webhooks/849967012062691328/qDd3tsk0-DSD4_FmcZGByWC0XT5w3fMqBD-8ezflXQqpF8Yj38ZAMCH_8pGk3_vL8aEj
-- Fix hardSellPercentage data structure & remove hardSellPercentage.high
+- v3.0.2 rollout 
+	- remove everyones hardSellPercentage and replace 'hardSellPercentage.low' with stopLossPercentage
+	- rename everyones alertPercentage to warningPercentage
+	- manually test /force-sell
 - Don't pause the bot on every error - if crypto.com is down, let bot keep running rather than everyone having to unpause manually
 - AUTOMATION TEST! 
 	- Heaps of errors on the v3 release on the crypto-assistant, lots could've been caught my
 - Fix logic around force-sell/hard-sell-low!
 	- buy back in at where the losses were (e.g. -10%) but if it goes down again, sell at -11% to avoid it bouncing around, 
-	  just take the 1% loss instead of -0.4% every transaction
+		just take the 1% loss instead of -0.4% every transaction
 	- Don't pause bot anymore
 	- If it hard sells, automatically set your sell percent to whatever the hard-sell % was plus the sell % you set - i.e. what % you'll still make money at
 	- But also send a warning message saying 'set sell % to X in order to break even' (hard-sell-high to sell and not buy back in?)

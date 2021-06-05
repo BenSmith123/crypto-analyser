@@ -104,6 +104,16 @@
                 "Fix error message/no transaction details coming through if the order was not filled",
                 "Fix /force-buy command"
             ]
+        },
+        {
+            "version": "3.0.2",
+            "devChanges": [
+                "Database/data-structure tidy up"
+            ],
+            "changes": [
+                "Show crypto currency name in low funds warning messages",
+                "Fix /force-sell command & no longer pause bot after using"
+            ]
         }
     ]
 }
