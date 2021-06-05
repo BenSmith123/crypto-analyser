@@ -249,26 +249,36 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 
 			const order = await placeSellOrder(cryptoName, availableCrypto);
 
-			const orderValue = await processPlacedOrder(order.result?.order_id);
+			const sellPriceFilled = await processPlacedOrder(order.result?.order_id);
+
+			// if order wasn't filled, use the price the order was made at
+			const sellPrice = sellPriceFilled || cryptoPrice;
 
 			let valueUSDT;
 
 			if (limitUSDT) {
 				// get the USDT value of the sell to store
-				valueUSDT = Math.floor((orderValue || cryptoPrice) * availableCrypto);
+				valueUSDT = Math.floor(sellPrice * availableCrypto);
 				// TODO - use the price when the order was filled otherwise this might be slightly off
 				// ^ might not matter since the next buy scenario the price of the coin should have dropped
 			}
 
-			config = updateConfigRecord(config, cryptoName, orderValue || cryptoPrice, false, valueUSDT);
-
-			const orderDetails = formatOrder('Sell', cryptoName, availableCrypto, cryptoPrice, orderValue);
-			log(orderDetails.summary);
-
 			// if crypto was sold because of the stopLossPercentage
 			if (sellAtLoss) {
-				log(`${cryptoName} stop-loss threshold was met`);
+				thresholds.buyPriceBeforeLoss = cryptoRecord.lastBuyPrice;
+				thresholds.buyPercentage = 1;
+				thresholds.sellPercentage = calculatePercDiff(cryptoRecord.lastBuyPrice, sellPrice)
+					.toFixed(1);
+
+				log(`${cryptoName} stop-loss threshold was met, adjusting your buy/sell thresholds...`);
+				log('Buy-back percentage set to +1% of this sell price');
+				log(`Sell-percentage is set to ${cryptoRecord.sellPercentage} in order to break even, once ${cryptoName} is sold it won't be bought again until set manually`);
 			}
+
+			config = updateConfigRecord(config, cryptoName, sellPrice, false, valueUSDT);
+
+			const orderDetails = formatOrder('Sell', cryptoName, availableCrypto, cryptoPrice, sellPriceFilled);
+			log(orderDetails.summary);
 
 			ordersPlaced.push(orderDetails);
 			refreshAccount = true;
