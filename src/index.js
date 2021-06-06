@@ -120,6 +120,14 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 
 	for (let i = 0; i < cryptoValueNames.length; i++) {
 
+		const cryptoName = cryptoValueNames[i];
+		const cryptoRecord = config.records[cryptoName];
+
+		if (cryptoRecord.isPaused) {
+			log(`${cryptoName} is paused (${cryptoRecord.pausedReason})`);
+			continue;
+		}
+
 		if (refreshAccount) {
 			// initial check or after every transaction - get new account data
 			account = await getAccountSummary();
@@ -143,13 +151,10 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 			break;
 		}
 
-		const cryptoName = cryptoValueNames[i];
 		const cryptoValue = cryptoValues[cryptoName];
-
 		let cryptoPrice = cryptoValue.bestAsk; // bestAsk for any buy orders, bestBid for sell orders
 
 		// database transaction record of the crypto
-		const cryptoRecord = config.records[cryptoName];
 		const { thresholds, limitUSDT } = cryptoRecord;
 
 		// if no limit set, or there isn't enough available USDT use all available USDT
@@ -201,7 +206,7 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 				const orderValue = await processPlacedOrder(order?.result?.order_id);
 
 				// use the confirmed value if the order was filled immediately
-				config = updateConfigRecord(config, cryptoName, orderValue || cryptoValue, true, limitUSDT);
+				config = updateConfigRecord(config, cryptoName, orderValue || cryptoPrice, true);
 
 				const orderDetails = formatOrder('buy', cryptoName, amountUSDT, cryptoPrice, orderValue);
 				log(orderDetails.summary);
@@ -235,56 +240,66 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 		const forceSell = sellAtLoss || cryptoRecord.forceSell;
 
 		// crypto is up more than x %
-		if (percentageDiff > thresholds.sellPercentage || forceSell) {
-
-			// ignore this step if any of the hard-sell conditions are met
-			if (!forceSell && await checkLatestValueTrend(cryptoName, true)) {
-				// if the crypto value is still increasing, hold the crypto!
-				log(`${cryptoName} is still increasing, holding off selling..`);
-				continue;
-			}
-
-			// otherwise, crypto value is up but not consistently, sell!
-			const availableCrypto = round(account[cryptoName].available, cryptoName);
-
-			const order = await placeSellOrder(cryptoName, availableCrypto);
-
-			const sellPriceFilled = await processPlacedOrder(order.result?.order_id);
-
-			// if order wasn't filled, use the price the order was made at
-			const sellPrice = sellPriceFilled || cryptoPrice;
-
-			let valueUSDT;
-
-			if (limitUSDT) {
-				// get the USDT value of the sell to store
-				valueUSDT = Math.floor(sellPrice * availableCrypto);
-				// TODO - use the price when the order was filled otherwise this might be slightly off
-				// ^ might not matter since the next buy scenario the price of the coin should have dropped
-			}
-
-			// if crypto was sold because of the stopLossPercentage
-			if (sellAtLoss) {
-				thresholds.buyPriceBeforeLoss = cryptoRecord.lastBuyPrice;
-				thresholds.buyPercentage = 1;
-				thresholds.sellPercentage = calculatePercDiff(cryptoRecord.lastBuyPrice, sellPrice)
-					.toFixed(1);
-
-				log(`${cryptoName} stop-loss threshold was met, adjusting your buy/sell thresholds...`);
-				log('Buy-back percentage set to +1% of this sell price');
-				log(`Sell-percentage is set to ${cryptoRecord.sellPercentage} in order to break even, once ${cryptoName} is sold it won't be bought again until set manually`);
-			}
-
-			config = updateConfigRecord(config, cryptoName, sellPrice, false, valueUSDT);
-
-			const orderDetails = formatOrder('Sell', cryptoName, availableCrypto, cryptoPrice, sellPriceFilled);
-			log(orderDetails.summary);
-
-			ordersPlaced.push(orderDetails);
-			refreshAccount = true;
+		if (percentageDiff < thresholds.sellPercentage && !forceSell) {
+			continue;
 		}
 
+		// ignore this step if any of the hard-sell conditions are met
+		if (!forceSell && await checkLatestValueTrend(cryptoName, true)) {
+			// if the crypto value is still increasing, hold the crypto!
+			log(`${cryptoName} is still increasing, holding off selling..`);
+			continue;
+		}
+
+		// otherwise, crypto value is up but not consistently, sell!
+		const availableCrypto = round(account[cryptoName].available, cryptoName);
+
+		const order = await placeSellOrder(cryptoName, availableCrypto);
+
+		const sellPriceFilled = await processPlacedOrder(order?.result?.order_id);
+
+		// if order wasn't filled, use the price the order was made at
+		const sellPrice = sellPriceFilled || cryptoPrice;
+
+		let valueUSDT;
+
+		if (limitUSDT) {
+			// get the USDT value of the sell to store
+			valueUSDT = Math.floor(sellPrice * availableCrypto);
+			// TODO - use the price when the order was filled otherwise this might be slightly off
+			// ^ might not matter since the next buy scenario the price of the coin should have dropped
+		}
+
+		// if crypto was sold because of the stopLossPercentage
+		if (sellAtLoss) {
+			thresholds.buyPercentage = 1;
+			thresholds.stopLossPercentage = -1;
+			thresholds.sellPercentage = Number((calculatePercDiff(cryptoRecord.lastBuyPrice, sellPrice)
+				+ 1).toFixed(1)); // add 1% to cover the buy-back % loss
+
+			cryptoRecord.pauseAfterSell = true;
+
+			log(`${cryptoName} stop-loss threshold was met, adjusting buy/sell thresholds...`);
+			log('Buy-back percentage set to +1% of this sell price');
+			log('Stop loss percentage set to to sell at this price again in case the value drops after buying back in');
+
+			log(`Sell-percentage is set to ${cryptoRecord.sellPercentage} in order to break even, once ${cryptoName} is sold it won't be bought again until set manually`);
+
+		} else if (cryptoRecord.pauseAfterSell) {
+			// if crypto wasn't sold at a loss but has this flag, the break-even price was met
+			cryptoRecord.isPaused = true; // prevent the next buy
+			cryptoRecord.pausedReason = 'break-even threshold met';
+		}
+
+		config = updateConfigRecord(config, cryptoName, sellPrice, false, valueUSDT);
+
+		const orderDetails = formatOrder('Sell', cryptoName, availableCrypto, cryptoPrice, sellPriceFilled);
+		log(orderDetails.summary);
+
+		ordersPlaced.push(orderDetails);
+		refreshAccount = true;
 	}
+
 
 	return { ordersPlaced, config };
 }

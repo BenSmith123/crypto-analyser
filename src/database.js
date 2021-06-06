@@ -91,29 +91,36 @@ function investmentConfigIsValid(data) {
  */
 function updateConfigRecord(investmentConfig, name, value, isBuyOrder, limitUSDT) {
 
-	const { thresholds } = investmentConfig.records[name]; // keep the existing record thresholds
+	const currentRecord = investmentConfig.records[name];
 
 	const buyOrSellKey = isBuyOrder
 		? 'lastBuyPrice'
 		: 'lastSellPrice';
 
-	const updatedConfig = investmentConfig;
-
 	// update transaction record
-	updatedConfig.records[name] = {
+	const updatedRecord = {
 		[buyOrSellKey]: value,
 		isHolding: isBuyOrder, // if it was a buy order, we are holding the coin
 		timestamp: Date.now(),
 		orderDate: moment(Date.now()).format(DATETIME_FORMAT),
-		thresholds,
-		// if there was a limit, update it when selling or store to be used when buying back in
-		...limitUSDT && {
+		...limitUSDT && { // if there was a limit, it is updated in sell transactions
 			limitUSDT,
 		},
-		// TODO - add order Id etc. to this
 	};
 
-	return updatedConfig;
+	// remove unused prices for simplicity
+	if (isBuyOrder) {
+		delete currentRecord.lastSellPrice;
+		delete currentRecord.forceBuy; // delete temp flags
+	} else {
+		delete currentRecord.lastBuyPrice;
+		delete currentRecord.forceSell;
+	}
+
+	return {
+		...currentRecord,
+		...updatedRecord,
+	};
 }
 
 
