@@ -214,7 +214,7 @@ async function updateUserConfig({ command, userId, body }) {
 	case 'force-buy': {
 
 		if (!currentRecord) { return `Your crypto-bot isn't using **${currencyCode}**`; }
-		if (currentRecord.isHolding) { return `You are already holding any **${currencyCode}**`; }
+		if (currentRecord.isHolding) { return `You are already holding **${currencyCode}**`; }
 
 		currentRecord.forceBuy = true;
 		responseMsg = `**${currencyCode}** will be bought by the crypto-bot shortly!`;
