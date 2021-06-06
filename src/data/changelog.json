@@ -106,13 +106,14 @@
             ]
         },
         {
-            "version": "3.0.2",
+            "version": "3.1.0",
             "devChanges": [
                 "Database/data-structure tidy up"
             ],
             "changes": [
                 "Show crypto currency name in low funds warning messages",
-                "Fix /force-sell command & no longer pause bot after using"
+                "Fix /force-sell command & no longer pause bot after using",
+                "Updated stop-loss logic: Sell at a loss when threshold is met, automatically update buy/sell thresholds to buy back when the value is coming up and sell when the value breaks-even - then hold"
             ]
         }
     ]
