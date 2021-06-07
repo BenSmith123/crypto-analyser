@@ -56,7 +56,7 @@ function investmentConfigIsValid(data) {
 		const validRecords = cryptoTransactionKeys.filter(cryptoName => {
 			const record = data.records[cryptoName];
 
-			// if isBuyOrder is defined, record must have: true=lastBuyPrice false=lastSellPrice
+			// if isHolding is defined, record must have: true=lastBuyPrice false=lastSellPrice
 			if (typeof record.isHolding !== 'undefined') {
 				if (record.isHolding && !record.lastBuyPrice) { return false; }
 				if (!record.isHolding && !record.lastSellPrice) { return false; }
@@ -65,10 +65,10 @@ function investmentConfigIsValid(data) {
 			return (record.thresholds
 				&& record.thresholds.buyPercentage
 				&& record.thresholds.sellPercentage
-				&& record.thresholds.hardSellPercentage
 				// currently optional:
 				// record.limitUSDT
-				// record.alertPercentage
+				// record.stopLossPercentage
+				// record.warningPercentage
 			);
 		});
 
@@ -91,26 +91,36 @@ function investmentConfigIsValid(data) {
  */
 function updateConfigRecord(investmentConfig, name, value, isBuyOrder, limitUSDT) {
 
-	const { thresholds } = investmentConfig.records[name]; // keep the existing record thresholds
+	const updatedConfig = investmentConfig;
+	const currentRecord = investmentConfig.records[name];
 
 	const buyOrSellKey = isBuyOrder
 		? 'lastBuyPrice'
 		: 'lastSellPrice';
 
-	const updatedConfig = investmentConfig;
-
 	// update transaction record
-	updatedConfig.records[name] = {
+	const updatedRecord = {
 		[buyOrSellKey]: value,
 		isHolding: isBuyOrder, // if it was a buy order, we are holding the coin
 		timestamp: Date.now(),
 		orderDate: moment(Date.now()).format(DATETIME_FORMAT),
-		thresholds,
-		// if there was a limit, update it when selling or store to be used when buying back in
-		...limitUSDT && {
+		...limitUSDT && { // if there was a limit, it is updated in sell transactions
 			limitUSDT,
 		},
-		// TODO - add order Id etc. to this
+	};
+
+	// remove unused prices for simplicity
+	if (isBuyOrder) {
+		delete currentRecord.lastSellPrice;
+		delete currentRecord.forceBuy; // delete temp flags
+	} else {
+		delete currentRecord.lastBuyPrice;
+		delete currentRecord.forceSell;
+	}
+
+	updatedConfig.records[name] = {
+		...currentRecord,
+		...updatedRecord,
 	};
 
 	return updatedConfig;

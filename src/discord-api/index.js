@@ -18,7 +18,9 @@ const helpers = require('../helpers');
 
 const discordName = 'Crypto assistant';
 
-const multipleCurrencyLimit = 4;
+const multipleCurrencyLimit = 8;
+
+const BYPASS_VALIDATION = process.env.BYPASS_VALIDATION === 'true';
 
 
 // map discord command paths to their functions
@@ -37,7 +39,7 @@ exports.discordController = async function (event) {
 
 	try {
 
-		if (!requestIsValid(event)) {
+		if (!requestIsValid(event) && !BYPASS_VALIDATION) {
 			return errorResponse(`Invalid request: ${JSON.stringify(event)}`, 401);
 		}
 
@@ -187,11 +189,8 @@ async function updateUserConfig({ command, userId, body }) {
 			thresholds: {
 				sellPercentage: options['sell-percentage'],
 				buyPercentage: options['buy-percentage'],
-				alertPercentage: options['warning-percentage'], // TODO - rename 'alertPercentage'
-				hardSellPercentage: {
-					high: null,
-					low: options['stop-loss-percentage'], // TODO - remove/fix data
-				},
+				warningPercentage: options['warning-percentage'],
+				stopLossPercentage: options['stop-loss-percentage'],
 			},
 		};
 
@@ -215,6 +214,7 @@ async function updateUserConfig({ command, userId, body }) {
 	case 'force-buy': {
 
 		if (!currentRecord) { return `Your crypto-bot isn't using **${currencyCode}**`; }
+		if (currentRecord.isHolding) { return `You are already holding **${currencyCode}**`; }
 
 		currentRecord.forceBuy = true;
 		responseMsg = `**${currencyCode}** will be bought by the crypto-bot shortly!`;
@@ -224,6 +224,7 @@ async function updateUserConfig({ command, userId, body }) {
 	case 'force-sell': {
 
 		if (!currentRecord) { return `Your crypto-bot isn't using **${currencyCode}**`; }
+		if (!currentRecord.isHolding) { return `You aren't holding any **${currencyCode}**`; }
 
 		currentRecord.forceSell = true;
 		responseMsg = `**${currencyCode}** will be sold by the crypto-bot shortly!\nOnce sold the bot will be paused`;
@@ -252,7 +253,7 @@ async function updateUserConfig({ command, userId, body }) {
 
 		if (!currentRecord) { return `Your crypto-bot isn't using **${currencyCode}**`; }
 
-		currentRecord.thresholds.alertPercentage = options['warning-percentage'];
+		currentRecord.thresholds.warningPercentage = options['warning-percentage'];
 		responseMsg = `Your crypto-bot is set to notify you when the value is **${options['warning-percentage']}%** of the last purchase price`;
 		break;
 	}
@@ -261,8 +262,8 @@ async function updateUserConfig({ command, userId, body }) {
 
 		if (!currentRecord) { return `Your crypto-bot isn't using **${currencyCode}**`; }
 
-		currentRecord.thresholds.hardSellPercentage.low = options['sell-percentage'];
-		responseMsg = `Your stop loss percentage is now **${options['sell-percentage']}%** of the last buy price`;
+		currentRecord.thresholds.stopLossPercentage = options['stop-loss-percentage'];
+		responseMsg = `Your stop loss percentage is now **${options['stop-loss-percentage']}%** of the last buy price`;
 		break;
 	}
 

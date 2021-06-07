@@ -140,7 +140,7 @@
         },
         {
             "name": "set-stop-loss",
-            "description": "TODO - clarify logic",
+            "description": "Threshold to sell at a loss - once met your buy/sell percentages will be adjusted to break-even",
 			"options": [
 				{
 					"name": "code",
@@ -149,7 +149,7 @@
 					"required": true
 				},
 				{
-					"name": "sell-percentage",
+					"name": "stop-loss-percentage",
 					"description": "negative",
 					"type": 4,
 					"required": true

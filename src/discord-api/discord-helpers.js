@@ -92,7 +92,7 @@ function validateCommandParams(body, commandDetails) {
 
 	const validationErrors = inputOptions.map(option => {
 
-		const isRequired = commandDetails.options.find(opt => (opt.name === option.name)).required;
+		const isRequired = commandDetails.options.find(opt => (opt.name === option.name))?.required;
 
 		const optionValue = getInputValue(option.name, inputOptions);
 
@@ -118,7 +118,9 @@ function validateCommandParams(body, commandDetails) {
 				: `Invalid input '${optionValue}' - ${option.name} must be a positive number`;
 		}
 
-		case 'buy-percentage' || 'stop-loss-percentage' || 'warning-percentage': {
+		case 'buy-percentage':
+		case 'stop-loss-percentage':
+		case 'warning-percentage': {
 			return optionValue < 0
 				? null
 				: `Invalid input '${optionValue}' - ${option.name} must be a negative number`;
