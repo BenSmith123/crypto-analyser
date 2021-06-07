@@ -1,9 +1,5 @@
 
 ### TODO
-- v3.0.2 rollout 
-	- remove everyones hardSellPercentage and replace 'hardSellPercentage.low' with stopLossPercentage
-	- rename everyones alertPercentage to warningPercentage
-	- manually test /force-sell
 - Don't pause the bot on every error - if crypto.com is down, let bot keep running rather than everyone having to unpause manually
 - AUTOMATION TEST! 
 	- Heaps of errors on the v3 release on the crypto-assistant, lots could've been caught my

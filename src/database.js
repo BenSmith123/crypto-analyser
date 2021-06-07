@@ -56,7 +56,7 @@ function investmentConfigIsValid(data) {
 		const validRecords = cryptoTransactionKeys.filter(cryptoName => {
 			const record = data.records[cryptoName];
 
-			// if isBuyOrder is defined, record must have: true=lastBuyPrice false=lastSellPrice
+			// if isHolding is defined, record must have: true=lastBuyPrice false=lastSellPrice
 			if (typeof record.isHolding !== 'undefined') {
 				if (record.isHolding && !record.lastBuyPrice) { return false; }
 				if (!record.isHolding && !record.lastSellPrice) { return false; }
@@ -91,6 +91,7 @@ function investmentConfigIsValid(data) {
  */
 function updateConfigRecord(investmentConfig, name, value, isBuyOrder, limitUSDT) {
 
+	const updatedConfig = investmentConfig;
 	const currentRecord = investmentConfig.records[name];
 
 	const buyOrSellKey = isBuyOrder
@@ -117,10 +118,12 @@ function updateConfigRecord(investmentConfig, name, value, isBuyOrder, limitUSDT
 		delete currentRecord.forceSell;
 	}
 
-	return {
+	updatedConfig.records[name] = {
 		...currentRecord,
 		...updatedRecord,
 	};
+
+	return updatedConfig;
 }
 
 
