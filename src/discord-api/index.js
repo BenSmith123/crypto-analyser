@@ -217,6 +217,9 @@ async function updateUserConfig({ command, userId, body }) {
 		if (currentRecord.isHolding) { return `You are already holding **${currencyCode}**`; }
 
 		currentRecord.forceBuy = true;
+		delete currentRecord.isAtLoss; // if in stop-loss scenario and forceBuy was used
+		// remove this flag to avoid buying back in incorrectly
+
 		responseMsg = `**${currencyCode}** will be bought by the crypto-bot shortly!`;
 		break;
 	}
@@ -227,6 +230,7 @@ async function updateUserConfig({ command, userId, body }) {
 		if (!currentRecord.isHolding) { return `You aren't holding any **${currencyCode}**`; }
 
 		currentRecord.forceSell = true;
+		delete currentRecord.isAtLoss;
 		responseMsg = `**${currencyCode}** will be sold by the crypto-bot shortly!\nOnce sold the bot will be paused`;
 		break;
 	}
@@ -263,7 +267,7 @@ async function updateUserConfig({ command, userId, body }) {
 		if (!currentRecord) { return `Your crypto-bot isn't using **${currencyCode}**`; }
 
 		currentRecord.thresholds.stopLossPercentage = options['stop-loss-percentage'];
-		responseMsg = `Your stop loss percentage is now **${options['stop-loss-percentage']}%** of the last buy price`;
+		responseMsg = `Your **${currencyCode}** stop loss percentage is now **${options['stop-loss-percentage']}%** of the last buy price`;
 		break;
 	}
 
