@@ -172,7 +172,7 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 		}
 
 		// set forceBuy to true if it's the first buy, otherwise use config
-		const forceBuy = initialBuy === true || cryptoRecord.forceBuy;
+		let forceBuy = initialBuy === true || cryptoRecord.forceBuy;
 		const { simpleLogs } = config.options;
 
 		// check for BUY condition
@@ -191,33 +191,49 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 				log(formatPriceLog(cryptoName, 'sold', cryptoRecord.lastSellPrice, cryptoPrice, percentageDiff, simpleLogs));
 			}
 
-			// crypto is down more than x %
-			if (forceBuy || percentageDiff < thresholds.buyPercentage) {
+			let buyBackAtLoss;
 
-				if (!forceBuy && await checkLatestValueTrend(cryptoName, false)) {
-					// if the crypto value is still decreasing, hold off buying!
-					log(`${cryptoName} is still decreasing, holding off buying..`);
-					continue;
-				}
+			if (cryptoRecord.isAtLoss) {
+				buyBackAtLoss = percentageDiff >= thresholds.buyPercentage;
+				forceBuy = buyBackAtLoss;
+			}
 
-				// TODO - stack promises.all?
-				const order = await placeBuyOrder(cryptoName, amountUSDT);
+			if (cryptoRecord.isAtLoss && !buyBackAtLoss) {
+				continue;
+			}
 
-				const orderValue = await processPlacedOrder(order?.result?.order_id);
+			if (!forceBuy && percentageDiff > thresholds.buyPercentage) {
+				continue;
+			}
 
-				// use the confirmed value if the order was filled immediately
-				config = updateConfigRecord(config, cryptoName, orderValue || cryptoPrice, true);
+			// BUY SCENARIO
+			if (!forceBuy && await checkLatestValueTrend(cryptoName, false)) {
+				// if the crypto value is still decreasing, hold off buying!
+				log(`${cryptoName} is still decreasing, holding off buying..`);
+				continue;
+			}
 
-				const orderDetails = formatOrder('buy', cryptoName, amountUSDT, cryptoPrice, orderValue);
-				log(orderDetails.summary);
+			// TODO - stack promises.all?
+			const order = await placeBuyOrder(cryptoName, amountUSDT);
 
-				if (forceBuy && !initialBuy) {
+			const orderValue = await processPlacedOrder(order?.result?.order_id);
+
+			// use the confirmed value if the order was filled immediately
+			config = updateConfigRecord(config, cryptoName, orderValue || cryptoPrice, true);
+
+			const orderDetails = formatOrder('buy', cryptoName, amountUSDT, cryptoPrice, orderValue);
+			log(orderDetails.summary);
+
+			if (forceBuy) {
+				if (buyBackAtLoss) {
+					log(`${cryptoName} is more than +1% of the stop-loss value, buying back in to sell at the break-even price`);
+				} else if (!initialBuy) {
 					log(`Force buy was used - if you already had ${cryptoName}, the last buy price will be overridden by this buy price.`);
 				}
-
-				ordersPlaced.push(orderDetails);
-				refreshAccount = true;
 			}
+
+			ordersPlaced.push(orderDetails);
+			refreshAccount = true;
 
 			continue;
 		}
@@ -229,20 +245,28 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 
 		log(formatPriceLog(cryptoName, 'bought', cryptoRecord.lastBuyPrice, cryptoPrice, percentageDiff, simpleLogs));
 
-		// log a warning if price has dropped below the specified percentage
-		if (thresholds.warningPercentage && percentageDiff < thresholds.warningPercentage) {
-			log(`[Warning] ${cryptoName} is now ${percentageDiff.toFixed(2)}% since purchasing, consider selling`);
-		}
-
 		const sellAtLoss = thresholds.stopLossPercentage
 		&& percentageDiff < thresholds.stopLossPercentage;
 
 		const forceSell = sellAtLoss || cryptoRecord.forceSell;
 
-		// crypto is up more than x %
+		// crypto is not ready to be sold
 		if (percentageDiff < thresholds.sellPercentage && !forceSell) {
+
+			if (cryptoRecord.breakEvenPrice) {
+				const breakEven = calculatePercDiff(cryptoRecord.breakEvenPrice, cryptoPrice);
+				log(`${breakEven.toFixed(2)}% from breaking even`);
+			}
+
+			// log a warning
+			if (thresholds.warningPercentage && percentageDiff < thresholds.warningPercentage) {
+				log(`[Warning] ${cryptoName} is now ${percentageDiff.toFixed(2)}% since purchasing, consider selling`);
+			}
+
 			continue;
 		}
+
+		// SELL SCENARIO
 
 		// ignore this step if any of the hard-sell conditions are met
 		if (!forceSell && await checkLatestValueTrend(cryptoName, true)) {
@@ -274,21 +298,33 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 		if (sellAtLoss) {
 			thresholds.buyPercentage = 1;
 			thresholds.stopLossPercentage = -1;
-			thresholds.sellPercentage = Number((calculatePercDiff(cryptoRecord.lastBuyPrice, sellPrice)
-				+ 1).toFixed(1)); // add 1% to cover the buy-back % loss
-
-			cryptoRecord.pauseAfterSell = true;
 
 			log(`${cryptoName} stop-loss threshold was met, adjusting buy/sell thresholds...`);
-			log('Buy-back percentage set to +1% of this sell price');
-			log('Stop loss percentage set to to sell at this price again in case the value drops after buying back in');
 
-			log(`Sell-percentage is set to ${cryptoRecord.sellPercentage} in order to break even, once ${cryptoName} is sold it won't be bought again until set manually`);
+			if (!cryptoRecord.isAtLoss) {
+				// if this is the first time meeting the stop-loss threshold
+				cryptoRecord.breakEvenPrice = cryptoRecord.lastBuyPrice;
+				thresholds.sellPercentage = Number((calculatePercDiff(cryptoRecord.lastBuyPrice, sellPrice)
+				+ 1).toFixed(1)); // add 1% to cover the buy-back % loss
+				log(`Sell threshold is set to +${thresholds.sellPercentage}% in order to break even, once ${cryptoName} is sold it won't be bought again until set manually`);
+			} else {
+				log(`Sell threshold remains at +${thresholds.sellPercentage}% in order to break even`);
+			}
+
+			cryptoRecord.pauseAfterSell = true;
+			cryptoRecord.isAtLoss = true; // flag that we're in a stop-loss scenario, trying to break even
+
+			log('Buy-back set to +1% of this sell price');
+			log('Stop-loss set to -1% of this price in case the value drops after buying back in');
 
 		} else if (cryptoRecord.pauseAfterSell) {
 			// if crypto wasn't sold at a loss but has this flag, the break-even price was met
 			cryptoRecord.isPaused = true; // prevent the next buy
 			cryptoRecord.pausedReason = 'break-even threshold met';
+
+			// remove flags for future trading
+			delete cryptoRecord.isAtLoss;
+			delete cryptoRecord.breakEvenPrice;
 		}
 
 		config = updateConfigRecord(config, cryptoName, sellPrice, false, valueUSDT);
