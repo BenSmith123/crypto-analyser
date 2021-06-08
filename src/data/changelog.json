@@ -115,6 +115,15 @@
                 "Fix /force-sell command & no longer pause bot after using",
                 "Updated stop-loss logic: Sell at a loss when threshold is met, automatically update buy/sell thresholds to buy back when the value is coming up and sell when the value breaks-even - then hold"
             ]
+        },
+        {
+            "version": "3.1.1",
+            "changes": [
+                "Fix stop-loss sell price being incorrectly set after buying back in and selling again at the stop loss value",
+				"Fix stop-loss messages not showing the sell-percentage that it was adjusted to",
+				"Don't log sell warning messages when selling the crypto",
+				"Show stop-loss % difference from the break even price in the logs"
+            ]
         }
     ]
 }

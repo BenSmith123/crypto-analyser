@@ -254,7 +254,7 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 		if (percentageDiff < thresholds.sellPercentage && !forceSell) {
 
 			if (cryptoRecord.breakEvenPrice) {
-				const breakEven = calculatePercDiff(cryptoRecord.breakEvenPrice, cryptoPrice);
+				const breakEven = calculatePercDiff(cryptoPrice, cryptoRecord.breakEvenPrice);
 				log(`${breakEven.toFixed(2)}% from breaking even`);
 			}
 
