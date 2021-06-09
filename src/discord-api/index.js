@@ -109,7 +109,7 @@ async function getConfigurationResponse({ userId }) {
 		options: config.options,
 	};
 
-	return JSON.stringify(filteredConfig, null, 4).replace(/"/g, '');
+	return JSON.stringify(filteredConfig, null, 4).replace(/"|,/g, '');
 }
 
 

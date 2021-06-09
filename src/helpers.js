@@ -149,7 +149,7 @@ async function logToDiscord(message, isAlert = false, username) {
 	};
 
 	if (typeof message !== 'string') {
-		data.content = JSON.stringify(message, null, 4).replace(/"/g, '');
+		data.content = JSON.stringify(message, null, 4).replace(/"|,/g, '');
 	}
 
 	if (isAlert) { console.log(data.content); } // console log any alerts
