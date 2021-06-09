@@ -303,9 +303,9 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 
 			if (!cryptoRecord.isAtLoss) {
 				// if this is the first time meeting the stop-loss threshold
-				cryptoRecord.breakEvenPrice = cryptoRecord.lastBuyPrice;
-				thresholds.sellPercentage = Number((calculatePercDiff(cryptoRecord.lastBuyPrice, sellPrice)
-				+ 1).toFixed(1)); // add 1% to cover the buy-back % loss
+				cryptoRecord.breakEvenPrice = cryptoRecord.lastBuyPrice * (1 + 0.01);
+				// add 1% to cover the buy-back % loss
+				thresholds.sellPercentage = calculatePercDiff(cryptoRecord.breakEvenPrice, sellPrice);
 				log(`Sell threshold is set to +${thresholds.sellPercentage}% in order to break even, once ${cryptoName} is sold it won't be bought again until set manually`);
 			} else {
 				log(`Sell threshold remains at +${thresholds.sellPercentage}% in order to break even`);
