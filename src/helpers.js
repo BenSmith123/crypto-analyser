@@ -92,9 +92,10 @@ function formatPriceLog(name, context, price, value, diff, simpleLogs) {
  * @param {number} amount - crypto that was bought or USDT that was sold for a crypto
  * @param {number} valuePlaced - crypto value that the order was PLACED at
  * @param {number} [valueFilled] - optional - crypto value that the order was FILLED at
+ * @param {string} orderId
  * @returns {object}
  */
-function formatOrder(type, cryptoName, amount, valuePlaced, valueFilled) {
+function formatOrder(type, cryptoName, amount, valuePlaced, valueFilled, orderId) {
 
 	const isBuy = type === 'buy';
 
@@ -115,6 +116,7 @@ function formatOrder(type, cryptoName, amount, valuePlaced, valueFilled) {
 		amount,
 		valuePlaced,
 		valueFilled,
+		orderId,
 		quantity: isBuy
 			? `${estimateFlag} ${amount / value} ${cryptoName}`
 			: `${estimateFlag} ${(amount * value).toFixed(2)} USD`,

@@ -216,12 +216,14 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 			// TODO - stack promises.all?
 			const order = await placeBuyOrder(cryptoName, amountUSDT);
 
-			const orderValue = await processPlacedOrder(order?.result?.order_id);
+			const orderId = order?.result?.order_id;
+
+			const orderValue = await processPlacedOrder(orderId);
 
 			// use the confirmed value if the order was filled immediately
 			config = updateConfigRecord(config, cryptoName, orderValue || cryptoPrice, true);
 
-			const orderDetails = formatOrder('buy', cryptoName, amountUSDT, cryptoPrice, orderValue);
+			const orderDetails = formatOrder('buy', cryptoName, amountUSDT, cryptoPrice, orderValue, orderId);
 			log(orderDetails.summary);
 
 			if (forceBuy) {
@@ -280,7 +282,9 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 
 		const order = await placeSellOrder(cryptoName, availableCrypto);
 
-		const sellPriceFilled = await processPlacedOrder(order?.result?.order_id);
+		const orderId = order?.result?.order_id;
+
+		const sellPriceFilled = await processPlacedOrder(orderId);
 
 		// if order wasn't filled, use the price the order was made at
 		const sellPrice = sellPriceFilled || cryptoPrice;
@@ -329,7 +333,7 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 
 		config = updateConfigRecord(config, cryptoName, sellPrice, false, valueUSDT);
 
-		const orderDetails = formatOrder('Sell', cryptoName, availableCrypto, cryptoPrice, sellPriceFilled);
+		const orderDetails = formatOrder('Sell', cryptoName, availableCrypto, cryptoPrice, sellPriceFilled, orderId);
 		log(orderDetails.summary);
 
 		ordersPlaced.push(orderDetails);
