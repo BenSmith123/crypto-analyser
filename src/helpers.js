@@ -92,10 +92,11 @@ function formatPriceLog(name, context, price, value, diff, simpleLogs) {
  * @param {number} amount - crypto that was bought or USDT that was sold for a crypto
  * @param {number} valuePlaced - crypto value that the order was PLACED at
  * @param {number} [valueFilled] - optional - crypto value that the order was FILLED at
+ * @param {number} [percentageDiff] - optional - diff to the last-buy price (sell transactions)
  * @param {string} orderId
  * @returns {object}
  */
-function formatOrder(type, cryptoName, amount, valuePlaced, valueFilled, orderId) {
+function formatOrder(type, cryptoName, amount, valuePlaced, valueFilled, percentageDiff, orderId) {
 
 	const isBuy = type === 'buy';
 
@@ -117,6 +118,11 @@ function formatOrder(type, cryptoName, amount, valuePlaced, valueFilled, orderId
 		valuePlaced,
 		valueFilled,
 		orderId,
+		...percentageDiff && { // add percentageDiff in sell scenarios
+			difference: percentageDiff > 0
+				? `+${percentageDiff.toFixed(2)}%`
+				: `${percentageDiff.toFixed(2)}%`,
+		},
 		quantity: isBuy
 			? `${estimateFlag} ${amount / value} ${cryptoName}`
 			: `${estimateFlag} ${(amount * value).toFixed(2)} USD`,

@@ -223,7 +223,7 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 			// use the confirmed value if the order was filled immediately
 			config = updateConfigRecord(config, cryptoName, orderValue || cryptoPrice, true);
 
-			const orderDetails = formatOrder('buy', cryptoName, amountUSDT, cryptoPrice, orderValue, orderId);
+			const orderDetails = formatOrder('buy', cryptoName, amountUSDT, cryptoPrice, orderValue, null, orderId);
 			log(orderDetails.summary);
 
 			if (forceBuy) {
@@ -331,9 +331,11 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 			delete cryptoRecord.breakEvenPrice;
 		}
 
+		const sellPercentageDiff = calculatePercDiff(cryptoPrice, cryptoRecord.lastBuyPrice);
+
 		config = updateConfigRecord(config, cryptoName, sellPrice, false, valueUSDT);
 
-		const orderDetails = formatOrder('Sell', cryptoName, availableCrypto, cryptoPrice, sellPriceFilled, orderId);
+		const orderDetails = formatOrder('Sell', cryptoName, availableCrypto, cryptoPrice, sellPriceFilled, sellPercentageDiff, orderId);
 		log(orderDetails.summary);
 
 		ordersPlaced.push(orderDetails);
