@@ -230,8 +230,7 @@ async function updateUserConfig({ command, userId, body }) {
 		if (!currentRecord.isHolding) { return `You aren't holding any **${currencyCode}**`; }
 
 		currentRecord.forceSell = true;
-		delete currentRecord.isAtLoss;
-		responseMsg = `**${currencyCode}** will be sold by the crypto-bot shortly!\nOnce sold the bot will be paused`;
+		responseMsg = `**${currencyCode}** will be sold by the crypto-bot shortly!`;
 		break;
 	}
 

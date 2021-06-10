@@ -1,14 +1,9 @@
 
 ### TODO
+- Add number of transactions
 - Don't pause the bot on every error - if crypto.com is down, let bot keep running rather than everyone having to unpause manually
 - AUTOMATION TEST! 
-	- Heaps of errors on the v3 release on the crypto-assistant, lots could've been caught my
-- Fix logic around force-sell/hard-sell-low!
-	- buy back in at where the losses were (e.g. -10%) but if it goes down again, sell at -11% to avoid it bouncing around, 
-		just take the 1% loss instead of -0.4% every transaction
-	- Don't pause bot anymore
-	- If it hard sells, automatically set your sell percent to whatever the hard-sell % was plus the sell % you set - i.e. what % you'll still make money at
-	- But also send a warning message saying 'set sell % to X in order to break even' (hard-sell-high to sell and not buy back in?)
+	- Heaps of errors on the v3 release on the crypto-assistant, lots could've been caught
 - Add user details to transactions? Not just their IDs
 - Website to show of the bot!
 	- Purpose, details, features
