@@ -103,7 +103,7 @@ function formatOrder(type, cryptoName, amount, valuePlaced, valueFilled, percent
 	// declare/default values as if the order was not filled
 	let value = valuePlaced;
 	let status = 'PLACED';
-	let estimateFlag = 'Estimate';
+	let estimateFlag = 'Estimate ';
 
 	if (valueFilled) {
 		value = valueFilled;
@@ -117,19 +117,19 @@ function formatOrder(type, cryptoName, amount, valuePlaced, valueFilled, percent
 		amount,
 		valuePlaced,
 		valueFilled,
-		orderId,
 		...percentageDiff && { // add percentageDiff in sell scenarios
 			difference: percentageDiff > 0
 				? `+${percentageDiff.toFixed(2)}%`
 				: `${percentageDiff.toFixed(2)}%`,
 		},
 		quantity: isBuy
-			? `${estimateFlag} ${amount / value} ${cryptoName}`
-			: `${estimateFlag} ${(amount * value).toFixed(2)} USD`,
+			? `${estimateFlag}${amount / value} ${cryptoName}`
+			: `${estimateFlag}${(amount * value).toFixed(2)} USD`,
 		summary: isBuy
 			? `Buy order ${status} for $${amount} USD worth of ${cryptoName} at ${value}`
 			: `Sell order ${status} for ${amount} ${cryptoName} at $${value} USD`,
 		date: moment(Date.now()).format(DATETIME_FORMAT),
+		orderId,
 	};
 }
 
