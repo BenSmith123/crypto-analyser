@@ -37,6 +37,32 @@ async function loadInvestmentConfig(databaseId) {
 
 
 /**
+ * Returns a transaction from the database
+ *
+ * @param {string} orderId
+ */
+async function getTransaction(orderId) {
+
+	const params = {
+		TableName: DATABASE_TABLES.transactions,
+		Key: {
+			orderId,
+		},
+	};
+
+	return new Promise((resolve, reject) => {
+		dynamoClient.get(params, (err, data) => {
+			if (err) {
+				reject(err);
+			} else {
+				resolve(data.Item);
+			}
+		});
+	});
+}
+
+
+/**
  * Returns true if the database investment state data is valid
  */
 function investmentConfigIsValid(data) {
@@ -173,6 +199,7 @@ function formatTransaction(transaction) {
 		user: transaction.order_info.client_oid,
 		// expose important data at a higher level for easier access
 		status: transaction.order_info.status,
+		timestamp: transaction.order_info.create_time,
 		...transaction,
 	};
 }
@@ -180,6 +207,7 @@ function formatTransaction(transaction) {
 
 module.exports = {
 	loadInvestmentConfig,
+	getTransaction,
 	investmentConfigIsValid,
 	updateConfigRecord,
 	updateInvestmentConfig,
