@@ -49,5 +49,20 @@
 				"AWS_PROFILE": "bensmith"
 			}
 		},
+		{
+            "type": "node",
+            "request": "launch",
+            "name": "Mocha run tests",
+            "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+            "args": [
+                "--no-timeout",
+                "--colors",
+                "${workspaceFolder}/tests/main.spec.js"
+            ],
+            "env": {
+                "AWS_PROFILE": "bensmith",
+				"TRANSACTIONS_ENABLED": "false",
+            }
+        },
     ]
 }
