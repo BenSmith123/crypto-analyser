@@ -62,6 +62,7 @@
             "env": {
                 "AWS_PROFILE": "bensmith",
 				"TRANSACTIONS_ENABLED": "false",
+				"USER_ID": "409274228794458113"
             }
         },
     ]
