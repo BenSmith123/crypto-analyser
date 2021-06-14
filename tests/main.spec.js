@@ -12,11 +12,6 @@ const cryptoModule = require('../src/crypto');
 const helperModule = require('../src/helpers');
 const { investmentConfigIsValid } = require('../src/database');
 
-
-let spyformatPriceLog;
-const stubs = {};
-
-
 const mockAccount = {
 	BTC: { balance: 0.005, available: 0.005, currency: 'BTC' },
 	DOGE: { balance: 31, available: 31, currency: 'DOGE' },
@@ -24,10 +19,10 @@ const mockAccount = {
 	CRO: { balance: 0.01879796, available: 0.01879796, currency: 'CRO' },
 };
 
-// spyformatPriceLog = sinon.spy(helperModule, 'formatPriceLog');
+// const spyformatPriceLog = sinon.spy(helperModule, 'formatPriceLog');
 
 
-function overrideLogToDiscord(message, isAlert) {
+function overrideLogToDiscord(message) {
 
 	if (typeof message !== 'string') {
 		console.log(JSON.stringify(message, null, 4).replace(/"|,/g, ''));
@@ -41,6 +36,7 @@ function overrideLogToDiscord(message, isAlert) {
 describe('#makeCryptoCurrenciesTrades', () => {
 
 	let makeCryptoCurrenciesTrades;
+	const stubs = {};
 
 	before(() => {
 		sinon.stub(helperModule, 'logToDiscord').callsFake(overrideLogToDiscord);
