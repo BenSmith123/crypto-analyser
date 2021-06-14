@@ -1,0 +1,28 @@
+{
+    "id": "409274228794458113",
+    "isPaused": false,
+    "currenciesTargeted": [
+        "BTC"
+    ],
+    "records": {
+        "BTC": {
+            "limitUSDT": 10,
+            "isHolding": true,
+            "orderDate": "10/06/2021, 05:00am",
+            "lastBuyPrice": 0.34533,
+            "timestamp": 1623258035687,
+			"thresholds": {
+                "stopLossPercentage": -15,
+                "sellPercentage": 5,
+                "buyPercentage": -5
+            }
+        }
+    },
+    "user": {
+        "firstName": "Ben",
+        "displayName": "Ben"
+    },
+    "options": {
+        "simpleLogs": true
+    }
+}
