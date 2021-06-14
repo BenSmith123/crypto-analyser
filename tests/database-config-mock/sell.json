@@ -1,0 +1,28 @@
+{
+    "id": "409274228794458113",
+    "isPaused": false,
+    "currenciesTargeted": [
+        "DOGE"
+    ],
+    "records": {
+        "DOGE": {
+            "limitUSDT": 10,
+            "isHolding": true,
+            "orderDate": "10/06/2021, 05:00am",
+            "lastBuyPrice": 0.34533,
+            "timestamp": 1623258035687,
+			"thresholds": {
+                "stopLossPercentage": -10,
+                "sellPercentage": 3,
+                "buyPercentage": -1
+            }
+        }
+    },
+    "user": {
+        "firstName": "Ben",
+        "displayName": "Ben"
+    },
+    "options": {
+        "simpleLogs": true
+    }
+}

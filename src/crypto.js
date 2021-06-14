@@ -289,22 +289,15 @@ async function checkLatestValueTrend(cryptoName, checkIncrease = true) {
 	const timeframe = '5m';
 	const lookback = 3; // num of array elements to compare
 
-	try {
-		const candlestick = await getCryptoCandlestick(`${cryptoName}_USDT`, timeframe);
+	const candlestick = await getCryptoCandlestick(`${cryptoName}_USDT`, timeframe);
 
-		if (!candlestick.data || !candlestick.data.length) { throw new Error(`Missing candlestick data for ${cryptoName}`); }
+	if (!candlestick.data || !candlestick.data.length) { throw new Error(`Missing candlestick data for ${cryptoName}`); }
 
-		const latest = candlestick.data.slice(candlestick.data.length - lookback);
+	const latest = candlestick.data.slice(candlestick.data.length - lookback);
 
-		return checkIncrease
-			? latest.every(isIncreasing)
-			: latest.every(isDecreasing);
-
-	} catch (err) {
-		// TODO - remove if you don't see any of these logs
-		logToDiscord(`checkLatestValueTrend error has occurred: ${err.message}\n\nStack: ${err.stack}`, true);
-		return false;
-	}
+	return checkIncrease
+		? latest.every(isIncreasing)
+		: latest.every(isDecreasing);
 }
 
 
