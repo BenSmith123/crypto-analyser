@@ -122,12 +122,16 @@
                 "Fix stop-loss sell price being incorrectly set after buying back in and selling again at the stop loss value",
 				"Fix stop-loss messages not showing the sell-percentage that it was adjusted to",
 				"Don't log sell warning messages when selling the crypto",
-				"Show stop-loss % difference from the break even price in the logs",
+				"Show stop-loss % difference from the break even price in the logs"
             ]
         },
         {
             "version": "3.2.0",
+			"devChanges": [
+				"Implemented automation tests - less manual testing and more reliable code releases"
+            ],
             "changes": [
+				"Fix sell-percentage adjustments to 2dp",
                 "Add orderId to all transactions",
                 "Add difference % to sell transactions"
             ]
