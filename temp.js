@@ -1,22 +1,50 @@
 
-// const bcrypt = require('bcrypt');
-
-const data = require('./resources/crypto-api-response-examples/get-account-summary-all.json');
-
+/* eslint-disable no-console */
 /* eslint-disable max-len */
 /* eslint-disable no-return-assign */
 /* eslint-disable no-param-reassign */
 
+// const bcrypt = require('bcrypt');
 
-// map API response to meanings
-const PRICE = {
-	bestBid: 'b',
-	bestAsk: 'k',
-	latestTrade: 'a',
-};
+const axios = require('axios');
+
+const { RSI } = require('technicalindicators');
 
 
 (async () => {
+
+	// const inputRSI = {
+	// 	values: [127.75, 129.02, 132.75, 145.40, 148.98, 137.52, 147.38, 139.05, 137.23, 149.30, 162.45, 178.95, 200.35, 221.90, 243.23, 243.52, 286.42, 280.27, 277.35, 269.02, 263.23, 214.90],
+	// 	period: 14,
+	// };
+
+	// const expectedResult = [
+	// 	86.41, 86.43, 89.65, 86.50, 84.96, 80.54, 77.56, 58.06,
+	// ];
+
+	// console.log(RSI.calculate(inputRSI));
+
+	const API_URL = 'https://api.crypto.com/v2';
+
+	const instrumentName = 'DOGE_USDT';
+	const timeframe = '1m';
+
+	const candleStickEndpoint = `/public/get-candlestick?instrument_name=${instrumentName}&timeframe=${timeframe}`;
+
+	const rawResponse = await axios(API_URL + candleStickEndpoint);
+
+	const candlestickData = rawResponse.data.result.data;
+
+	const cryptoValues = candlestickData.map(data => data.c); // NOTE array 0 is the oldest time
+
+	console.log(candlestickData[cryptoValues.length - 1]);
+
+	const lastFifthteen = cryptoValues.slice(-15);
+
+	console.log(RSI.calculate({ values: lastFifthteen, period: 14 }));
+	// console.log(RSI.calculate({ values: lastFifthteen.reverse(), period: 14 }));
+
+	// console.log(rawResponse);
 
 
 	/// /////////////////////////////////
@@ -26,92 +54,18 @@ const PRICE = {
 
 	// bcrypt.genSalt(saltRounds, (err, salt) => {
 
-	// 	console.log(salt);
+	// console.log(salt);
 
-	// 	bcrypt.hash(myPlaintextPassword, salt, (err, hash) => {
-	// 		console.log(err, hash);
+	// bcrypt.hash(myPlaintextPassword, salt, (err, hash) => {
+	// console.log(err, hash);
 
 
-	// 		bcrypt.compare(myPlaintextPassword, hash, (err, result) => {
-	// 			console.log(result);
-	// 		});
-	// 	});
+	// bcrypt.compare(myPlaintextPassword, hash, (err, result) => {
+	// console.log(result);
+	// });
+	// });
 
 	// });
 	/// ////////////////////////////////
-
-	const b = [
-		{
-			code: 0,
-			method: 'public/get-ticker',
-			result: {
-				instrument_name: 'CRO_USDT',
-				data: {
-					i: 'CRO_USDT',
-					b: 0.15900,
-					k: 0.15916,
-					a: 0.15916,
-					t: 1619147323652,
-					v: 95219143.095,
-					h: 0.19251,
-					l: 0.15450,
-					c: -0.03025,
-				},
-			},
-		},
-		{
-			code: 0,
-			method: 'public/get-ticker',
-			result: {
-				instrument_name: 'BTC_USDT',
-				data: {
-					i: 'CRO_USDT',
-					b: 0.15900,
-					k: 0.15916,
-					a: 0.15916,
-					t: 1619147323652,
-					v: 95219143.095,
-					h: 0.19251,
-					l: 0.15450,
-					c: -0.03025,
-				},
-			},
-		},
-	];
-
-	const c = b.reduce((currValuesFormatted, { result }) => ( // eslint-disable-line no-return-assign
-		// split key name by _ (e.g. CRO_USDT becomes CRO)
-		currValuesFormatted[result.instrument_name.split('_')[0]] = {
-			bestBid: result.data.b,
-			bestAsk: result.data.k,
-			latestTrade: result.data.a,
-		}, currValuesFormatted),
-	{});
-
-	console.log(c);
-
-
-	// example:
-	// {
-	// 	CRO: {
-	// 		bestBid: 0.159,
-	// 		bestAsk: 0.15916,
-	// 		latestTrade: 0.15916 },
-	// 	BTC: {
-	// 		bestBid: 0.159,
-	// 		bestAsk: 0.15916,
-	// 		latestTrade: 0.15916 },
-	// };
-
-	const a = data.result.accounts
-		.filter(account => account.available > 0) // filter out accounts that have no crypto balance
-		.reduce((acc, curr) => ( // eslint-disable-line no-return-assign
-			acc[curr.currency] = { ...curr }, acc),
-		{});
-
-	console.log(Object.keys(a).length > 1 || !a.USDT);
-
-	// a.filter((b) => b.currency !== 'USDT');
-
 
 })();

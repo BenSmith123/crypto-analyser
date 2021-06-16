@@ -16,6 +16,7 @@
     "crypto-js": "^4.0.0",
     "dotenv": "^8.6.0",
     "moment-timezone": "^0.5.33",
+    "technicalindicators": "^3.1.0",
     "tweetnacl": "^1.0.3"
   },
   "devDependencies": {
