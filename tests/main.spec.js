@@ -68,13 +68,13 @@ describe('#makeCryptoCurrenciesTrades', () => {
 
 		});
 
-		it('should have updated the current record of the config', async () => {
+		it('should have updated configuration and valid order data', async () => {
 
 			const inputConfig = require('./database-config-mock/sell.json');
 
 			const { config, ordersPlaced } = await makeCryptoCurrenciesTrades(inputConfig);
 
-			// test database configuration
+			// TEST DATABASE CONFIGURATION
 			assert.isTrue(investmentConfigIsValid(config), 'expect config to be valid for next run');
 
 			const currentRecord = config.records.DOGE;
@@ -87,6 +87,11 @@ describe('#makeCryptoCurrenciesTrades', () => {
 			assert.equal(currentRecord.thresholds.sellPercentage, 3);
 			assert.equal(currentRecord.thresholds.stopLossPercentage, -10);
 
+			// dynamic data
+			assert.isString(currentRecord.orderDate);
+			assert.isNumber(currentRecord.timestamp);
+
+			// TEST ORDER
 			// maybe test this individually and check values less specifically
 			const expectedOrderObj = {
 				type: 'SELL',
@@ -128,29 +133,53 @@ describe('#makeCryptoCurrenciesTrades', () => {
 			makeCryptoCurrenciesTrades = index.__get__('makeCryptoCurrenciesTrades');
 		});
 
-		it('should have valid config for next run', async () => {
+		it('should have updated configuration and valid order data', async () => {
 
 			const inputConfig = require('./database-config-mock/sellStoploss.json');
 
 			const { config, ordersPlaced } = await makeCryptoCurrenciesTrades(inputConfig);
 
-			// test database configuration
+			// TEST DATABASE CONFIGURATION
 			assert.isTrue(investmentConfigIsValid(config), 'expect config to be valid for next run');
 
 			const currentRecord = config.records.BTC;
 
-			// const testThis = {
-			// 	limitUSDT: 10,
-			// 	isHolding: false,
-			// 	orderDate: '14/06/2021, 15:45pm',
-			// 	timestamp: 1623642347339,
-			// 	thresholds: { stopLossPercentage: -1, sellPercentage: 32.99, buyPercentage: 1 },
-			// 	breakEvenPrice: 0.3487833,
-			// 	pauseAfterSell: true,
-			// 	isAtLoss: true,
-			// 	lastSellPrice: 0.25,
-			// };
+			assert.equal(currentRecord.isHolding, false);
+			assert.equal(currentRecord.limitUSDT, 10);
+			assert.equal(currentRecord.lastSellPrice, 0.25);
 
+			// extra data added in stop-loss scenarios
+			assert.equal(currentRecord.breakEvenPrice, 0.3487833);
+			assert.isTrue(currentRecord.pauseAfterSell);
+			assert.isTrue(currentRecord.isAtLoss);
+
+			assert.equal(currentRecord.thresholds.buyPercentage, 1);
+			assert.equal(currentRecord.thresholds.sellPercentage, 32.99);
+			assert.equal(currentRecord.thresholds.stopLossPercentage, -1);
+
+			// dynamic data
+			assert.isString(currentRecord.orderDate);
+			assert.isNumber(currentRecord.timestamp);
+
+			// TEST ORDER
+			const expectedOrderObj = {
+				type: 'SELL',
+				name: 'BTC',
+				amount: 0.005,
+				valuePlaced: 0.248,
+				valueFilled: 0.25,
+				difference: '-32.81%',
+				quantity: '0.00 USD',
+				summary: 'Sell order FILLED for 0.005 BTC at $0.25 USD',
+				orderId: '078340',
+			};
+
+			assert.equal(ordersPlaced.length, 1);
+
+			assert.isString(ordersPlaced[0].date);
+			delete ordersPlaced[0].date; // date is dynamic, remove before comparing
+
+			assert.deepEqual(ordersPlaced[0], expectedOrderObj);
 		});
 
 	});
