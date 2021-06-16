@@ -1,0 +1,23 @@
+{
+    "id": "409274228794458113",
+    "isPaused": false,
+    "currenciesTargeted": [
+        "DOGE"
+    ],
+    "records": {
+        "DOGE": {
+            "limitUSDT": 100,
+			"thresholds": {
+                "sellPercentage": 3,
+                "buyPercentage": -3
+            }
+        }
+    },
+    "user": {
+        "firstName": "Ben",
+        "displayName": "Ben"
+    },
+    "options": {
+        "simpleLogs": true
+    }
+}

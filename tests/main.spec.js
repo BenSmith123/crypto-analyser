@@ -44,6 +44,8 @@ describe('#makeCryptoCurrenciesTrades', () => {
 		sinon.stub(cryptoModule, 'getAccountSummary').returns(mockAccount);
 		sinon.stub(cryptoModule, 'checkLatestValueTrend').returns(false);
 		sinon.stub(cryptoModule, 'placeSellOrder').returns({ result: { order_id: '078340' } });
+		sinon.stub(cryptoModule, 'placeBuyOrder').returns({ result: { order_id: '0232236' } });
+
 	});
 
 	afterEach(() => {
@@ -51,7 +53,7 @@ describe('#makeCryptoCurrenciesTrades', () => {
 		stubs.processPlacedOrder.restore();
 	});
 
-	describe('Feature: Standard sell order', () => {
+	describe('Feature: Standard SELL order', () => {
 
 		before(async () => {
 
@@ -172,6 +174,66 @@ describe('#makeCryptoCurrenciesTrades', () => {
 				quantity: '0.00 USD',
 				summary: 'Sell order FILLED for 0.005 BTC at $0.25 USD',
 				orderId: '078340',
+			};
+
+			assert.equal(ordersPlaced.length, 1);
+
+			assert.isString(ordersPlaced[0].date);
+			delete ordersPlaced[0].date; // date is dynamic, remove before comparing
+
+			assert.deepEqual(ordersPlaced[0], expectedOrderObj);
+		});
+	});
+
+
+	describe('Feature: Initial BUY order', () => {
+
+		before(async () => {
+
+			const mockCryptoValue = {
+				DOGE: { bestBid: 0.4, bestAsk: 0.3 },
+			};
+
+			stubs.getAllCryptoValues = sinon.stub(cryptoModule, 'getAllCryptoValues').returns(mockCryptoValue);
+			stubs.processPlacedOrder = sinon.stub(cryptoModule, 'processPlacedOrder').returns(12.4);
+
+			const index = rewire('../src/index');
+			makeCryptoCurrenciesTrades = index.__get__('makeCryptoCurrenciesTrades');
+		});
+
+		it('should have updated configuration and valid order data', async () => {
+
+			const inputConfig = require('./database-config-mock/buy.json');
+
+			const { config, ordersPlaced } = await makeCryptoCurrenciesTrades(inputConfig);
+
+			// TEST DATABASE CONFIGURATION
+			assert.isTrue(investmentConfigIsValid(config), 'expect config to be valid for next run');
+
+			const currentRecord = config.records.DOGE;
+
+			assert.equal(currentRecord.isHolding, true);
+			assert.equal(currentRecord.limitUSDT, 100);
+			assert.equal(currentRecord.lastBuyPrice, 12.4);
+			assert.notExists(currentRecord.lastSellPrice);
+
+			assert.equal(currentRecord.thresholds.buyPercentage, -3);
+			assert.equal(currentRecord.thresholds.sellPercentage, 3);
+
+			// dynamic data
+			assert.isString(currentRecord.orderDate);
+			assert.isNumber(currentRecord.timestamp);
+
+			// TEST ORDER
+			const expectedOrderObj = {
+				type: 'BUY',
+				name: 'DOGE',
+				amount: 8,
+				valuePlaced: 0.3,
+				valueFilled: 12.4,
+				quantity: '0.6451612903225806 DOGE',
+				summary: 'Buy order FILLED for $8 USD worth of DOGE at 12.4',
+				orderId: '0232236',
 			};
 
 			assert.equal(ordersPlaced.length, 1);
