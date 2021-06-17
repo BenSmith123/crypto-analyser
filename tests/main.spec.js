@@ -128,8 +128,10 @@ describe('#makeCryptoCurrenciesTrades', () => {
 				BTC: { bestBid: 0.248, bestAsk: 0.2475 },
 			};
 
+			const sellPrice = 0.25;
+
 			stubs.getAllCryptoValues = sinon.stub(cryptoModule, 'getAllCryptoValues').returns(mockCryptoValue);
-			stubs.processPlacedOrder = sinon.stub(cryptoModule, 'processPlacedOrder').returns(0.25);
+			stubs.processPlacedOrder = sinon.stub(cryptoModule, 'processPlacedOrder').returns(sellPrice);
 
 			const index = rewire('../src/index');
 			makeCryptoCurrenciesTrades = index.__get__('makeCryptoCurrenciesTrades');
@@ -203,7 +205,7 @@ describe('#makeCryptoCurrenciesTrades', () => {
 
 		it('should have updated configuration and valid order data', async () => {
 
-			const inputConfig = require('./database-config-mock/buy.json');
+			const inputConfig = require('./database-config-mock/buy-initial.json');
 
 			const { config, ordersPlaced } = await makeCryptoCurrenciesTrades(inputConfig);
 
@@ -233,6 +235,69 @@ describe('#makeCryptoCurrenciesTrades', () => {
 				valueFilled: 12.4,
 				quantity: '0.6451612903225806 DOGE',
 				summary: 'Buy order FILLED for $8 USD worth of DOGE at 12.4',
+				orderId: '0232236',
+			};
+
+			assert.equal(ordersPlaced.length, 1);
+
+			assert.isString(ordersPlaced[0].date);
+			delete ordersPlaced[0].date; // date is dynamic, remove before comparing
+
+			assert.deepEqual(ordersPlaced[0], expectedOrderObj);
+		});
+
+	});
+
+
+	describe('Feature: Standard BUY order (-10% of lastSellPrice)', () => {
+
+		before(async () => {
+
+			const mockCryptoValue = {
+				DOGE: { bestBid: 90, bestAsk: 90 },
+			};
+
+			const sellPrice = 91.5;
+
+			stubs.getAllCryptoValues = sinon.stub(cryptoModule, 'getAllCryptoValues').returns(mockCryptoValue);
+			stubs.processPlacedOrder = sinon.stub(cryptoModule, 'processPlacedOrder').returns(sellPrice);
+
+			const index = rewire('../src/index');
+			makeCryptoCurrenciesTrades = index.__get__('makeCryptoCurrenciesTrades');
+		});
+
+		it('should have updated configuration and valid order data', async () => {
+
+			const inputConfig = require('./database-config-mock/buy-standard.json');
+
+			const { config, ordersPlaced } = await makeCryptoCurrenciesTrades(inputConfig);
+
+			// TEST DATABASE CONFIGURATION
+			assert.isTrue(investmentConfigIsValid(config), 'expect config to be valid for next run');
+
+			const currentRecord = config.records.DOGE;
+
+			assert.equal(currentRecord.isHolding, true);
+			assert.equal(currentRecord.lastBuyPrice, 91.5);
+			assert.notExists(currentRecord.limitUSDT);
+			assert.notExists(currentRecord.lastSellPrice);
+
+			assert.equal(currentRecord.thresholds.buyPercentage, -3);
+			assert.equal(currentRecord.thresholds.sellPercentage, 3);
+
+			// dynamic data
+			assert.isString(currentRecord.orderDate);
+			assert.isNumber(currentRecord.timestamp);
+
+			// TEST ORDER
+			const expectedOrderObj = {
+				type: 'BUY',
+				name: 'DOGE',
+				amount: 8,
+				valuePlaced: 90,
+				valueFilled: 91.5,
+				quantity: '0.08743169398907104 DOGE',
+				summary: 'Buy order FILLED for $8 USD worth of DOGE at 91.5',
 				orderId: '0232236',
 			};
 
