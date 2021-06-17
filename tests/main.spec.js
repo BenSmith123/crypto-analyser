@@ -45,13 +45,43 @@ describe('#makeCryptoCurrenciesTrades', () => {
 		sinon.stub(cryptoModule, 'checkLatestValueTrend').returns(false);
 		sinon.stub(cryptoModule, 'placeSellOrder').returns({ result: { order_id: '078340' } });
 		sinon.stub(cryptoModule, 'placeBuyOrder').returns({ result: { order_id: '0232236' } });
-
 	});
 
 	afterEach(() => {
-		stubs.getAllCryptoValues.restore();
-		stubs.processPlacedOrder.restore();
+		if (stubs.getAllCryptoValues) stubs.getAllCryptoValues.restore();
+		if (stubs.processPlacedOrder) stubs.processPlacedOrder.restore();
 	});
+
+	after(() => {
+		// log the results after running all tests just
+		console.log(getLogs());
+	});
+
+	describe('Scenario: No orders placed - sell price not met (price % basically the same)', () => {
+
+		before(async () => {
+
+			const mockCryptoValue = {
+				DOGE: { bestBid: 0.345, bestAsk: 0.345 },
+			};
+
+			stubs.getAllCryptoValues = sinon.stub(cryptoModule, 'getAllCryptoValues').returns(mockCryptoValue);
+
+			const index = rewire('../src/index');
+			makeCryptoCurrenciesTrades = index.__get__('makeCryptoCurrenciesTrades');
+		});
+
+		it('should have updated configuration and valid order data', async () => {
+
+			const inputConfig = require('./database-config-mock/sell.json');
+
+			const { config, ordersPlaced } = await makeCryptoCurrenciesTrades(inputConfig);
+
+			assert.deepEqual(config, inputConfig, 'config should be exactly the same as no transactions were made');
+			assert.equal(ordersPlaced.length, 0);
+		});
+	});
+
 
 	describe('Feature: Standard SELL order', () => {
 
@@ -66,8 +96,6 @@ describe('#makeCryptoCurrenciesTrades', () => {
 
 			const index = rewire('../src/index');
 			makeCryptoCurrenciesTrades = index.__get__('makeCryptoCurrenciesTrades');
-			// ^ with object destructuring in index.js this has to be stubbed BEFORE index.js is rewired
-
 		});
 
 		it('should have updated configuration and valid order data', async () => {
@@ -113,8 +141,6 @@ describe('#makeCryptoCurrenciesTrades', () => {
 			delete ordersPlaced[0].date; // date is dynamic, remove before comparing
 
 			assert.deepEqual(ordersPlaced[0], expectedOrderObj);
-
-			console.log(getLogs());
 		});
 
 	});
