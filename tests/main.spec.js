@@ -83,7 +83,7 @@ describe('#makeCryptoCurrenciesTrades', () => {
 	});
 
 
-	describe('Feature: Standard SELL order', () => {
+	describe('Feature: Standard SELL order (+15% of lastBuyPrice)', () => {
 
 		before(async () => {
 
