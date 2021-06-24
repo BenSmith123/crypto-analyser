@@ -135,6 +135,12 @@
                 "Add orderId to all transactions",
                 "Add difference % to sell transactions"
             ]
+        },
+        {
+            "version": "3.2.1",
+            "changes": [
+				"Use closed price instead of open price when looking for spikes/dips that halt buy/sell orders"
+            ]
         }
     ]
 }

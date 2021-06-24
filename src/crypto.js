@@ -41,18 +41,18 @@ function signRequest(request, apiKey, apiSecret) {
 // returns true if array values are increasing or the same
 function isIncreasing(elt, i, arr) {
 	const prev = arr[i - 1]
-		? arr[i - 1].o
+		? arr[i - 1].c
 		: 0;
-	return !i || elt.o === prev || elt.o > prev;
+	return !i || elt.c === prev || elt.c > prev;
 }
 
 
 // returns true if array values are decreasing or the same
 function isDecreasing(elt, i, arr) {
 	const prev = arr[i - 1]
-		? arr[i - 1].o
+		? arr[i - 1].c
 		: 0;
-	return !i || elt.o === prev || elt.o > prev;
+	return !i || elt.c === prev || elt.c > prev;
 }
 
 
