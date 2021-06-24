@@ -1,0 +1,119 @@
+{
+	"resource": "/{endpoint+}",
+	"path": "/commands",
+	"httpMethod": "GET",
+	"headers": {
+		"accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+		"accept-encoding": "gzip, deflate, br",
+		"accept-language": "en-GB,en-US;q=0.9,en;q=0.8",
+		"cache-control": "no-cache",
+		"Host": "csezryhvsa.execute-api.ap-southeast-2.amazonaws.com",
+		"pragma": "no-cache",
+		"sec-ch-ua": "\" Not;A Brand\";v=\"99\", \"Google Chrome\";v=\"91\", \"Chromium\";v=\"91\"",
+		"sec-ch-ua-mobile": "?0",
+		"sec-fetch-dest": "document",
+		"sec-fetch-mode": "navigate",
+		"sec-fetch-site": "none",
+		"sec-fetch-user": "?1",
+		"upgrade-insecure-requests": "1",
+		"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36",
+		"X-Amzn-Trace-Id": "Root=1-60d41bc7-46bc8733015aa38f65d54d0a",
+		"X-Forwarded-For": "222.152.188.186",
+		"X-Forwarded-Port": "443",
+		"X-Forwarded-Proto": "https"
+	},
+	"multiValueHeaders": {
+		"accept": [
+			"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"
+		],
+		"accept-encoding": [
+			"gzip, deflate, br"
+		],
+		"accept-language": [
+			"en-GB,en-US;q=0.9,en;q=0.8"
+		],
+		"cache-control": [
+			"no-cache"
+		],
+		"Host": [
+			"csezryhvsa.execute-api.ap-southeast-2.amazonaws.com"
+		],
+		"pragma": [
+			"no-cache"
+		],
+		"sec-ch-ua": [
+			"\" Not;A Brand\";v=\"99\", \"Google Chrome\";v=\"91\", \"Chromium\";v=\"91\""
+		],
+		"sec-ch-ua-mobile": [
+			"?0"
+		],
+		"sec-fetch-dest": [
+			"document"
+		],
+		"sec-fetch-mode": [
+			"navigate"
+		],
+		"sec-fetch-site": [
+			"none"
+		],
+		"sec-fetch-user": [
+			"?1"
+		],
+		"upgrade-insecure-requests": [
+			"1"
+		],
+		"User-Agent": [
+			"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36"
+		],
+		"X-Amzn-Trace-Id": [
+			"Root=1-60d41bc7-46bc8733015aa38f65d54d0a"
+		],
+		"X-Forwarded-For": [
+			"222.152.188.186"
+		],
+		"X-Forwarded-Port": [
+			"443"
+		],
+		"X-Forwarded-Proto": [
+			"https"
+		]
+	},
+	"queryStringParameters": null,
+	"multiValueQueryStringParameters": null,
+	"pathParameters": {
+		"endpoint": "heth"
+	},
+	"stageVariables": null,
+	"requestContext": {
+		"resourceId": "j8nhaj",
+		"resourcePath": "/{endpoint+}",
+		"httpMethod": "GET",
+		"extendedRequestId": "BalHPFoSywMFkRQ=",
+		"requestTime": "24/Jun/2021:05:44:39 +0000",
+		"path": "/prod/heth",
+		"accountId": "793861092533",
+		"protocol": "HTTP/1.1",
+		"stage": "prod",
+		"domainPrefix": "csezryhvsa",
+		"requestTimeEpoch": 1624513479758,
+		"requestId": "c7fb9214-1b1a-4b56-8682-92f2b21a0bc5",
+		"identity": {
+			"cognitoIdentityPoolId": null,
+			"accountId": null,
+			"cognitoIdentityId": null,
+			"caller": null,
+			"sourceIp": "222.152.188.186",
+			"principalOrgId": null,
+			"accessKey": null,
+			"cognitoAuthenticationType": null,
+			"cognitoAuthenticationProvider": null,
+			"userArn": null,
+			"userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36",
+			"user": null
+		},
+		"domainName": "csezryhvsa.execute-api.ap-southeast-2.amazonaws.com",
+		"apiId": "csezryhvsa"
+	},
+	"body": null,
+	"isBase64Encoded": false
+}

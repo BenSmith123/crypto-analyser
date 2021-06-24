@@ -32,10 +32,25 @@ const API_ENDPOINTS = {
 	health: checkCryptoApiStatus,
 	configuration: getConfigurationResponse,
 	'list-available-crypto': getAvailableCrypto,
+	// NOTE - these are all read only endpoints, this is exposed to the web-API also
+	// don't add any functions that have a perform write operations
 };
 
 
 exports.discordController = async function (event) {
+
+	// return {
+	// 	statusCode: 200,
+	// 	body: JSON.stringify(event || { ben: 5 }),
+	// 	headers: {
+	// 		'Content-Type': 'application/json',
+	// 		'Access-Control-Allow-Origin': '*',
+	// 	},
+	// };
+
+	// if (isHttpRequest()) {
+	// 	return;
+	// }
 
 	try {
 

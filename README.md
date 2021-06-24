@@ -1,6 +1,9 @@
 
 ### TODO
-- Add number of transactions
+- Automation test scenarios mocking a spike and not selling - use this to test newly added RSI
+- Remove the INTERNAL_RUN stuff and replace code with test framework
+- Remove the prod code changes to mock functions ^
+- Add number of transactions? & initial date etc.
 - Don't pause the bot on every error - if crypto.com is down, let bot keep running rather than everyone having to unpause manually
 - AUTOMATION TEST! 
 	- Heaps of errors on the v3 release on the crypto-assistant, lots could've been caught
