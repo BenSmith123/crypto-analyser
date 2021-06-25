@@ -3,8 +3,10 @@ const axios = require('axios');
 const { API_URL } = require('../environment');
 
 
-function getCommands() {
+function getCommands({ json }) {
 	const commandsJSON = require('../data/discordCommands.json'); // eslint-disable-line global-require
+
+	if (json) { return JSON.stringify(commandsJSON); }
 
 	const results = [];
 
@@ -16,9 +18,11 @@ function getCommands() {
 }
 
 
-function getChangelog() {
+function getChangelog({ json }) {
 
 	const changelog = require('../data/changelog.json'); // eslint-disable-line global-require
+
+	if (json) { return JSON.stringify(changelog); }
 
 	const results = [];
 
@@ -73,9 +77,11 @@ async function checkCryptoApiStatus() {
  *
  * @returns {array}
  */
-async function getAvailableCrypto() {
+async function getAvailableCrypto({ json }) {
 
 	const supportedCurrencies = require('../data/decimalValueMap.json'); // eslint-disable-line global-require
+
+	if (json) { return JSON.stringify(supportedCurrencies); }
 
 	const cryptoList = supportedCurrencies
 		.map(instrument => (instrument.instrument_name.includes('USDT')

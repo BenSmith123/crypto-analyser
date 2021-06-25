@@ -37,21 +37,15 @@ const API_ENDPOINTS = {
 };
 
 
+// manual CORS check
+function isPublicHttpRequest(headers) { return headers?.origin?.includes('cryptobot.nz'); }
+
+
 exports.discordController = async function (event) {
 
-	// return {
-	// 	statusCode: 200,
-	// 	body: JSON.stringify(event || { ben: 5 }),
-	// 	headers: {
-	// 		'Content-Type': 'application/json',
-	// 		'Access-Control-Allow-Origin': '*',
-	// 	},
-	// };
+	if (isPublicHttpRequest(event.headers)) { return publicHttpController(event); }
 
-	// if (isHttpRequest()) {
-	// 	return;
-	// }
-
+	// if not public http request, assume discord and validate discord headers
 	try {
 
 		if (!requestIsValid(event) && !BYPASS_VALIDATION) {
@@ -98,6 +92,49 @@ exports.discordController = async function (event) {
 	}
 
 };
+
+
+/**
+ * Returns the HTTP response based on the requested API endpoint
+ *
+ * @param {object} event
+ * @returns {object}
+ */
+async function publicHttpController(event) {
+
+	const requestedEndpoint = event.pathParameters.endpoint;
+
+	if (event.httpMethod !== 'GET' && event.httpMethod !== 'OPTIONS') { return returnHttpError(400, 'Invalid request method'); }
+	if (!API_ENDPOINTS[requestedEndpoint]) { throw new Error(404, 'Endpoint not found'); }
+
+	const response = await API_ENDPOINTS[requestedEndpoint]({ json: true });
+
+	return {
+		statusCode: 200,
+		body: response,
+		headers: {
+			'Content-Type': 'application/json',
+			'Access-Control-Allow-Origin': '*',
+		},
+	};
+}
+
+
+/**
+ * @param {number} statusCode - default 400
+ * @param {string} body - JSON
+ * @returns {object}
+ */
+function returnHttpError(statusCode = 400, body) {
+	return {
+		statusCode: statusCode || 400,
+		body,
+		headers: {
+			'Content-Type': 'application/json',
+			'Access-Control-Allow-Origin': '*',
+		},
+	};
+}
 
 
 /**
