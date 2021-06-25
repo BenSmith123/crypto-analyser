@@ -135,6 +135,16 @@
                 "Add orderId to all transactions",
                 "Add difference % to sell transactions"
             ]
+        },
+        {
+            "version": "3.3.0",
+            "devChanges": [
+				"Updated the discord crypto-assistant to allow cryptobot.nz to access commands (via HTTP request)"
+            ],
+            "changes": [
+				"Use closed price instead of open price when looking for spikes/dips that halt buy/sell orders",
+                "Added 4 new crypto currencies (AMP, AXS, GTC, NANO)"
+            ]
         }
     ]
 }

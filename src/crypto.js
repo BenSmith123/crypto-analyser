@@ -41,18 +41,18 @@ function signRequest(request, apiKey, apiSecret) {
 // returns true if array values are increasing or the same
 function isIncreasing(elt, i, arr) {
 	const prev = arr[i - 1]
-		? arr[i - 1].o
+		? arr[i - 1].c
 		: 0;
-	return !i || elt.o === prev || elt.o > prev;
+	return !i || elt.c === prev || elt.c > prev;
 }
 
 
 // returns true if array values are decreasing or the same
 function isDecreasing(elt, i, arr) {
 	const prev = arr[i - 1]
-		? arr[i - 1].o
+		? arr[i - 1].c
 		: 0;
-	return !i || elt.o === prev || elt.o > prev;
+	return !i || elt.c === prev || elt.c > prev;
 }
 
 
@@ -287,13 +287,13 @@ async function checkLatestValueTrend(cryptoName, checkIncrease = true) {
 
 	// compare last 3 intervals of 5mins
 	const timeframe = '5m';
-	const lookback = 3; // num of array elements to compare
+	const lookback = -3; // num of array elements to compare
 
 	const candlestick = await getCryptoCandlestick(`${cryptoName}_USDT`, timeframe);
 
 	if (!candlestick.data || !candlestick.data.length) { throw new Error(`Missing candlestick data for ${cryptoName}`); }
 
-	const latest = candlestick.data.slice(candlestick.data.length - lookback);
+	const latest = candlestick.data.slice(lookback);
 
 	return checkIncrease
 		? latest.every(isIncreasing)

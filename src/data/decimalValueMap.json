@@ -24,6 +24,12 @@
         "quantity_decimals": 2
     },
     {
+        "instrument_name": "AMP_USDT",
+        "base_currency": "AMP",
+        "price_decimals": 5,
+        "quantity_decimals": 1
+    },
+    {
         "instrument_name": "ANKR_USDT",
         "base_currency": "ANKR",
         "price_decimals": 6,
@@ -46,6 +52,12 @@
         "base_currency": "AVAX",
         "price_decimals": 3,
         "quantity_decimals": 3
+    },
+    {
+        "instrument_name": "AXS_USDT",
+        "base_currency": "AXS",
+        "price_decimals": 4,
+        "quantity_decimals": 2
     },
     {
         "instrument_name": "BAL_USDT",
@@ -198,6 +210,12 @@
         "quantity_decimals": 2
     },
     {
+        "instrument_name": "GTC_USDT",
+        "base_currency": "GTC",
+        "price_decimals": 3,
+        "quantity_decimals": 3
+    },
+    {
         "instrument_name": "HOT_USDT",
         "base_currency": "HOT",
         "price_decimals": 6,
@@ -274,6 +292,12 @@
         "base_currency": "MKR",
         "price_decimals": 2,
         "quantity_decimals": 6
+    },
+    {
+        "instrument_name": "NANO_USDT",
+        "base_currency": "NANO",
+        "price_decimals": 4,
+        "quantity_decimals": 2
     },
     {
         "instrument_name": "NEAR_USDT",
