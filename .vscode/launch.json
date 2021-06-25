@@ -16,7 +16,7 @@
             }
 		},
 		{
-			"name": "Run discord bot",
+			"name": "Run discord (from Discord)",
 			"type": "node",
 			"request": "launch",
 			"program": "${workspaceFolder}/run/local-invoke-discord.js",
@@ -24,6 +24,16 @@
 			"env": {
 				"AWS_PROFILE": "bensmith",
 				"BYPASS_VALIDATION": "true"
+            }
+		},
+		{
+			"name": "Run discord (from HTTP)",
+			"type": "node",
+			"request": "launch",
+			"program": "${workspaceFolder}/run/local-invoke-discord-https.js",
+			"internalConsoleOptions": "openOnSessionStart",
+			"env": {
+				"AWS_PROFILE": "bensmith",
             }
 		},
 		{
