@@ -4,6 +4,8 @@
  * This is set up through API gateway and can be invoked by URL or by discord commands
  *
  * API endpoint: https://csezryhvsa.execute-api.ap-southeast-2.amazonaws.com/prod
+ *
+ * Note: the above API is cross-origin restricted to cryptobot.nz and discord slash commands
  */
 
 require('dotenv').config();
