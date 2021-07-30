@@ -66,16 +66,30 @@ async function postToCryptoApi(requestBody) {
 
 	if (!requestBody || !requestBody.method) { throw new Error('Missing request body or request method'); }
 
-	const res = await axios({
-		url: API_URL + requestBody.method,
-		method: 'post',
-		data: JSON.stringify(signRequest(requestBody, API_KEY, API_SECRET)),
-		headers: {
-			'content-type': 'application/json',
-		},
-	});
+	// TEMP attempt to catch mysterious error
+	try {
+		const res = await axios({
+			url: API_URL + requestBody.method,
+			method: 'post',
+			data: JSON.stringify(signRequest(requestBody, API_KEY, API_SECRET)),
+			headers: {
+				'content-type': 'application/json',
+			},
+		});
 
-	return res.data;
+		return res.data;
+
+	} catch (err) {
+
+		const errorDetails = {
+			requestBody,
+			message: err.message,
+			stack: err.stack,
+		};
+
+		await logToDiscord(errorDetails, true);
+		throw err;
+	}
 }
 
 
