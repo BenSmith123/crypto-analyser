@@ -20,7 +20,7 @@ const helpers = require('../helpers');
 
 const discordName = 'Crypto assistant';
 
-const multipleCurrencyLimit = 12;
+const multipleCurrencyLimit = 16;
 
 const BYPASS_VALIDATION = process.env.BYPASS_VALIDATION === 'true';
 

@@ -197,10 +197,6 @@
             "description": "Toggles the logging format (normal/short)"
         },
         {
-            "name": "test",
-            "description": "Don't fuck with this plz"
-        },
-        {
             "name": "unpause",
             "description": "Unpauses your crypto bot"
         }
