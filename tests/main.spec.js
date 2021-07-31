@@ -40,16 +40,17 @@ describe('#makeCryptoCurrenciesTrades', () => {
 
 	before(() => {
 		sinon.stub(helperModule, 'logToDiscord').callsFake(overrideLogToDiscord);
-
-		sinon.stub(cryptoModule, 'getAccountSummary').returns(mockAccount);
 		sinon.stub(cryptoModule, 'checkLatestValueTrend').returns(false);
 		sinon.stub(cryptoModule, 'placeSellOrder').returns({ result: { order_id: '078340' } });
 		sinon.stub(cryptoModule, 'placeBuyOrder').returns({ result: { order_id: '0232236' } });
 	});
 
+
 	afterEach(() => {
 		if (stubs.getAllCryptoValues) stubs.getAllCryptoValues.restore();
 		if (stubs.processPlacedOrder) stubs.processPlacedOrder.restore();
+
+		if (stubs.getAccountSummary) stubs.getAccountSummary.restore();
 	});
 
 	after(() => {
@@ -65,6 +66,7 @@ describe('#makeCryptoCurrenciesTrades', () => {
 				DOGE: { bestBid: 0.345, bestAsk: 0.345 },
 			};
 
+			stubs.getAccountSummary = sinon.stub(cryptoModule, 'getAccountSummary').returns(mockAccount);
 			stubs.getAllCryptoValues = sinon.stub(cryptoModule, 'getAllCryptoValues').returns(mockCryptoValue);
 
 			const index = rewire('../src/index');
@@ -91,6 +93,7 @@ describe('#makeCryptoCurrenciesTrades', () => {
 				DOGE: { bestBid: 0.4, bestAsk: 0.3 },
 			};
 
+			stubs.getAccountSummary = sinon.stub(cryptoModule, 'getAccountSummary').returns(mockAccount);
 			stubs.getAllCryptoValues = sinon.stub(cryptoModule, 'getAllCryptoValues').returns(mockCryptoValue);
 			stubs.processPlacedOrder = sinon.stub(cryptoModule, 'processPlacedOrder').returns(12.4);
 
@@ -156,6 +159,7 @@ describe('#makeCryptoCurrenciesTrades', () => {
 
 			const sellPrice = 0.25;
 
+			stubs.getAccountSummary = sinon.stub(cryptoModule, 'getAccountSummary').returns(mockAccount);
 			stubs.getAllCryptoValues = sinon.stub(cryptoModule, 'getAllCryptoValues').returns(mockCryptoValue);
 			stubs.processPlacedOrder = sinon.stub(cryptoModule, 'processPlacedOrder').returns(sellPrice);
 
@@ -222,6 +226,7 @@ describe('#makeCryptoCurrenciesTrades', () => {
 				DOGE: { bestBid: 0.4, bestAsk: 0.3 },
 			};
 
+			stubs.getAccountSummary = sinon.stub(cryptoModule, 'getAccountSummary').returns(mockAccount);
 			stubs.getAllCryptoValues = sinon.stub(cryptoModule, 'getAllCryptoValues').returns(mockCryptoValue);
 			stubs.processPlacedOrder = sinon.stub(cryptoModule, 'processPlacedOrder').returns(12.4);
 
@@ -275,6 +280,41 @@ describe('#makeCryptoCurrenciesTrades', () => {
 	});
 
 
+	describe('Feature: Attempt BUY order with no funds', () => {
+
+		before(async () => {
+
+			const mockCryptoValue = {
+				DOGE: { bestBid: 0.4, bestAsk: 0.3 },
+			};
+
+			const accountMock = {
+				USDT: { balance: 0.85, available: 0.85, currency: 'USDT' },
+			};
+
+			stubs.getAccountSummary = sinon.stub(cryptoModule, 'getAccountSummary').returns(accountMock);
+			stubs.getAllCryptoValues = sinon.stub(cryptoModule, 'getAllCryptoValues').returns(mockCryptoValue);
+			stubs.processPlacedOrder = sinon.stub(cryptoModule, 'processPlacedOrder').returns(12.4);
+
+			const index = rewire('../src/index');
+			makeCryptoCurrenciesTrades = index.__get__('makeCryptoCurrenciesTrades');
+		});
+
+		it('should have the same configuration and have made no transactions', async () => {
+
+			const inputConfig = require('./database-config-mock/buy-initial.json');
+
+			const { config, ordersPlaced } = await makeCryptoCurrenciesTrades(inputConfig);
+
+			assert.deepEqual(config, inputConfig, 'config should be exactly the same as no transactions were made');
+
+			assert.equal(ordersPlaced.length, 0);
+
+		});
+
+	});
+
+
 	describe('Feature: Standard BUY order (-10% of lastSellPrice)', () => {
 
 		before(async () => {
@@ -285,6 +325,7 @@ describe('#makeCryptoCurrenciesTrades', () => {
 
 			const sellPrice = 91.5;
 
+			stubs.getAccountSummary = sinon.stub(cryptoModule, 'getAccountSummary').returns(mockAccount);
 			stubs.getAllCryptoValues = sinon.stub(cryptoModule, 'getAllCryptoValues').returns(mockCryptoValue);
 			stubs.processPlacedOrder = sinon.stub(cryptoModule, 'processPlacedOrder').returns(sellPrice);
 
