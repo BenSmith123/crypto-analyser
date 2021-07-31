@@ -178,6 +178,11 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 		// check for BUY condition
 		if (cryptoRecord.lastSellPrice || forceBuy) {
 
+			if (!canBuy || amountUSDT < 1) {
+				log(`${cryptoName} - No available USDT, skipping`);
+				continue;
+			}
+
 			if (limitUSDT > availableUSDT) {
 				log(`[Warning] You do not have enough USDT funds ($${availableUSDT}) to meet the specified limit for ${cryptoName} ($${limitUSDT}), all available funds will be used in a buy scenario`);
 			}
