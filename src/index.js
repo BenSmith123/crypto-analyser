@@ -80,6 +80,9 @@ exports.main = async function (event, mockFunctions = null) {
 
 		// generic unexpected error scenario - log, update database config to paused, end lambda
 
+		const runtimeLogs = getLogs();
+		await logToDiscord(runtimeLogs.join('\n'));
+
 		// await log to ensure lambda doesn't terminate before log is properly sent
 		await logToDiscord(`An unexpected error has occurred: ${err.message}\n\nDate: ${moment(Date.now()).format(DATETIME_FORMAT)}\n\nStack: ${err.stack}`, true);
 
@@ -284,6 +287,14 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 
 		// otherwise, crypto value is up but not consistently, sell!
 		const availableCrypto = round(account[cryptoName].available, cryptoName);
+
+		if (availableCrypto <= 0) {
+			log(`Attempted to sell ${cryptoName} yet there isn't any available`); // TODO - figure out if this scenario is a:
+			// rounding error,
+			// caused by multiple sells of the same order
+			// OR from the user selling it and the bot not being aware
+			continue;
+		}
 
 		const order = await placeSellOrder(cryptoName, availableCrypto);
 
