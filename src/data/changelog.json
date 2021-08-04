@@ -145,6 +145,16 @@
 				"Use closed price instead of open price when looking for spikes/dips that halt buy/sell orders",
                 "Added 4 new crypto currencies (AMP, AXS, GTC, NANO)"
             ]
+        },
+        {
+            "version": "3.3.1",
+            "devChanges": [
+				"Ensure transaction data is stored in the database before moving on and analysing another crypto"
+            ],
+            "changes": [
+                "Fix attempting to place orders with no available crypto or USDT (no longer pauses the bot)",
+                "Added 9 new crypto currencies (BOSON, ETC, FET, IQ, KEEP, LUNA, PENDLE, SC, SLP)"
+            ]
         }
     ]
 }

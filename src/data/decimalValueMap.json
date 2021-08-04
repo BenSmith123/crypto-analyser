@@ -90,6 +90,12 @@
         "quantity_decimals": 3
     },
     {
+        "instrument_name": "BOSON_USDT",
+        "base_currency": "BOSON",
+        "price_decimals": 4,
+        "quantity_decimals": 2
+    },
+    {
         "instrument_name": "BTC_USDT",
         "base_currency": "BTC",
         "price_decimals": 2,
@@ -180,10 +186,22 @@
         "quantity_decimals": 2
     },
     {
+        "instrument_name": "ETC_USDT",
+        "base_currency": "ETC",
+        "price_decimals": 3,
+        "quantity_decimals": 3
+    },
+    {
         "instrument_name": "ETH_USDT",
         "base_currency": "ETH",
         "price_decimals": 2,
         "quantity_decimals": 5
+    },
+    {
+        "instrument_name": "FET_USDT",
+        "base_currency": "FET",
+        "price_decimals": 5,
+        "quantity_decimals": 1
     },
     {
         "instrument_name": "FIL_USDT",
@@ -234,10 +252,22 @@
         "quantity_decimals": 3
     },
     {
+        "instrument_name": "IQ_USDT",
+        "base_currency": "IQ",
+        "price_decimals": 6,
+        "quantity_decimals": 0
+    },
+    {
         "instrument_name": "KAVA_USDT",
         "base_currency": "KAVA",
         "price_decimals": 4,
         "quantity_decimals": 2
+    },
+    {
+        "instrument_name": "KEEP_USDT",
+        "base_currency": "KEEP",
+        "price_decimals": 5,
+        "quantity_decimals": 1
     },
     {
         "instrument_name": "KNC_USDT",
@@ -268,6 +298,12 @@
         "base_currency": "LTC",
         "price_decimals": 2,
         "quantity_decimals": 5
+    },
+    {
+        "instrument_name": "LUNA_USDT",
+        "base_currency": "LUNA",
+        "price_decimals": 4,
+        "quantity_decimals": 2
     },
     {
         "instrument_name": "MANA_USDT",
@@ -354,6 +390,12 @@
         "quantity_decimals": 5
     },
     {
+        "instrument_name": "PENDLE_USDT",
+        "base_currency": "PENDLE",
+        "price_decimals": 5,
+        "quantity_decimals": 1
+    },
+    {
         "instrument_name": "QTUM_USDT",
         "base_currency": "QTUM",
         "price_decimals": 4,
@@ -396,6 +438,12 @@
         "quantity_decimals": 2
     },
     {
+        "instrument_name": "SC_USDT",
+        "base_currency": "SC",
+        "price_decimals": 6,
+        "quantity_decimals": 0
+    },
+    {
         "instrument_name": "SHIB_USDT",
         "base_currency": "SHIB",
         "price_decimals": 9,
@@ -406,6 +454,12 @@
         "base_currency": "SKL",
         "price_decimals": 5,
         "quantity_decimals": 2
+    },
+    {
+        "instrument_name": "SLP_USDT",
+        "base_currency": "SLP",
+        "price_decimals": 5,
+        "quantity_decimals": 1
     },
     {
         "instrument_name": "SNX_USDT",
