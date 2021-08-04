@@ -224,13 +224,12 @@ async function processPlacedOrder(orderId, secondAttempt = false) {
 	const orderIsFilled = order.result?.order_info?.status === 'FILLED' || false;
 
 	if (orderIsFilled) {
-		// TODO - should this be awaited or can it be done async
-		saveTransaction(order.result);
+		await saveTransaction(order.result);
 		return order.result.order_info.avg_price;
 	}
 
 	if (secondAttempt) {
-		saveTransaction(order.result); // same here ^
+		await saveTransaction(order.result);
 		logToDiscord(`Order was placed but not filled - no confirmed value (orderId=${orderId})`, true);
 		return null;
 	}
