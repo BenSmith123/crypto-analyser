@@ -80,9 +80,6 @@ exports.main = async function (event, mockFunctions = null) {
 
 		// generic unexpected error scenario - log, update database config to paused, end lambda
 
-		const runtimeLogs = getLogs();
-		await logToDiscord(runtimeLogs.join('\n'));
-
 		// await log to ensure lambda doesn't terminate before log is properly sent
 		await logToDiscord(`An unexpected error has occurred: ${err.message}\n\nDate: ${moment(Date.now()).format(DATETIME_FORMAT)}\n\nStack: ${err.stack}`, true);
 
@@ -97,11 +94,8 @@ exports.main = async function (event, mockFunctions = null) {
 		const runtimeLogs = getLogs();
 
 		if (runtimeLogs.length) {
-			if (CONSOLE_LOG) {
-				console.log(runtimeLogs);
-			} else {
-				await logToDiscord(runtimeLogs.join('\n'));
-			}
+			if (CONSOLE_LOG) { console.log(runtimeLogs); }
+			await logToDiscord(runtimeLogs.join('\n'));
 		}
 	}
 
