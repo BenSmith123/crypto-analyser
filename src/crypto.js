@@ -229,6 +229,12 @@ async function processPlacedOrder(orderId, secondAttempt = false) {
 	}
 
 	if (secondAttempt) {
+
+		if (!order || !order.result) {
+			logToDiscord(`Order placed but was not found (orderId=${orderId})\nTransaction not saved`, true);
+			return null;
+		}
+
 		await saveTransaction(order.result);
 		logToDiscord(`Order was placed but not filled - no confirmed value (orderId=${orderId})`, true);
 		return null;
