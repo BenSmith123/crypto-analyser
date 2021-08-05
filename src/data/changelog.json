@@ -155,6 +155,14 @@
                 "Fix attempting to place orders with no available crypto or USDT (no longer pauses the bot)",
                 "Added 9 new crypto currencies (BOSON, ETC, FET, IQ, KEEP, LUNA, PENDLE, SC, SLP)"
             ]
+        },
+        {
+            "version": "3.3.2",
+            "changes": [
+				"Fix transaction logs not appearing in discord when bot crashes",
+				"Fix bot crashing when crypto API doesn't respond with transaction details",
+				"Added error message log in error scenarios"
+            ]
         }
     ]
 }
