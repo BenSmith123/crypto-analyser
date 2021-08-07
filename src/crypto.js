@@ -217,7 +217,7 @@ async function processPlacedOrder(orderId, secondAttempt = false) {
 		return null;
 	}
 
-	await timeout(1000);
+	await timeout(secondAttempt ? 1000 : 2000);
 
 	const order = await getOrderDetail(orderId);
 
@@ -230,13 +230,13 @@ async function processPlacedOrder(orderId, secondAttempt = false) {
 
 	if (secondAttempt) {
 
-		if (!order || !order.result) {
-			logToDiscord(`Order placed but was not found (orderId=${orderId})\nTransaction not saved`, true);
+		if (!order || !order.result || !Object.keys(order.result)) {
+			logToDiscord(`Order placed but was not found [Order ID: ${orderId})\nTransaction not saved`, true);
 			return null;
 		}
 
 		await saveTransaction(order.result);
-		logToDiscord(`Order was placed but not filled - no confirmed value (orderId=${orderId})`, true);
+		logToDiscord(`Order was placed but not filled - no confirmed value [Order ID: ${orderId}]`, true);
 		return null;
 	}
 
