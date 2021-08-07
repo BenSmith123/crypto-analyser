@@ -205,6 +205,8 @@ async function getOrderDetail(orderId) {
  *     if order is still not filled, store in database anyway,
  *     return null
  *
+ * TODO
+ *
  * @param {string} orderId
  * @param {boolean} [attempt] - don't repeat if on second attempt
  * @returns {object|null}
