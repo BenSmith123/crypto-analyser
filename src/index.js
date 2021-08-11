@@ -1,10 +1,10 @@
 
 const moment = require('moment-timezone');
 
-const { INTERNAL_RUN, CONSOLE_LOG, DATETIME_FORMAT } = require('./environment');
+const { CONSOLE_LOG, DATETIME_FORMAT } = require('./environment');
 const { investmentConfigIsValid, updateConfigRecord } = require('./database');
-let { loadInvestmentConfig, updateInvestmentConfig } = require('./database');
-let { getAccountSummary, getAllCryptoValues, checkLatestValueTrend, placeBuyOrder, placeSellOrder, processPlacedOrder } = require('./crypto');
+const { loadInvestmentConfig, updateInvestmentConfig } = require('./database');
+const { getAccountSummary, getAllCryptoValues, checkLatestValueTrend, placeBuyOrder, placeSellOrder, processPlacedOrder } = require('./crypto');
 const { calculatePercDiff, round, formatOrder, formatPriceLog, logToDiscord } = require('./helpers');
 const { log, getLogs } = require('./logging');
 
@@ -15,10 +15,9 @@ const { log, getLogs } = require('./logging');
  * Lambda handler function!
  *
  * @param {object} event - AWS Lambda function event
- * @param {object} [mockFunctions=null] - optional, used for debugging/analysis in INTERNAL_RUN mode
  * @returns
  */
-exports.main = async function (event, mockFunctions = null) {
+exports.main = async function (event) {
 
 	// Scheduled job (CloudWatch)
 	if (!isScheduledEvent(event)) {
@@ -28,21 +27,6 @@ exports.main = async function (event, mockFunctions = null) {
 
 		// terminate the lambda function if it wasn't invoked by a scheduled job (CloudWatch)
 		return 'Nothing to see here :)';
-	}
-
-
-	if (INTERNAL_RUN) {
-		// replace the functions that get external data with mock functions
-		if (!mockFunctions) { throw new Error('INTERNAL_RUN mode is true but no mock functions passed in'); }
-
-		loadInvestmentConfig = mockFunctions.loadInvestmentConfig;
-		getAccountSummary = mockFunctions.getAccountSummary;
-		updateInvestmentConfig = mockFunctions.updateInvestmentConfig;
-		getAllCryptoValues = mockFunctions.getAllCryptoValues;
-		placeBuyOrder = () => {}; // TODO - replace with mock
-		placeSellOrder = () => {}; // TODO - replace with mock
-		processPlacedOrder = () => {};
-		checkLatestValueTrend = () => false;
 	}
 
 	const investmentConfig = await loadInvestmentConfig();

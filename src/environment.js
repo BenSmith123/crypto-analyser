@@ -26,9 +26,6 @@ const TRANSACTIONS_ENABLED = (!process.env.TRANSACTIONS_ENABLED || process.env.T
 
 const CONSOLE_LOG = process.env.CONSOLE_LOG === 'true' || false;
 
-// in internal run mode no external calls are made (to the database or crypto API)
-const INTERNAL_RUN = process.env.INTERNAL_RUN === 'true' || false;
-
 module.exports = {
 	API_URL,
 	API_KEY,
@@ -41,5 +38,4 @@ module.exports = {
 	// debug stuff
 	TRANSACTIONS_ENABLED,
 	CONSOLE_LOG,
-	INTERNAL_RUN,
 };
