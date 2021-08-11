@@ -22,7 +22,6 @@ const announcement = `Bot upgraded to ${version}
 
 async function logToDiscord(message) {
 
-
 	if (!message) { throw new Error('No message content'); }
 
 	const data = {
@@ -31,7 +30,7 @@ async function logToDiscord(message) {
 	};
 
 	const params = {
-		url: 'https://discord.com/api/webhooks/849967012062691328/qDd3tsk0-DSD4_FmcZGByWC0XT5w3fMqBD-8ezflXQqpF8Yj38ZAMCH_8pGk3_vL8aEj',
+		url: 'https://discord.com/api/webhooks/',
 		method: 'POST',
 		data,
 		headers: {

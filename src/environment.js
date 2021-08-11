@@ -14,11 +14,11 @@ const API_URL = process.env.API_URL || 'https://api.crypto.com/v2/';
 // enable discord logs by default if not specified
 const DISCORD_ENABLED = (!process.env.DISCORD_ENABLED || process.env.DISCORD_ENABLED === 'true');
 
-const discordApi = 'https://discord.com/api/webhooks';
+// const discordApi = 'https://discord.com/api/webhooks';
 
 // default log to my channels
-const DISCORD_URL_ALERTS = process.env.DISCORD_URL_ALERTS || `${discordApi}/834201420302647306/3UyU72vcsRwstQmYjiMxb-5d7YSIDNDu1QWz2vMg_Y5nQsP5X05vgMr-PvYqma15MinZ`;
-const DISCORD_URL_LOGS = process.env.DISCORD_URL_LOGS || `${discordApi}/834182612419346432/0cvHHmrCE0tXAGmzr_l4RgGvEl7LhVgd4cej0g_rOjSrhcKcEjoyAYkRIh-lJHa0FnPy`;
+const { DISCORD_URL_ALERTS } = process.env;
+const { DISCORD_URL_LOGS } = process.env;
 // TODO ^ should this be moved to database config instead?
 
 // transactions enabled if not specified
