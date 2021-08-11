@@ -52,7 +52,15 @@
         },
 		{
             "name": "configuration",
-            "description": "Displays your current crypto-analyser bot configuration"
+            "description": "Displays your bot configuration - specify a crypto currency for details",
+			"options": [
+				{
+					"name": "code",
+					"description": "e.g. 'BTC'",
+					"type": 3,
+					"required": false
+				}
+			]
         },
         {
             "name": "force-buy",

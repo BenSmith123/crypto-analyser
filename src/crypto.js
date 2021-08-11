@@ -81,6 +81,7 @@ async function postToCryptoApi(requestBody) {
 
 	} catch (err) {
 
+		// TODO - should this be removed now?
 		const errorDetails = {
 			requestBody,
 			message: err.message,
@@ -113,7 +114,7 @@ async function getCryptoValue(instrumentName) {
 /**
  * Returns the crypto API account summary
  *
- * @param {string} currency - optional (default will return all crypto)
+ * @param {string} [currency] - optional (default will return all crypto)
  * @returns {object} - structured object by currency name e.g. { CRO: { balance: 0 } }
  */
 async function getAccountSummary(currency) {
@@ -175,8 +176,8 @@ async function getOrderHistory() {
 /**
  * Returns the crypto API account summary
  *
- * @param {string} currency - optional (default will return all crypto)
- * @returns {object} - structured object by currency name e.g. { CRO: { balance: 0 } }
+ * @param {string} orderId
+ * @returns {object}
  */
 async function getOrderDetail(orderId) {
 
@@ -204,11 +205,13 @@ async function getOrderDetail(orderId) {
  *     if order is still not filled, store in database anyway,
  *     return null
  *
+ * TODO
+ *
  * @param {string} orderId
- * @param {boolean} secondAttempt - don't repeat if on second attempt
+ * @param {boolean} [attempt] - don't repeat if on second attempt
  * @returns {object|null}
  */
-async function processPlacedOrder(orderId, secondAttempt = false) {
+async function processPlacedOrder(orderId, attempt = 0) {
 
 	if (!TRANSACTIONS_ENABLED) { return null; }
 
@@ -217,7 +220,7 @@ async function processPlacedOrder(orderId, secondAttempt = false) {
 		return null;
 	}
 
-	await timeout(secondAttempt ? 1000 : 2000);
+	await timeout(attempt ? 100 : 500);
 
 	const order = await getOrderDetail(orderId);
 
@@ -228,19 +231,25 @@ async function processPlacedOrder(orderId, secondAttempt = false) {
 		return order.result.order_info.avg_price;
 	}
 
-	if (secondAttempt) {
+	// if not first attempt
+	if (attempt) {
 
-		if (!order || !order.result || !Object.keys(order.result)) {
-			logToDiscord(`Order placed but was not found [Order ID: ${orderId})\nTransaction not saved`, true);
+		// after first attempt try one more time
+		if (attempt === 1) {
+			return processPlacedOrder(orderId, 2);
+		}
+
+		if (!order || !order.result || !Object.keys(order.result).length) {
+			logToDiscord(`Order placed but was not found [order ID: ${orderId}]\nTransaction not saved`, true);
 			return null;
 		}
 
 		await saveTransaction(order.result);
-		logToDiscord(`Order was placed but not filled - no confirmed value [Order ID: ${orderId}]`, true);
+		logToDiscord(`Order was placed but not filled - no confirmed value [order ID: ${orderId}]`, true);
 		return null;
 	}
 
-	return processPlacedOrder(orderId, true);
+	return processPlacedOrder(orderId, 1);
 }
 
 
@@ -379,7 +388,7 @@ async function placeSellOrder(cryptoName, amount) {
 module.exports = {
 	getAccountSummary,
 	getOrderHistory,
-	// getOrderDetail,
+	getOrderDetail,
 	processPlacedOrder,
 	// getCryptoValue, - export if needed
 	getAllCryptoValues,

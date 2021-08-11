@@ -152,18 +152,31 @@ async function logToDiscord(msg) {
 /**
  * Returns the user database configuration as formatted JSON
  */
-async function getConfigurationResponse({ userId }) {
+async function getConfigurationResponse({ userId, body }) {
+
 	const config = await getUserConfiguration(userId);
 
-	const filteredConfig = {
-		ID: config.id,
-		currencies: config.currenciesTargeted,
-		isPaused: config.isPaused,
-		records: config.records,
-		options: config.options,
-	};
+	let cryptoCode;
 
-	return JSON.stringify(filteredConfig, null, 4).replace(/"|,/g, '');
+	if (body.data?.options) {
+		cryptoCode = body.data?.options[0];
+
+		if (!config.records[cryptoCode]) {
+			return `Bot has no record of ${cryptoCode}`;
+		}
+	}
+
+	const configResponse = cryptoCode
+		? { record: config.records[cryptoCode] }
+		: {
+			ID: config.id,
+			currencies: config.currenciesTargeted,
+			isPaused: config.isPaused,
+			records: config.records,
+			options: config.options,
+		};
+
+	return JSON.stringify(configResponse, null, 4).replace(/"|,/g, '');
 }
 
 
