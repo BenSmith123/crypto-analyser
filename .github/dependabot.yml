@@ -1,0 +1,13 @@
+
+# Configuration options:
+# https://help.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
+
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    target-branch: "master"
+    schedule:
+      interval: "monthly"
+    reviewers:
+      - "BenSmith123"

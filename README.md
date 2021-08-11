@@ -1,9 +1,27 @@
 
+# crypto-analyser
+
+## Description
+
+### crypto-bot
+- AWS Lambda function crypto-bot code (per user) running on scheduled jobs every 15 minutes.
+- The crypto-bot uses the Crypto.com exchange API to monitor and trade cryptocurrency based on a users configuration.
+- To use this bot a user must have a Crypto.com exchange account.
+
+### crypto-assistant (discord-api)
+- A seperate lambda function API (exposed via API gateway) for updating user crypto-bot configuration
+code and can be found in the `/src/discord-api/` folder. This is known as the 'Crypto Assistant' and is 
+currently accessable via Discord slash commands.
+- This API is also used to service the `cryptobot.nz` website.
+- NOTE: This API shares functionality with the crypto-bot code but does not contain any keys and has no
+access to any users Crypto.com accounts.
+
+
 ### TODO
 - Automation test scenarios mocking a spike and not selling - use this to test newly added RSI
-- Remove the INTERNAL_RUN stuff and replace code with test framework
-- Remove the prod code changes to mock functions ^
+- Incorporate RSI, volume etc. - still to discuss whether or not this is useful
 - Add number of transactions? & initial date etc.
+- Re-implement the local-analyser.js code in a test/mock framework
 - Don't pause the bot on every error - if crypto.com is down, let bot keep running rather than everyone having to unpause manually
 - AUTOMATION TEST! 
 	- Heaps of errors on the v3 release on the crypto-assistant, lots could've been caught
@@ -13,7 +31,6 @@
 	- Lists the commands/has screenshots
 	- Has all logic documented
 	- Includes changelog
-- Incorporate RSI, volume etc.
 - Convert all outputs from USDT to NZD estimates
 - Crypto assistant audit logs - daily/weekly updates on no. of transactions, all filled, money moved etc.
 - More coin options:
@@ -23,7 +40,6 @@
 - ^ might not be useful if everyone can already see it in their wallet
 - Auto limit sell order or stop loss?
 - Implement paused 'reason' - Error, manually, bot update etc.
-- Pause crypto currencies individually?
 - Icon or emoji for discord bot
 
 
@@ -44,6 +60,11 @@
 - Add their lambda function name to the `deploy-all.sh` for their function to be included in code roll-outs
 
 ### Commands
+- `npm start`
+
+- `npm test`
+	- Mocha run all tests
+
 - `update-currency-map`
 	- See `scripts/updateDecimalValueMap.js` description
 
@@ -59,9 +80,6 @@
 - `npm run configure <lambda-name>`
 	- Configures a lambda function with the default settings (timeout, env vars, handler, role etc.)
 	- NOTE: This clears any existing environment variables
-
-### Reminders
-- It's safe to make this repo public when you need, keys and temp data aren't committed!
 
 ### Resources
 - Discord announcements channel: https://discord.com/api/webhooks/839816114094866463/UYjXAY_evzfnCKohuFNNFnG7IOQlNhigZKvaCZ0juPz0HZSD7MtCptGcVIj1kOhMl7z2
