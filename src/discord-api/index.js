@@ -158,8 +158,8 @@ async function getConfigurationResponse({ userId, body }) {
 
 	let cryptoCode;
 
-	if (body.data?.options) {
-		cryptoCode = body.data?.options[0];
+	if (body.options) {
+		cryptoCode = body.options[0].value;
 
 		if (!config.records[cryptoCode]) {
 			return `Bot has no record of ${cryptoCode}`;
@@ -167,13 +167,14 @@ async function getConfigurationResponse({ userId, body }) {
 	}
 
 	const configResponse = cryptoCode
-		? { record: config.records[cryptoCode] }
+		? config.records[cryptoCode]
 		: {
 			ID: config.id,
 			currencies: config.currenciesTargeted,
 			isPaused: config.isPaused,
-			records: config.records,
 			options: config.options,
+			// skip records as they can now be requested seperately
+			// records: config.records
 		};
 
 	return JSON.stringify(configResponse, null, 4).replace(/"|,/g, '');
