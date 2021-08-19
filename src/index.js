@@ -150,7 +150,7 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 
 		if (!initialBuy && !cryptoRecord.lastSellPrice && !cryptoRecord.lastBuyPrice) {
 			// if price then log and skip to the next crypto
-			logToDiscord(`${cryptoName} database record has no last sell or last buy price`, true);
+			log(`${cryptoName} - Error: no last sell or last buy price`);
 			continue;
 		}
 
@@ -167,7 +167,7 @@ async function makeCryptoCurrenciesTrades(investmentConfig) {
 			}
 
 			if (limitUSDT > availableUSDT) {
-				log(`[Warning] You do not have enough USDT funds ($${availableUSDT}) to meet the specified limit for ${cryptoName} ($${limitUSDT}), all available funds will be used in a buy scenario`);
+				log(`${cryptoName} - Insufficient USDT funds ($${availableUSDT}) to meet the specified limit ($${limitUSDT}), all available funds will be used`);
 			}
 
 			let percentageDiff;
