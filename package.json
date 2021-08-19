@@ -1,6 +1,6 @@
 {
   "name": "crypto-analyser",
-  "version": "3.3.2x",
+  "version": "3.3.2",
   "description": "",
   "main": "src/index.js",
   "scripts": {
