@@ -15,13 +15,14 @@
 const { getOrderDetail } = require('../src/crypto');
 const { saveTransaction } = require('../src/database');
 
+process.env.DISCORD_ENABLED = false;
 
 /// UPDATE ME ///
 process.env.API_KEY = '';
 process.env.API_SECRET = '';
 
 const ordersToSave = [
-	'1690510435207149122',
+	'',
 ];
 /// ///////// ///
 
@@ -36,15 +37,20 @@ const ordersToSave = [
 
 		// don't bother stacking the promises just to make debugging easier
 		for (let i = 0; i < ordersToSave.length; i++) {
+
 			const orderId = ordersToSave[i];
 			const order = await getOrderDetail(orderId);
 
-			if (!order || !order.result || !Object.keys(order.result).length) {
+			if (!order || !order.result) {
 				console.log(`Error: Order ${orderId} not found`);
-			}
 
-			await saveTransaction(order);
-			console.log(`Order ${orderId} saved`);
+			} else if (!Object.keys(order.result).length) {
+				console.log(`Error: Try again.. ${orderId}`);
+
+			} else {
+				await saveTransaction(order.result);
+				console.log(`Order ${orderId} saved`);
+			}
 		}
 
 		console.log('Done! :)');
