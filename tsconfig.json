@@ -1,0 +1,18 @@
+{
+	"include": [
+		"package.json",
+		"src/*.ts",
+		"src/web-api/*.ts"
+	],
+	"compilerOptions": {
+		"noImplicitAny": true,
+		"outDir": "dist",
+		"module": "es6",
+		"target": "es6",
+		"resolveJsonModule": false,
+		"moduleResolution": "node",
+		"lib": [
+			"es2020",
+		]
+	}
+}

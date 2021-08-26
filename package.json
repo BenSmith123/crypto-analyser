@@ -5,22 +5,29 @@
   "main": "src/index.js",
   "scripts": {
     "start": "AWS_PROFILE=bensmith node src/index.js",
-	"test": "TRANSACTIONS_ENABLED=false USER_ID=409274228794458113 mocha ./tests/*.spec.* --no-timeouts",
+    "test": "TRANSACTIONS_ENABLED=false USER_ID=409274228794458113 mocha ./tests/*.spec.* --no-timeouts",
     "update-currency-map": "node scripts/updateDecimalValueMap.js",
     "deploy": "sh scripts/zip.sh && sh scripts/deploy.sh && sh scripts/cleanup.sh",
     "deploy-all": "sh scripts/zip.sh && sh scripts/deploy-all.sh && sh scripts/cleanup.sh",
     "deploy-discord": "sh scripts/zip.sh && sh scripts/deploy-discord.sh && sh scripts/cleanup.sh",
+    "deploy-web-api": "sh scripts/build.sh && sh scripts/deploy-web-api.sh && sh scripts/cleanup.sh",
     "configure": "sh scripts/configureEnvironment.sh"
   },
   "dependencies": {
     "axios": "^0.21.1",
+    "body-parser": "^1.19.0",
     "crypto-js": "^4.1.1",
     "dotenv": "^8.6.0",
+    "express": "^4.17.1",
     "moment-timezone": "^0.5.33",
+    "serverless-http": "^2.7.0",
     "technicalindicators": "^3.1.0",
     "tweetnacl": "^1.0.3"
   },
   "devDependencies": {
+    "@types/node": "^16.7.2",
+    "@typescript-eslint/eslint-plugin": "^4.29.3",
+    "@typescript-eslint/parser": "^4.29.3",
     "aws-sdk": "^2.958.0",
     "chai": "^4.3.4",
     "eslint": "^7.32.0",
@@ -29,7 +36,8 @@
     "eslint-plugin-import": "^2.23.4",
     "mocha": "^9.0.3",
     "rewire": "^5.0.0",
-    "sinon": "^11.1.2"
+    "sinon": "^11.1.2",
+    "typescript": "^4.3.5"
   },
   "repository": {
     "type": "git",
