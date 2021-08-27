@@ -5,8 +5,6 @@ const moment = require('moment-timezone');
 const { writeFileSync } = require('fs');
 const { DISCORD_ENABLED, DISCORD_URL_ALERTS, DISCORD_URL_LOGS, DATETIME_FORMAT } = require('./environment');
 
-const { version } = require('../package.json');
-
 const decimalValueMap = require('./data/decimalValueMap.json');
 
 moment.tz.setDefault('Pacific/Auckland');
@@ -153,7 +151,7 @@ async function logToDiscord(message, isAlert = false, username) {
 		: DISCORD_URL_LOGS;
 
 	const data = {
-		username: username || `Analyser v${version}`,
+		username: username || 'Analyser v3.4.0',
 		content: message,
 	};
 
