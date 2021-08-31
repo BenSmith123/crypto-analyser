@@ -12,7 +12,7 @@ const url = require('url');
 
 const PORT = 3000;
 
-const lambda = require('../dist/index');
+const lambda = require('../dist/web-api/index');
 
 http.createServer(async (req, res) => {
 

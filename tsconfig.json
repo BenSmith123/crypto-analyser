@@ -12,6 +12,7 @@
 		"removeComments": true,
 		"resolveJsonModule": true,
 		"moduleResolution": "node",
+    	"sourceMap": true,
 		"lib": [
 			"es2020",
 		],
