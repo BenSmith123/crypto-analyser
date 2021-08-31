@@ -1,6 +1,6 @@
 
 # typescript compile code to /dist folder
-echo -n "Compiling typescript files";
+echo "Compiling typescript files";
 tsc
 
 echo "Installing packages";
