@@ -10,7 +10,7 @@ const url = require('url');
  * this invokes the lambda function based on an incoming request.
  */
 
-const PORT = 3000;
+const PORT = 8081;
 
 const lambda = require('../dist/web-api/index');
 

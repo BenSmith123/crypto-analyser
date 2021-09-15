@@ -6,7 +6,7 @@
 		"allowJs": true,
 		"outDir": "dist",
 		"rootDir": "src",
-		"module": "es6",
+		"module": "commonjs",
 		"target": "es6",
 		"noImplicitAny": true,
 		"removeComments": true,
