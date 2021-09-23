@@ -4,8 +4,7 @@ const { CognitoIdentityServiceProvider } = require('aws-sdk'); // lambda runtime
 
 const cognito = new CognitoIdentityServiceProvider({ region: 'ap-southeast-2' });
 
-// eslint-disable-next-line import/prefer-default-export
-export const getUserSession = async (AccessToken: string): Promise<Record<string, string>> => {
+export default async (AccessToken: string): Promise<Record<string, string>> => {
 	try {
 		return await cognito.getUser({ AccessToken }).promise();
 	} catch (err) {

@@ -8,11 +8,16 @@
  * Note: the above API is cross-origin restricted to cryptobot.nz
  */
 
+
+import * as express from 'express';
+import { UserConfiguration } from './types';
+import getUserSession from './user';
+
 const serverless = require('serverless-http');
 const bodyParser = require('body-parser');
-const express = require('express');
 
-const { getUserConfiguration } = require('../database');
+const userDiscordMap = require('./user-discord-map');
+const { loadInvestmentConfig } = require('../database');
 
 
 const app = express();
@@ -20,40 +25,54 @@ const app = express();
 app.use(bodyParser.json({ strict: false }));
 
 
-app.get('/', (req: any, res: any) => {
-	console.log('request came in');
-	return res.send('Hello World!');
-});
+app.get('/', (req: express.Request, res: express.Response) => res.send('Hello World!'));
 
-app.get('/changelog', (req: any, res: any) => {
+app.get('/changelog', (req: express.Request, res: express.Response) => {
 	const changelog = require('../data/changelog.json'); // eslint-disable-line global-require
 	return res.json(changelog);
 });
 
-app.get('/commands', (req: any, res: any) => {
+app.get('/commands', (req: express.Request, res: express.Response) => {
 	const commands = require('../data/discordCommands.json'); // eslint-disable-line global-require
 	return res.json(commands);
 });
 
-app.get('/available-crypto', (req: any, res: any) => {
+app.get('/available-crypto', (req: express.Request, res: express.Response) => {
 	const supportedCurrencies = require('../data/decimalValueMap.json'); // eslint-disable-line global-require
 	return res.json(supportedCurrencies);
 });
 
-app.get('/user/configuration', (req: any, res: any) => {
+app.get('/user/configuration', async (req: express.Request, res: express.Response) => {
 
 	// TODO - get access token from headers
-	const { accessToken } = req.query;
+	const accessToken: any = req.headers.accesstoken; // eslint-disable-line
 
 	if (!accessToken) {
 		return res.status(400).json({ message: 'No user token provided' });
 	}
 
-	// TODO - use cognito to user data and confirm user is valid
-	return res.status(404).json({ message: 'User ID not found' });
+	const userSession = await getUserSession(accessToken);
+	const webUserId: string = userSession.Username;
 
-	// TODO - get user configuration from database
-	// return loadInvestmentConfig(userId);
+	if (!webUserId) {
+		return res.status(400).json({ message: userSession.message || 'Authentication error' });
+	}
+
+	const discordId: string = userDiscordMap[webUserId];
+
+	// temp - all users should have a discord ID, error if not found
+	if (!discordId) {
+		return res.status(400).json({ message: 'User ID not found' });
+	}
+
+	try {
+		const userConfiguration: UserConfiguration = await loadInvestmentConfig(discordId);
+		return res.json(userConfiguration);
+	} catch (err) {
+		return res.status(500).json({ message: `Error loading user config: ${err.message}` });
+	}
+
 });
+
 
 module.exports.webController = serverless(app);

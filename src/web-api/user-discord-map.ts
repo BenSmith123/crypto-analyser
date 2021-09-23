@@ -1,9 +1,12 @@
 
-// temporarily map v3 users from discord to their new web user accounts
-const DisordUserMap: Record<string, string> = {
-	discordId: '409274228794458113', // my ID
-};
+// temporarily hardcode a map of v3 users from discord to their new web user accounts
+interface DisordUserMap {
+	[key: string]: string;
+}
 
+
+// key: web user ID
+// value: discord user ID
 module.exports = {
-	DisordUserMap,
+	86511737: '409274228794458113', // my ID
 };
