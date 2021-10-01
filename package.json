@@ -13,7 +13,7 @@
     "configure": "sh scripts/configureEnvironment.sh"
   },
   "dependencies": {
-    "axios": "^0.21.1",
+    "axios": "^0.22.0",
     "crypto-js": "^4.1.1",
     "dotenv": "^10.0.0",
     "moment-timezone": "^0.5.33",
