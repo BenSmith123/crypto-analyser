@@ -3,5 +3,11 @@
     "editor.showUnused": true,
     "editor.codeActionsOnSave": {
         "source.fixAll.eslint": true
-    }
+    },
+    "shellLauncher.shells.windows": [
+        {
+            "shell": "D:\\Program Files\\Git\\git-bash.exe",
+            "label": "cmd"
+        },
+    ]
 }
