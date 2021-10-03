@@ -5,10 +5,19 @@ export interface UserConfiguration {
 	currenciesTargeted: string[],
 	records: {
 		[key: string]: { // key is crypto currency code e.g. BTC. CRO
-			sellPercentage: 5,
-			buyPercentage: -5,
-			warningPercentage: null | number,
-			stopLossPercentage: null | number,
+			lastSellPrice?: number,
+			lastBuyPrice?: number,
+            orderDate: string,
+            timestamp: number,
+			isHolding?: boolean,
+            forceSell?: boolean,
+			forceBuy?: boolean,
+			thresholds: {
+				sellPercentage: number,
+				buyPercentage: number,
+				warningPercentage?: null | number,
+				stopLossPercentage?: null | number,
+			}
 		}
 	}
 	options: {

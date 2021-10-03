@@ -8,7 +8,7 @@ export default async (AccessToken: string): Promise<Record<string, string>> => {
 	try {
 		return await cognito.getUser({ AccessToken }).promise();
 	} catch (err) {
-		console.error(err); // TODO?
-		return err;
+		console.error(err);
+		return null; // swallow error and respond with generic 400
 	}
 };

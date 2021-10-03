@@ -61,7 +61,7 @@ app.get('/user/configuration', async (req: express.Request, res: express.Respons
 	}
 
 	const userSession = await getUserSession(accessToken);
-	const webUserId: string = userSession.Username;
+	const webUserId: string = userSession?.Username;
 
 	if (!webUserId) {
 		return res.status(400).json({ message: userSession.message || 'Authentication error' });
@@ -94,7 +94,7 @@ app.post('/user/configuration', async (req: express.Request, res: express.Respon
 	}
 
 	const userSession = await getUserSession(accessToken);
-	const webUserId: string = userSession.Username;
+	const webUserId: string = userSession?.Username;
 
 	if (!webUserId) {
 		return res.status(400).json({ message: userSession.message || 'Authentication error' });
