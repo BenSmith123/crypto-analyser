@@ -168,7 +168,9 @@ async function updateInvestmentConfig(config) {
 
 	investmentConfigIsValid(config);
 
-	return dynamoClient.put(params).promise(params);
+	await dynamoClient.put(params).promise(params);
+
+	return config;
 }
 
 

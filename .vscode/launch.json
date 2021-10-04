@@ -1,6 +1,6 @@
 {
-    "version": "0.2.0",
-    "configurations": [
+	"version": "0.2.0",
+	"configurations": [
 		{
 			"name": "Run analyser bot",
 			"type": "node",
@@ -13,7 +13,20 @@
 				"USER_ID": "409274228794458113",
 				"DISCORD_ENABLED": "false",
 				"CONSOLE_LOG": "true"
-            }
+			}
+		},
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "Run web-api server",
+			"program": "${workspaceFolder}/run/local-server-web-api.js",
+			"preLaunchTask": "tsc: build - tsconfig.json",
+			"outFiles": [
+				"${workspaceFolder}/dist/**/*.js"
+			],
+			"env": {
+				"AWS_PROFILE": "bensmith",
+			}
 		},
 		{
 			"name": "Run discord (from Discord)",
@@ -24,7 +37,7 @@
 			"env": {
 				"AWS_PROFILE": "bensmith",
 				"BYPASS_VALIDATION": "true"
-            }
+			}
 		},
 		{
 			"name": "Run discord (from HTTP)",
@@ -34,7 +47,7 @@
 			"internalConsoleOptions": "openOnSessionStart",
 			"env": {
 				"AWS_PROFILE": "bensmith",
-            }
+			}
 		},
 		{
 			"name": "Local analyse",
@@ -47,7 +60,7 @@
 				"DISCORD_ENABLED": "false",
 				"TRANSACTIONS_ENABLED": "false", // buy/sell functions are already replaced but disable just in case!
 				"USER_ID": "409274228794458113"
-            }
+			}
 		},
 		{
 			"name": "Node selected",
@@ -59,20 +72,20 @@
 			}
 		},
 		{
-            "type": "node",
-            "request": "launch",
-            "name": "Mocha run tests",
-            "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
-            "args": [
-                "--no-timeout",
-                "--colors",
-                "${workspaceFolder}/tests/main.spec.js"
-            ],
-            "env": {
-                "AWS_PROFILE": "bensmith",
+			"type": "node",
+			"request": "launch",
+			"name": "Mocha run tests",
+			"program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+			"args": [
+				"--no-timeout",
+				"--colors",
+				"${workspaceFolder}/tests/main.spec.js"
+			],
+			"env": {
+				"AWS_PROFILE": "bensmith",
 				"TRANSACTIONS_ENABLED": "false",
 				"USER_ID": "409274228794458113"
-            }
-        },
-    ]
+			}
+		},
+	]
 }
