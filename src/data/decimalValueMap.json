@@ -18,10 +18,22 @@
         "quantity_decimals": 1
     },
     {
+        "instrument_name": "AGLD_USDT",
+        "base_currency": "AGLD",
+        "price_decimals": 4,
+        "quantity_decimals": 2
+    },
+    {
         "instrument_name": "ALGO_USDT",
         "base_currency": "ALGO",
         "price_decimals": 4,
         "quantity_decimals": 2
+    },
+    {
+        "instrument_name": "ALICE_USDT",
+        "base_currency": "ALICE",
+        "price_decimals": 3,
+        "quantity_decimals": 3
     },
     {
         "instrument_name": "AMP_USDT",
@@ -132,6 +144,12 @@
         "quantity_decimals": 5
     },
     {
+        "instrument_name": "CQT_USDT",
+        "base_currency": "CQT",
+        "price_decimals": 4,
+        "quantity_decimals": 2
+    },
+    {
         "instrument_name": "CRO_USDT",
         "base_currency": "CRO",
         "price_decimals": 5,
@@ -156,6 +174,12 @@
         "quantity_decimals": 3
     },
     {
+        "instrument_name": "DERC_USDT",
+        "base_currency": "DERC",
+        "price_decimals": 4,
+        "quantity_decimals": 2
+    },
+    {
         "instrument_name": "DOGE_USDT",
         "base_currency": "DOGE",
         "price_decimals": 5,
@@ -166,6 +190,18 @@
         "base_currency": "DOT",
         "price_decimals": 4,
         "quantity_decimals": 3
+    },
+    {
+        "instrument_name": "DYDX_USDT",
+        "base_currency": "DYDX",
+        "price_decimals": 3,
+        "quantity_decimals": 3
+    },
+    {
+        "instrument_name": "EFI_USDT",
+        "base_currency": "EFI",
+        "price_decimals": 4,
+        "quantity_decimals": 2
     },
     {
         "instrument_name": "EGLD_USDT",
@@ -222,6 +258,12 @@
         "quantity_decimals": 3
     },
     {
+        "instrument_name": "FTM_USDT",
+        "base_currency": "FTM",
+        "price_decimals": 4,
+        "quantity_decimals": 2
+    },
+    {
         "instrument_name": "GRT_USDT",
         "base_currency": "GRT",
         "price_decimals": 5,
@@ -234,10 +276,22 @@
         "quantity_decimals": 3
     },
     {
+        "instrument_name": "HNT_USDT",
+        "base_currency": "HNT",
+        "price_decimals": 3,
+        "quantity_decimals": 3
+    },
+    {
         "instrument_name": "HOT_USDT",
         "base_currency": "HOT",
         "price_decimals": 6,
         "quantity_decimals": 0
+    },
+    {
+        "instrument_name": "ICP_USDT",
+        "base_currency": "ICP",
+        "price_decimals": 3,
+        "quantity_decimals": 3
     },
     {
         "instrument_name": "ICX_USDT",
@@ -309,6 +363,12 @@
         "instrument_name": "MANA_USDT",
         "base_currency": "MANA",
         "price_decimals": 5,
+        "quantity_decimals": 2
+    },
+    {
+        "instrument_name": "MASK_USDT",
+        "base_currency": "MASK",
+        "price_decimals": 4,
         "quantity_decimals": 2
     },
     {
@@ -396,9 +456,27 @@
         "quantity_decimals": 1
     },
     {
+        "instrument_name": "PLA_USDT",
+        "base_currency": "PLA",
+        "price_decimals": 5,
+        "quantity_decimals": 1
+    },
+    {
+        "instrument_name": "QNT_USDT",
+        "base_currency": "QNT",
+        "price_decimals": 2,
+        "quantity_decimals": 4
+    },
+    {
         "instrument_name": "QTUM_USDT",
         "base_currency": "QTUM",
         "price_decimals": 4,
+        "quantity_decimals": 4
+    },
+    {
+        "instrument_name": "QUICK_USDT",
+        "base_currency": "QUICK",
+        "price_decimals": 2,
         "quantity_decimals": 4
     },
     {
@@ -430,6 +508,12 @@
         "base_currency": "RSR",
         "price_decimals": 5,
         "quantity_decimals": 1
+    },
+    {
+        "instrument_name": "RUNE_USDT",
+        "base_currency": "RUNE",
+        "price_decimals": 3,
+        "quantity_decimals": 3
     },
     {
         "instrument_name": "SAND_USDT",
@@ -574,6 +658,12 @@
         "base_currency": "YFI",
         "price_decimals": 2,
         "quantity_decimals": 6
+    },
+    {
+        "instrument_name": "YGG_USDT",
+        "base_currency": "YGG",
+        "price_decimals": 4,
+        "quantity_decimals": 2
     },
     {
         "instrument_name": "ZIL_USDT",

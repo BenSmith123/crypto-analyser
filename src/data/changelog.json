@@ -163,6 +163,13 @@
 				"Fix bot crashing when crypto API doesn't respond with transaction details",
 				"Added error message log in error scenarios"
             ]
+        },
+        {
+            "version": "3.4.0",
+            "changes": [
+				"Added support for pausing individual crypto currencies without pausing the whole bot",
+				"Added 15 new crypto currencies (AGLD, ALICE, CQT, DERC, DYDX, EFI, FTM, HNT, ICP, MASK, PLA, QNT, QUICK, RUNE, YGG)"
+            ]
         }
     ]
 }
