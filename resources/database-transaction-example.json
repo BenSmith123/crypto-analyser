@@ -1,0 +1,39 @@
+{
+	"orderId": "1000215125125",
+	"order_info": {
+		"side": "BUY",
+		"cumulative_quantity": 7.58,
+		"quantity": 0,
+		"create_time": 1623885334522,
+		"fee_currency": "MATIC",
+		"avg_price": 1.44946,
+		"exec_inst": "",
+		"client_oid": "1000235235",
+		"type": "MARKET",
+		"update_time": 1623885334524,
+		"time_in_force": "GOOD_TILL_CANCEL",
+		"instrument_name": "MATIC_USDT",
+		"price": 0,
+		"cumulative_value": 10.9869068,
+		"order_id": "1000215125125",
+		"status": "FILLED"
+	},
+	"trade_list": [
+		{
+			"liquidity_indicator": "TAKER",
+			"side": "BUY",
+			"trade_id": "1545132420411231650",
+			"create_time": 1623885334524,
+			"instrument_name": "MATIC_USDT",
+			"fee": 0.03032,
+			"fee_currency": "MATIC",
+			"traded_quantity": 7.58,
+			"client_oid": "1000235235",
+			"traded_price": 1.44946,
+			"order_id": "1000215125125"
+		}
+	],
+	"status": "FILLED",
+	"timestamp": 1623885334522,
+	"user": "1000235235"
+}
