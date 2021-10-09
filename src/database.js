@@ -63,6 +63,33 @@ async function getTransaction(orderId) {
 
 
 /**
+ *
+ * @param {string} userId
+ * @returns
+ */
+async function getTransactions(userId) {
+
+	if (!userId) { throw new Error('No userId provided'); }
+
+	const params = {
+		TableName: DATABASE_TABLES.transactions,
+		IndexName: 'user-index',
+		KeyConditionExpression: '#user = :userId',
+		ExpressionAttributeValues: {
+			':userId': userId,
+		},
+		ExpressionAttributeNames: {
+			'#user': 'user',
+		},
+	};
+
+	const result = await dynamoClient.query(params).promise();
+
+	return result.Items;
+}
+
+
+/**
  * Returns true if the database investment state data is valid
  */
 function investmentConfigIsValid(data) {
@@ -210,6 +237,7 @@ function formatTransaction(transaction) {
 module.exports = {
 	loadInvestmentConfig,
 	getTransaction,
+	getTransactions,
 	investmentConfigIsValid,
 	updateConfigRecord,
 	updateInvestmentConfig,

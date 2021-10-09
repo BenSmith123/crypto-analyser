@@ -51,6 +51,12 @@ app.get('/available-crypto', (req: express.Request, res: express.Response) => {
 	return res.json(supportedCurrencies);
 });
 
+app.get('/user/transactions', (req: express.Request, res: express.Response) => {
+	const transactions = require('../data/transactions.json'); // eslint-disable-line global-require
+	// TODO
+	return res.json(transactions);
+});
+
 
 app.get('/user/configuration', async (req: express.Request, res: express.Response) => {
 
