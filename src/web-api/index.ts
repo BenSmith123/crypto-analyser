@@ -8,8 +8,10 @@
  * Note: the above API is cross-origin restricted to cryptobot.nz
  */
 
+/* eslint-disable global-require */
 
 import * as express from 'express';
+import { getTransactions } from '../database';
 import { UserConfiguration } from './types';
 import getUserSession from './user';
 
@@ -35,25 +37,42 @@ app.get('/', (req: express.Request, res: express.Response) => res.send('Hello Wo
 
 
 app.get('/changelog', (req: express.Request, res: express.Response) => {
-	const changelog = require('../data/changelog.json'); // eslint-disable-line global-require
+	const changelog = require('../data/changelog.json');
 	return res.json(changelog);
 });
 
 
 app.get('/commands', (req: express.Request, res: express.Response) => {
-	const commands = require('../data/discordCommands.json'); // eslint-disable-line global-require
+	const commands = require('../data/discordCommands.json');
 	return res.json(commands);
 });
 
 
-app.get('/available-crypto', (req: express.Request, res: express.Response) => {
-	const supportedCurrencies = require('../data/decimalValueMap.json'); // eslint-disable-line global-require
+app.get('/currencies', (req: express.Request, res: express.Response) => {
+	const supportedCurrencies = require('../data/decimalValueMap.json');
 	return res.json(supportedCurrencies);
 });
 
-app.get('/user/transactions', (req: express.Request, res: express.Response) => {
-	const transactions = require('../data/transactions.json'); // eslint-disable-line global-require
-	// TODO
+app.get('/user/transactions', async (req: express.Request, res: express.Response) => {
+
+	const accessToken: any = req.headers.accesstoken; // eslint-disable-line
+	const allItems: boolean = req.headers.allItems === 'true';
+
+	if (!accessToken) {
+		return res.status(400).json({ message: 'No user token provided' });
+	}
+
+	const userSession = await getUserSession(accessToken);
+	const webUserId: string = userSession?.Username;
+
+	if (!webUserId) {
+		return res.status(400).json({ message: userSession.message || 'Authentication error' });
+	}
+
+	const discordId: string = userDiscordMap[webUserId];
+
+	const transactions = await getTransactions(discordId || webUserId, allItems);
+
 	return res.json(transactions);
 });
 
@@ -75,13 +94,8 @@ app.get('/user/configuration', async (req: express.Request, res: express.Respons
 
 	const discordId: string = userDiscordMap[webUserId];
 
-	// temp - all users should have a discord ID, error if not found
-	if (!discordId) {
-		return res.status(400).json({ message: 'User ID not found' });
-	}
-
 	try {
-		const userConfiguration: UserConfiguration = await loadInvestmentConfig(discordId);
+		const userConfiguration: UserConfiguration = await loadInvestmentConfig(discordId || webUserId);
 		return res.json(userConfiguration);
 	} catch (err) {
 		return res.status(500).json({ message: `Error loading user config: ${err.message}` });
@@ -108,9 +122,10 @@ app.post('/user/configuration', async (req: express.Request, res: express.Respon
 
 	const discordId: string = userDiscordMap[webUserId];
 
-	// temp - all users should have a discord ID, error if not found
-	if (!discordId) {
-		return res.status(400).json({ message: 'User ID not found' });
+	// if no discord ID, check that the web ID in the token matches the ID in config
+	if (!discordId && webUserId !== updatedConfig.id) {
+		// this avoids user configs being overwritten by another user
+		return res.status(400).json({ message: 'Authentication error - ID mismatch' });
 	}
 
 	try {

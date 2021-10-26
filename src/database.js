@@ -63,17 +63,19 @@ async function getTransaction(orderId) {
 
 
 /**
+ * Returns database transactions in time ascending order
  *
  * @param {string} userId
+ * @param {boolean} [allItems=false] - number of database items to return (default 10)
  * @returns
  */
-async function getTransactions(userId) {
+async function getTransactions(userId, allItems = false) {
 
 	if (!userId) { throw new Error('No userId provided'); }
 
 	const params = {
 		TableName: DATABASE_TABLES.transactions,
-		IndexName: 'user-index',
+		IndexName: 'user-timestamp-index',
 		KeyConditionExpression: '#user = :userId',
 		ExpressionAttributeValues: {
 			':userId': userId,
@@ -81,7 +83,12 @@ async function getTransactions(userId) {
 		ExpressionAttributeNames: {
 			'#user': 'user',
 		},
+		ScanIndexForward: false,
 	};
+
+	if (!allItems) {
+		params.Limit = 10;
+	}
 
 	const result = await dynamoClient.query(params).promise();
 
