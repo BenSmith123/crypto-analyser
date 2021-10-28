@@ -67,7 +67,7 @@ async function getTransaction(orderId) {
  *
  * @param {string} userId
  * @param {boolean} [allItems=false] - number of database items to return (default 10)
- * @returns
+ * @returns {array}
  */
 async function getTransactions(userId, allItems = false) {
 
@@ -92,7 +92,7 @@ async function getTransactions(userId, allItems = false) {
 
 	const result = await dynamoClient.query(params).promise();
 
-	return result.Items;
+	return result.Items || [];
 }
 
 

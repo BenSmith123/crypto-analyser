@@ -73,7 +73,7 @@ app.get('/user/transactions', async (req: express.Request, res: express.Response
 
 	const transactions = await getTransactions(discordId || webUserId, allItems);
 
-	return res.json(transactions);
+	return res.json({ transactions });
 });
 
 
