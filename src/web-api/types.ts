@@ -58,7 +58,7 @@ export interface Transaction {
             side: 'SELL' | 'BUY',
             trade_id: string,
             create_time: number,
-            instrument_name: 'SUSHI_USDT',
+            instrument_name: string, // e.g. SUSHI_USDT,
             fee: number,
             fee_currency: string,
 			traded_quantity: number,

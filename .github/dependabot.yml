@@ -9,5 +9,5 @@ updates:
     target-branch: "master"
     schedule:
       interval: "monthly"
-    reviewers:
-      - "BenSmith123"
+    # reviewers:
+    #   - "BenSmith123"
