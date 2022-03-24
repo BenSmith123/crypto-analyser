@@ -65,8 +65,11 @@ access to any users Crypto.com accounts.
 - `npm test`
 	- Mocha run all tests
 
-- `update-currency-map`
+- `npm run update-currency-map`
 	- See `scripts/updateDecimalValueMap.js` description
+
+- `npm run analyse-transactions`
+	- Gets all transactions from the database and generates a summary `transactions-summary.json` file
 
 - `npm run deploy` 
 	- Copies the package.json and src/ files into a temp `/dist` folder

@@ -7,6 +7,7 @@
     "start": "AWS_PROFILE=bensmith node src/index.js",
     "test": "TRANSACTIONS_ENABLED=false USER_ID=409274228794458113 mocha ./tests/*.spec.* --no-timeouts",
     "update-currency-map": "node scripts/updateDecimalValueMap.js",
+    "analyse-transactions": "node scripts/analyse-transactions.js",
     "deploy": "sh scripts/zip.sh && sh scripts/deploy.sh && sh scripts/cleanup.sh",
     "deploy-all": "sh scripts/zip.sh && sh scripts/deploy-all.sh && sh scripts/cleanup.sh",
     "deploy-discord": "sh scripts/zip.sh && sh scripts/deploy-discord.sh && sh scripts/cleanup.sh",
