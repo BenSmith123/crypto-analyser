@@ -170,6 +170,12 @@
 				"Added support for pausing individual crypto currencies without pausing the whole bot",
 				"Added 15 new crypto currencies (AGLD, ALICE, CQT, DERC, DYDX, EFI, FTM, HNT, ICP, MASK, PLA, QNT, QUICK, RUNE, YGG)"
             ]
+        },
+        {
+            "version": "3.4.1",
+            "changes": [
+				"Added 60 new crypto currencies!"
+            ]
         }
     ]
 }
